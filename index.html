@@ -24,7 +24,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v16.0 (Searchable Form)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v17.0 (Date Range Filter)</div>
     </aside>
 
     <!-- Main Area -->
@@ -44,7 +44,7 @@
       <main class="p-6 space-y-6">
         <!-- TAB 1: DASHBOARD -->
         <section id="tab-dashboard" class="space-y-6">
-          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Filter Region</label>
               <select id="regionFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
@@ -56,7 +56,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Search Employee</label>
-              <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="Type ID or Name (e.g. 245)..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+              <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Item Category</label>
@@ -64,8 +64,16 @@
                 <option value="ALL">All Categories</option>
               </select>
             </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">From Date</label>
+              <input type="date" id="startDateFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">To Date</label>
+              <input type="date" id="endDateFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+            </div>
             <div class="flex items-end">
-              <button onclick="exportDashboardCSV()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export Dashboard CSV</button>
+              <button onclick="exportDashboardCSV()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export CSV</button>
             </div>
           </div>
 
@@ -90,7 +98,7 @@
             <div class="p-5 border-b border-slate-200 bg-slate-900 text-white flex justify-between items-center">
               <div>
                 <h3 class="font-bold text-base">📦 Items Summary Report <span id="summaryReportTitle" class="text-sky-400 text-xs font-normal ml-2">(Overall Summary)</span></h3>
-                <p class="text-xs text-slate-400 mt-0.5">Quantity breakdown per item (updates automatically when employee is searched)</p>
+                <p class="text-xs text-slate-400 mt-0.5">Quantity breakdown per item (filtered by date range & employee)</p>
               </div>
             </div>
             <div class="overflow-x-auto max-h-96">
@@ -267,6 +275,21 @@
       return "Center 1";
     }
 
+    function getRowDate(row) {
+      for (let cell of row) {
+        if (!cell) continue;
+        let str = cell.toString().trim();
+        let d = new Date(str);
+        if (!isNaN(d.getTime()) && str.length >= 8 && (str.includes('-') || str.includes('/'))) {
+          let year = d.getFullYear();
+          let month = String(d.getMonth() + 1).padStart(2, '0');
+          let day = String(d.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        }
+      }
+      return "";
+    }
+
     async function loadData() {
       const statusEl = document.getElementById('syncStatus');
       statusEl.innerText = "Syncing...";
@@ -414,6 +437,8 @@
       const selectedRegion = document.getElementById('regionFilter').value;
       const search = document.getElementById('empSearch').value.toLowerCase().trim();
       const catFilter = document.getElementById('catFilter').value;
+      const startDate = document.getElementById('startDateFilter').value;
+      const endDate = document.getElementById('endDateFilter').value;
 
       let itemTotals = {};
       categories.forEach(cat => { itemTotals[cat] = { issued: 0, used: 0 }; });
@@ -424,11 +449,16 @@
         categories.forEach(cat => { summary[id].items[cat] = { issued: 0, used: 0 }; });
       });
 
-      // 1. Process Issued Sheet
+      // 1. Process Issued Sheet (with Date Range Filter)
       if (rawIssued.length > 1) {
         let h = rawIssued[0];
         for (let i = 1; i < rawIssued.length; i++) {
           let r = rawIssued[i];
+          
+          let rowDate = getRowDate(r);
+          if (startDate && rowDate && rowDate < startDate) continue;
+          if (endDate && rowDate && rowDate > endDate) continue;
+
           let id = "";
           for (let col = 0; col < r.length; col++) {
             let val = r[col] ? r[col].toString().trim() : "";
@@ -459,11 +489,16 @@
         }
       }
 
-      // 2. Process Consumed Sheet
+      // 2. Process Consumed Sheet (with Date Range Filter)
       if (rawConsumed.length > 1) {
         let h = rawConsumed[0];
         for (let i = 1; i < rawConsumed.length; i++) {
           let r = rawConsumed[i];
+
+          let rowDate = getRowDate(r);
+          if (startDate && rowDate && rowDate < startDate) continue;
+          if (endDate && rowDate && rowDate > endDate) continue;
+
           let id = "";
           for (let col = 0; col < r.length; col++) {
             let val = r[col] ? r[col].toString().trim() : "";
@@ -610,10 +645,13 @@
       let dateStr = now.toLocaleDateString();
       let timeStr = now.toLocaleTimeString();
       let searchVal = document.getElementById('empSearch').value.trim();
+      let startDate = document.getElementById('startDateFilter').value;
+      let endDate = document.getElementById('endDateFilter').value;
 
       let csv = [];
       csv.push(`"FieldHub ERP - Inventory Report"`);
       csv.push(`"Report Date & Time","${dateStr} ${timeStr}"`);
+      csv.push(`"Date Range","${startDate || 'Start'} to ${endDate || 'End'}"`);
       
       if (searchVal && lastMatchingEmployees.length > 0) {
         csv.push(`"Employee ID(s)","${lastMatchingEmployees.map(e => e.id).join(', ')}"`);
