@@ -34,7 +34,7 @@
         </nav>
       </div>
       <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-        Office Management System v2.2
+        Office Management System v2.3
       </div>
     </aside>
 
@@ -48,7 +48,6 @@
           <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting to Google Sheet...</p>
         </div>
         <div class="flex items-center gap-3">
-          <!-- Staff Form Button -->
           <button onclick="openStaffModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
             📝 Open Staff Entry Form
           </button>
@@ -68,9 +67,8 @@
       <!-- Content Body -->
       <main class="p-6">
 
-        <!-- TAB 1: DASHBOARD / RECONCILIATION -->
+        <!-- TAB 1: DASHBOARD -->
         <section id="tab-dashboard" class="space-y-6">
-          <!-- Filters Bar -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Period</label>
@@ -140,7 +138,7 @@
           </div>
         </section>
 
-        <!-- TAB 2: STOCK ISSUED LOG -->
+        <!-- TAB 2: STOCK ISSUED -->
         <section id="tab-issued" class="hidden space-y-6">
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden p-6">
             <h3 class="font-bold text-slate-800 text-lg mb-4">Raw Stock Issued Records</h3>
@@ -148,7 +146,7 @@
           </div>
         </section>
 
-        <!-- TAB 3: DAILY CONSUMPTION LOG -->
+        <!-- TAB 3: DAILY CONSUMPTION -->
         <section id="tab-consumption" class="hidden space-y-6">
           <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden p-6">
             <h3 class="font-bold text-slate-800 text-lg mb-4">Daily Consumption Records</h3>
@@ -216,24 +214,33 @@
 
     function switchTab(tab) {
       ['dashboard', 'issued', 'consumption'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
-        document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition";
-        document.getElementById(`m-nav-${t}`).className = "flex-1 py-2 text-xs font-bold rounded-lg text-slate-300";
+        const tabEl = document.getElementById(`tab-${t}`);
+        const navEl = document.getElementById(`nav-${t}`);
+        const mNavEl = document.getElementById(`m-nav-${t}`);
+        if (tabEl) tabEl.classList.add('hidden');
+        if (navEl) navEl.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition";
+        if (mNavEl) mNavEl.className = "flex-1 py-2 text-xs font-bold rounded-lg text-slate-300";
       });
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      document.getElementById(`nav-${tab}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition";
-      document.getElementById(`m-nav-${tab}`).className = "flex-1 py-2 text-xs font-bold rounded-lg bg-sky-600 text-white";
+      const activeTab = document.getElementById(`tab-${tab}`);
+      const activeNav = document.getElementById(`nav-${tab}`);
+      const activeMNav = document.getElementById(`m-nav-${tab}`);
+      if (activeTab) activeTab.classList.remove('hidden');
+      if (activeNav) activeNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition";
+      if (activeMNav) activeMNav.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-sky-600 text-white";
       
       const titles = { dashboard: "Dashboard Overview", issued: "Stock Issued Records", consumption: "Daily Consumption Records" };
-      document.getElementById('pageTitle').innerText = titles[tab];
+      const titleEl = document.getElementById('pageTitle');
+      if (titleEl) titleEl.innerText = titles[tab];
     }
 
     async function loadData() {
       const statusEl = document.getElementById('syncStatus');
       const btn = document.getElementById('refreshBtn');
-      statusEl.innerText = "Syncing with Google Sheet...";
-      statusEl.className = "text-xs text-amber-600 font-medium mt-0.5";
-      btn.disabled = true;
+      if (statusEl) {
+        statusEl.innerText = "Syncing with Google Sheet...";
+        statusEl.className = "text-xs text-amber-600 font-medium mt-0.5";
+      }
+      if (btn) btn.disabled = true;
 
       try {
         const res = await fetch(SCRIPT_URL, { method: "GET", redirect: "follow" });
@@ -249,21 +256,23 @@
           itemHeaders = categories;
           
           const catSel = document.getElementById('catFilter');
-          catSel.innerHTML = '<option value="ALL">All Categories</option>';
-          categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+          if (catSel) {
+            catSel.innerHTML = '<option value="ALL">All Categories</option>';
+            categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+          }
 
-          // Populate Modal Items
           const container = document.getElementById('modalItemsContainer');
-          container.innerHTML = "";
-          itemHeaders.forEach(item => {
-            container.innerHTML += `
-              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                <label class="block text-xs font-bold text-slate-700 mb-1">${item}</label>
-                <input type="number" min="0" value="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';" class="modal-item-input w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-sky-500 focus:outline-none" data-item="${item}">
-              </div>`;
-          });
+          if (container) {
+            container.innerHTML = "";
+            itemHeaders.forEach(item => {
+              container.innerHTML += `
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                  <label class="block text-xs font-bold text-slate-700 mb-1">${item}</label>
+                  <input type="number" min="0" value="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';" class="modal-item-input w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-sky-500 focus:outline-none" data-item="${item}">
+                </div>`;
+            });
+          }
 
-          // Populate Employees
           empMap = {};
           for (let i = 1; i < rawIssued.length; i++) {
             let id = rawIssued[i][1] ? rawIssued[i][1].toString().trim() : "";
@@ -272,44 +281,55 @@
           }
 
           const select = document.getElementById('modalEmpSelect');
-          select.innerHTML = '<option value="">-- Choose ID --</option>';
-          Object.keys(empMap).sort().forEach(id => {
-            select.innerHTML += `<option value="${id}">${id} - ${empMap[id]}</option>`;
-          });
+          if (select) {
+            select.innerHTML = '<option value="">-- Choose ID --</option>';
+            Object.keys(empMap).sort().forEach(id => {
+              select.innerHTML += `<option value="${id}">${id} - ${empMap[id]}</option>`;
+            });
+          }
         }
 
         renderDashboard();
         renderRawTables();
-        statusEl.innerText = "Live Connected • Last updated: " + new Date().toLocaleTimeString();
-        statusEl.className = "text-xs text-emerald-600 font-medium mt-0.5";
+        if (statusEl) {
+          statusEl.innerText = "Live Connected • Last updated: " + new Date().toLocaleTimeString();
+          statusEl.className = "text-xs text-emerald-600 font-medium mt-0.5";
+        }
       } catch (e) {
         console.error(e);
-        statusEl.innerText = "Connection Failed! Check Apps Script access.";
-        statusEl.className = "text-xs text-rose-600 font-bold mt-0.5";
+        if (statusEl) {
+          statusEl.innerText = "Connection Failed! Check Apps Script access.";
+          statusEl.className = "text-xs text-rose-600 font-bold mt-0.5";
+        }
       } finally {
-        btn.disabled = false;
+        if (btn) btn.disabled = false;
       }
     }
 
     function openStaffModal() {
-      document.getElementById('staffModal').classList.remove('hidden');
+      const modal = document.getElementById('staffModal');
+      if (modal) modal.classList.remove('hidden');
     }
 
     function closeStaffModal() {
-      document.getElementById('staffModal').classList.add('hidden');
+      const modal = document.getElementById('staffModal');
+      if (modal) modal.classList.add('hidden');
     }
 
     function fillModalName() {
-      const id = document.getElementById('modalEmpSelect').value;
-      document.getElementById('modalEmpName').value = empMap[id] || "";
+      const idEl = document.getElementById('modalEmpSelect');
+      const nameEl = document.getElementById('modalEmpName');
+      if (idEl && nameEl) {
+        nameEl.value = empMap[idEl.value] || "";
+      }
     }
 
     async function submitModalData() {
-      const empId = document.getElementById('modalEmpSelect').value;
-      const empName = document.getElementById('modalEmpName').value;
-      const date = document.getElementById('modalDate').value;
+      const empIdEl = document.getElementById('modalEmpSelect');
+      const empNameEl = document.getElementById('modalEmpName');
+      const dateEl = document.getElementById('modalDate');
 
-      if (!date || !empId) {
+      if (!dateEl || !empIdEl || !dateEl.value || !empIdEl.value) {
         alert("براہ کرم تاریخ اور Employee ID منتخب کریں۔");
         return;
       }
@@ -320,47 +340,57 @@
       });
 
       const btn = document.getElementById('modalSubBtn');
-      btn.disabled = true;
-      btn.innerText = "⏳ Submitting...";
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = "⏳ Submitting...";
+      }
 
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ date, empId, empName, items })
+          body: JSON.stringify({ date: dateEl.value, empId: empIdEl.value, empName: empNameEl ? empNameEl.value : "", items })
         });
 
         const msgBox = document.getElementById('modalMsgBox');
-        msgBox.className = "p-3 rounded-xl text-center text-sm font-semibold bg-emerald-100 text-emerald-800 mt-2";
-        msgBox.innerText = "✅ رپورٹ کامیابی سے جمع ہو گئی!";
+        if (msgBox) {
+          msgBox.className = "p-3 rounded-xl text-center text-sm font-semibold bg-emerald-100 text-emerald-800 mt-2";
+          msgBox.innerText = "✅ رپورٹ کامیابی سے جمع ہو گئی!";
+          msgBox.classList.remove('hidden');
+        }
         
         setTimeout(() => {
           closeStaffModal();
-          msgBox.classList.add('hidden');
-          loadData(); // Refresh Dashboard
+          if (msgBox) msgBox.classList.add('hidden');
+          loadData();
         }, 1500);
 
         document.querySelectorAll('.modal-item-input').forEach(inp => inp.value = 0);
       } catch (err) {
         alert("ڈیٹا جمع کرانے میں مسئلہ ہوا۔");
       } finally {
-        btn.disabled = false;
-        btn.innerText = "✅ Submit Report";
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "✅ Submit Report";
+        }
       }
     }
 
     function renderDashboard() {
       const tbody = document.getElementById('erpTableBody');
+      if (!tbody) return;
+
       if (rawIssued.length < 2 && rawConsumed.length < 2) {
         tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No records found.</td></tr>`;
         return;
       }
 
       const headers = rawIssued.length > 0 ? rawIssued[0] : rawConsumed[0];
-      const period = document.getElementById('periodFilter').value;
-      const search = document.getElementById('empSearch').value.toLowerCase().trim();
-      const cat = document.getElementById('catFilter').value;
+      const searchEl = document.getElementById('empSearch');
+      const catEl = document.getElementById('catFilter');
+      const search = searchEl ? searchEl.value.toLowerCase().trim() : "";
+      const cat = catEl ? catEl.value : "ALL";
 
       let summary = {};
 
@@ -390,7 +420,8 @@
 
       let totIssued = 0, totUsed = 0;
       const empList = Object.values(summary);
-      document.getElementById('empCount').innerText = `${empList.length} Employees`;
+      const empCountEl = document.getElementById('empCount');
+      if (empCountEl) empCountEl.innerText = `${empList.length} Employees`;
       tbody.innerHTML = "";
 
       empList.forEach(emp => {
@@ -412,9 +443,12 @@
           </tr>`;
       });
 
-      document.getElementById('kpiIssued').innerText = totIssued;
-      document.getElementById('kpiUsed').innerText = totUsed;
-      document.getElementById('kpiBal').innerText = totIssued - totUsed;
+      const kpiIssued = document.getElementById('kpiIssued');
+      const kpiUsed = document.getElementById('kpiUsed');
+      const kpiBal = document.getElementById('kpiBal');
+      if (kpiIssued) kpiIssued.innerText = totIssued;
+      if (kpiUsed) kpiUsed.innerText = totUsed;
+      if (kpiBal) kpiBal.innerText = totIssued - totUsed;
     }
 
     function renderRawTables() {
@@ -430,8 +464,10 @@
         }
         return html + '</tbody></table>';
       };
-      document.getElementById('issuedRawBox').innerHTML = buildTable(rawIssued);
-      document.getElementById('consumptionRawBox').innerHTML = buildTable(rawConsumed);
+      const issuedBox = document.getElementById('issuedRawBox');
+      const consumedBox = document.getElementById('consumptionRawBox');
+      if (issuedBox) issuedBox.innerHTML = buildTable(rawIssued);
+      if (consumedBox) consumedBox.innerHTML = buildTable(rawConsumed);
     }
 
     function exportTable() {
