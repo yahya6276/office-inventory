@@ -3,10 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FieldHub ERP - Portal</title>
+  <title>HS ERP CLL - Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style> body { font-family: 'Inter', sans-serif; } </style>
+  <style> 
+    body { font-family: 'Inter', sans-serif; } 
+    .sidebar-bg {
+      background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.94)), url('https://raw.githubusercontent.com/yahya6276/office-inventory/main/1719942065190.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
@@ -14,7 +21,7 @@
   <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-200 space-y-6">
       <div class="text-center">
-        <h1 class="text-2xl font-black text-slate-900 tracking-wide">📦 FieldHub ERP</h1>
+        <h1 class="text-2xl font-black text-slate-900 tracking-wide">⚡ HS ERP CLL</h1>
         <p class="text-xs text-slate-500 mt-1">Employee & Admin Secure Login</p>
       </div>
       <div class="space-y-4">
@@ -35,27 +42,35 @@
   <!-- MAIN APP -->
   <div id="mainApp" class="hidden flex h-screen overflow-hidden">
     <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800">
+    <aside class="w-64 sidebar-bg text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800/80 shadow-xl">
       <div>
-        <div class="p-6 border-b border-slate-800">
-          <h1 class="text-xl font-bold text-white tracking-wide">📦 FieldHub ERP</h1>
-          <p class="text-xs text-slate-400 mt-1">Inventory Management System</p>
+        <div class="p-6 border-b border-slate-800/60 backdrop-blur-xs bg-slate-900/50">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-sky-600/30 border border-sky-400/30 flex items-center justify-center text-sky-400 font-black text-lg shadow-inner">⚡</div>
+            <div>
+              <h1 class="text-lg font-black text-white tracking-wider">HS ERP CLL</h1>
+              <p class="text-[10px] text-sky-400 font-semibold uppercase tracking-widest mt-0.5">Enterprise Portal</p>
+            </div>
+          </div>
         </div>
-        <nav class="p-4 space-y-1">
-          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition">📊 Admin Dashboard</button>
-          <button onclick="switchTab('demandroom')" id="nav-demandroom" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">🏢 Demand Room</button>
-          <button onclick="switchTab('issued')" id="nav-issued" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📤 Inventory Issued</button>
-          <button onclick="switchTab('consumption')" id="nav-consumption" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
+        <nav class="p-4 space-y-1.5">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition shadow-md shadow-sky-900/40">📊 Admin Dashboard</button>
+          <button onclick="switchTab('demandroom')" id="nav-demandroom" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">🏢 Demand Room</button>
+          <button onclick="switchTab('requests')" id="nav-requests" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">📋 Stock Requests</button>
+          <button onclick="switchTab('issued')" id="nav-issued" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">📤 Inventory Issued</button>
+          <button onclick="switchTab('consumption')" id="nav-consumption" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v25.0 (Date Filtered CSV)</div>
+      <div class="p-4 border-t border-slate-800/60 backdrop-blur-xs bg-slate-900/50 text-xs text-slate-400 font-medium text-center flex items-center justify-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v29.0 Pro
+      </div>
     </aside>
 
     <!-- Main Area -->
     <div class="flex-1 flex flex-col overflow-y-auto">
       <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-3 shadow-xs">
         <div>
-          <h2 id="pageTitle" class="text-xl font-bold text-slate-800">FieldHub Portal</h2>
+          <h2 id="pageTitle" class="text-xl font-bold text-slate-800">HS ERP Portal</h2>
           <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting...</p>
         </div>
         <div class="flex items-center gap-3">
@@ -204,6 +219,65 @@
           </div>
         </section>
 
+        <!-- TAB 1.6: STOCK REQUESTS MANAGEMENT -->
+        <section id="tab-requests" class="admin-only hidden space-y-6">
+          <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-5">
+            <div>
+              <h3 class="text-2xl font-black text-slate-900">Requests</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Manage stock requests submitted by employees.</p>
+            </div>
+
+            <!-- Search Bar -->
+            <div>
+              <input type="text" id="reqSearchInput" onkeyup="renderRequests()" placeholder="Search name, Employee ID, item or text..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+            </div>
+
+            <!-- Status Pills -->
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="setReqStatusFilter('ALL')" id="pill-ALL" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white transition shadow-xs">All <span id="count-ALL" class="ml-1 px-1.5 py-0.5 bg-slate-800 rounded-full">0</span></button>
+              <button onclick="setReqStatusFilter('Open')" id="pill-Open" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Open <span id="count-Open" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
+              <button onclick="setReqStatusFilter('In progress')" id="pill-In progress" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">In progress <span id="count-In progress" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
+              <button onclick="setReqStatusFilter('Resolved')" id="pill-Resolved" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Resolved <span id="count-Resolved" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
+              <button onclick="setReqStatusFilter('Closed')" id="pill-Closed" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Closed <span id="count-Closed" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
+              <button onclick="setReqStatusFilter('Cancelled')" id="pill-Cancelled" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Cancelled <span id="count-Cancelled" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
+            </div>
+
+            <!-- Filters Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 mb-1">Item / category</label>
+                <select id="reqFilterItem" onchange="renderRequests()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none">
+                  <option value="ALL">All items</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 mb-1">Handler</label>
+                <select id="reqFilterHandler" onchange="renderRequests()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none">
+                  <option value="ALL">All Handlers</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 mb-1">From date</label>
+                <input type="date" id="reqFilterStartDate" onchange="renderRequests()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-500 mb-1">To date</label>
+                <input type="date" id="reqFilterEndDate" onchange="renderRequests()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none">
+              </div>
+              <div class="flex items-end">
+                <button onclick="clearReqFilters()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-xs transition">Clear filters</button>
+              </div>
+            </div>
+
+            <div id="reqShowingCount" class="text-xs text-slate-500 font-medium pt-1">Showing 0 requests</div>
+          </div>
+
+          <!-- Requests List Container -->
+          <div id="requestsListContainer" class="space-y-4">
+            <!-- Dynamic Cards inserted here -->
+          </div>
+        </section>
+
         <!-- EMPLOYEE WELCOME -->
         <section id="employeeWelcome" class="hidden bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-4">
           <h2 id="welcomeEmpTitle" class="text-2xl font-black text-slate-900">خوش آمدید!</h2>
@@ -275,7 +349,7 @@
 
   <!-- ADD DEMAND ROOM STOCK MODAL -->
   <div id="demandModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
         <h3 class="font-bold text-lg">🏢 Add New Stock to Demand Room</h3>
         <button onclick="closeDemandModal()" class="text-white font-bold px-2 py-1">✕</button>
@@ -300,7 +374,7 @@
 
   <!-- ADMIN / OFFICE CONSUMPTION MODAL -->
   <div id="adminConsumptionModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
         <h3 class="font-bold text-lg">📤 Office / Admin Consumption Form</h3>
         <button onclick="closeAdminConsumptionModal()" class="text-white font-bold px-2 py-1">✕</button>
@@ -331,7 +405,7 @@
         <button onclick="closeStaffModal()" class="text-white font-bold px-2 py-1">✕</button>
       </div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-        <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="modalDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="modalDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="modalEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="modalEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="modalRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
@@ -350,7 +424,7 @@
         <button onclick="closeRequestModal()" class="text-white font-bold px-2 py-1">✕</button>
       </div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-        <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="reqDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="reqDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="reqEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="reqEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
@@ -375,11 +449,12 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby9owQXiG8eDYz6Glex01jRFnA6b8siDMt2_Q365-47o1DlsZXHFuIUytQqsxfFwjNhig/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwamzCz255yqYVqBmbzUbakBU9DPTL65OjfZVYxXwhaa-UtLQwH6NmAkaFCjCSUBXF0vA/exec";
     const ADMIN_PASSWORD = "admin123";
 
-    let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {};
+    let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {};
     let lastMatchingEmployees = [];
+    let currentReqStatusFilter = "ALL";
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
     const EXCLUDED_FIELD_ITEMS = ["SMALL BAG", "LARGE BAG", "ICE POUCH", "ICE PACK", "TONER 05A", "TONER 79", "OTHERS"];
 
@@ -466,7 +541,7 @@
         let empName = localStorage.getItem('logged_name') || '';
         let empId = localStorage.getItem('logged_id') || '';
         document.getElementById('welcomeEmpTitle').innerText = `خوش آمدید! ${empName} (${empId})`;
-        document.getElementById('pageTitle').innerText = `Employee Portal - ${empName}`;
+        document.getElementById('pageTitle').innerText = `HS ERP Portal - ${empName}`;
         loadData();
       }
     }
@@ -487,19 +562,19 @@
     }
 
     function switchTab(tab) {
-      ['dashboard', 'demandroom', 'issued', 'consumption'].forEach(t => {
+      ['dashboard', 'demandroom', 'requests', 'issued', 'consumption'].forEach(t => {
         let el = document.getElementById(`tab-${t}`);
         if(el) el.classList.add('hidden');
         let nav = document.getElementById(`nav-${t}`);
-        if(nav) nav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition";
+        if(nav) nav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition";
       });
       let targetTab = document.getElementById(`tab-${tab}`);
       if(targetTab) targetTab.classList.remove('hidden');
       let targetNav = document.getElementById(`nav-${tab}`);
-      if(targetNav) targetNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition";
+      if(targetNav) targetNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition shadow-md shadow-sky-900/40";
       
-      const titles = { dashboard: "Admin Dashboard", demandroom: "Demand Room Management", issued: "Office Inventory Issued Records", consumption: "Daily Consumption Records" };
-      document.getElementById('pageTitle').innerText = titles[tab] || "FieldHub Portal";
+      const titles = { dashboard: "Admin Dashboard", demandroom: "Demand Room Management", requests: "Stock Requests Management", issued: "Office Inventory Issued Records", consumption: "Daily Consumption Records" };
+      document.getElementById('pageTitle').innerText = titles[tab] || "HS ERP Portal";
     }
 
     function cleanRegion(r) {
@@ -538,6 +613,7 @@
         rawConsumed = data.consumed || [];
         rawDemand = data.demand || [];
         rawAdminConsumed = data.adminConsumed || [];
+        rawRequests = data.requests || [];
         allCategories = data.allItems || [];
 
         fieldCategories = allCategories.filter(item => !EXCLUDED_FIELD_ITEMS.includes(item.toUpperCase().trim()));
@@ -558,6 +634,24 @@
         if(catSel) {
           catSel.innerHTML = '<option value="ALL">All Categories</option>';
           allCategories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+        }
+
+        const reqCatSel = document.getElementById('reqFilterItem');
+        if(reqCatSel) {
+          reqCatSel.innerHTML = '<option value="ALL">All items</option>';
+          allCategories.forEach(c => reqCatSel.innerHTML += `<option value="${c}">${c}</option>`);
+        }
+
+        const reqHandlerSel = document.getElementById('reqFilterHandler');
+        if(reqHandlerSel) {
+          reqHandlerSel.innerHTML = '<option value="ALL">All Handlers</option>';
+          let handlers = new Set();
+          if (rawRequests.length > 1) {
+            for(let i=1; i<rawRequests.length; i++) {
+              if(rawRequests[i][8]) handlers.add(rawRequests[i][8].toString().trim());
+            }
+          }
+          handlers.forEach(h => reqHandlerSel.innerHTML += `<option value="${h}">${h}</option>`);
         }
 
         ['demandItemsContainer', 'adminConsItemsContainer'].forEach(containerId => {
@@ -589,6 +683,7 @@
         if(localStorage.getItem('erp_role') === 'admin') {
           renderDashboard();
           renderDemandRoom();
+          renderRequests();
           renderRawTables();
         }
         statusEl.innerText = "Connected • " + new Date().toLocaleTimeString();
@@ -695,14 +790,151 @@
       if (!date || !empId) { alert("تاریخ اور ایمپلائی آئی ڈی لازمی ہیں۔"); return; }
 
       let items = {};
-      document.querySelectorAll('.reqItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
+      let count = 0;
+      document.querySelectorAll('.reqItemsContainer-input').forEach(inp => {
+        let val = Number(inp.value) || 0;
+        if (val > 0) { items[inp.dataset.item] = val; count++; }
+      });
+
+      if (count === 0) { alert("براہ کرم کم از کم ایک آئٹم کی مقدار درج کریں۔"); return; }
 
       try {
         await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "request", date, region, empId, empName, items }) });
-        alert("✅ ریکویسٹ بھیج دی گئی!");
+        alert("✅ اسٹاک ریکویسٹ کامیابی سے بھیج دی گئی!");
         closeRequestModal();
         loadData();
       } catch (err) { alert("ایرر: " + err); }
+    }
+
+    // --- REQUESTS MANAGEMENT LOGIC ---
+    function setReqStatusFilter(status) {
+      currentReqStatusFilter = status;
+      ['ALL', 'Open', 'In progress', 'Resolved', 'Closed', 'Cancelled'].forEach(st => {
+        let btn = document.getElementById('pill-' + st);
+        if(!btn) return;
+        if(st === status) {
+          btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white transition shadow-xs";
+        } else {
+          btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
+        }
+      });
+      renderRequests();
+    }
+
+    function clearReqFilters() {
+      document.getElementById('reqSearchInput').value = "";
+      document.getElementById('reqFilterItem').value = "ALL";
+      document.getElementById('reqFilterHandler').value = "ALL";
+      document.getElementById('reqFilterStartDate').value = "";
+      document.getElementById('reqFilterEndDate').value = "";
+      setReqStatusFilter('ALL');
+    }
+
+    async function updateRequestStatus(reqId, newStatus) {
+      let adminName = localStorage.getItem('logged_name') || localStorage.getItem('logged_id') || "Admin";
+      try {
+        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "update_request_status", reqId, status: newStatus, handler: adminName }) });
+        alert("✅ ریکویسٹ اسٹیٹس اپ ڈیٹ ہو گیا!");
+        loadData();
+      } catch (e) {
+        alert("ایرر: " + e);
+      }
+    }
+
+    function renderRequests() {
+      const container = document.getElementById('requestsListContainer');
+      if(!container) return;
+
+      let counts = { ALL: 0, Open: 0, "In progress": 0, Resolved: 0, Closed: 0, Cancelled: 0 };
+      
+      let rows = rawRequests.slice(1); // skip header
+      counts.ALL = rows.length;
+      rows.forEach(r => {
+        let st = r[7] ? r[7].toString().trim() : "Open";
+        if (counts.hasOwnProperty(st)) counts[st]++;
+      });
+
+      Object.keys(counts).forEach(st => {
+        let badge = document.getElementById('count-' + st);
+        if(badge) badge.innerText = counts[st];
+      });
+
+      let search = document.getElementById('reqSearchInput').value.toLowerCase().trim();
+      let filterItem = document.getElementById('reqFilterItem').value;
+      let filterHandler = document.getElementById('reqFilterHandler').value;
+      let startDate = document.getElementById('reqFilterStartDate').value;
+      let endDate = document.getElementById('reqFilterEndDate').value;
+
+      let filtered = rows.filter(r => {
+        let reqId = r[0] ? r[0].toString() : "";
+        let date = getRowDate(r);
+        let region = r[2] ? r[2].toString() : "";
+        let empId = r[3] ? r[3].toString() : "";
+        let empName = r[4] ? r[4].toString() : "";
+        let item = r[5] ? r[5].toString() : "";
+        let qty = r[6] ? r[6].toString() : "";
+        let status = r[7] ? r[7].toString().trim() : "Open";
+        let handler = r[8] ? r[8].toString().trim() : "Unassigned";
+
+        if (currentReqStatusFilter !== "ALL" && status.toLowerCase() !== currentReqStatusFilter.toLowerCase()) return false;
+        if (filterItem !== "ALL" && item !== filterItem) return false;
+        if (filterHandler !== "ALL" && handler !== filterHandler) return false;
+        if (startDate && date && date < startDate) return false;
+        if (endDate && date && date > endDate) return false;
+
+        if (search) {
+          let fullStr = `${reqId} ${empId} ${empName} ${item} ${region} ${handler}`.toLowerCase();
+          if (!fullStr.includes(search)) return false;
+        }
+        return true;
+      });
+
+      document.getElementById('reqShowingCount').innerText = `Showing ${filtered.length} of ${rows.length} requests`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-400 font-medium">کوئی ریکویسٹ موجود نہیں ہے۔</div>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      filtered.forEach(r => {
+        let reqId = r[0];
+        let date = r[1];
+        let region = r[2];
+        let empId = r[3];
+        let empName = r[4];
+        let item = r[5];
+        let qty = r[6];
+        let status = r[7] || "Open";
+        let handler = r[8] || "Unassigned";
+
+        let statusBg = "bg-sky-100 text-sky-800 border-sky-200";
+        if(status === "Open") statusBg = "bg-amber-100 text-amber-800 border-amber-200";
+        if(status === "In progress") statusBg = "bg-indigo-100 text-indigo-800 border-indigo-200";
+        if(status === "Resolved") statusBg = "bg-emerald-100 text-emerald-800 border-emerald-200";
+        if(status === "Closed") statusBg = "bg-slate-200 text-slate-700 border-slate-300";
+        if(status === "Cancelled") statusBg = "bg-rose-100 text-rose-800 border-rose-200";
+
+        container.innerHTML += `
+          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 space-y-3 hover:border-slate-300 transition">
+            <div class="flex justify-between items-start gap-4">
+              <div>
+                <h4 class="font-black text-slate-900 text-base">${item} <span class="text-xs font-semibold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md ml-1">Qty: ${qty}</span></h4>
+                <p class="text-xs text-slate-500 mt-0.5"><strong class="text-slate-700">${empName}</strong> • ${empId} • ${date} • <span class="text-indigo-600 font-semibold">Handler: ${handler}</span></p>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusBg}">${status.toUpperCase()}</span>
+            </div>
+            <div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex items-center justify-between">
+              <span>Region: <strong class="text-slate-800">${region}</strong> | Req ID: <strong class="text-slate-800">${reqId}</strong></span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">
+              <button onclick="updateRequestStatus('${reqId}', 'In progress')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition shadow-2xs">Mark In Progress</button>
+              <button onclick="updateRequestStatus('${reqId}', 'Resolved')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition shadow-2xs">Mark Resolved</button>
+              <button onclick="updateRequestStatus('${reqId}', 'Cancelled')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition shadow-2xs">Cancel Request</button>
+              <button onclick="updateRequestStatus('${reqId}', 'Closed')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition shadow-2xs">Close</button>
+            </div>
+          </div>`;
+      });
     }
 
     function renderDemandRoom() {
@@ -776,7 +1008,7 @@
     function exportDemandRoomCSV() {
       let now = new Date();
       let csv = [];
-      csv.push(`"FieldHub ERP - Demand Room Inventory Report"`);
+      csv.push(`"HS ERP CLL - Demand Room Inventory Report"`);
       csv.push(`"Export Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
       csv.push("");
       csv.push("Item Name,Total Received,Total Out (Issued/Consumed),Remaining Balance");
@@ -1011,7 +1243,7 @@
     function exportDashboardCSV() {
       let now = new Date();
       let csv = [];
-      csv.push(`"FieldHub ERP - Inventory Report"`);
+      csv.push(`"HS ERP CLL - Inventory Report"`);
       csv.push(`"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
       csv.push("");
       csv.push("Item Name,Total Issued,Total Used,Remaining Balance");
@@ -1039,7 +1271,7 @@
       const endDate = document.getElementById(endDateId) ? document.getElementById(endDateId).value : "";
 
       let csv = [];
-      csv.push(`"FieldHub ERP Report"`);
+      csv.push(`"HS ERP CLL Report"`);
       csv.push(`"Export Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
       if (startDate || endDate) {
         csv.push(`"Date Range","From: ${startDate || 'All'} To: ${endDate || 'All'}"`);
@@ -1047,17 +1279,12 @@
       csv.push("");
 
       let rows = table.querySelectorAll("tr");
-      rows.forEach((row, index) => {
+      rows.forEach((row) => {
         let cols = row.querySelectorAll("th, td");
-        // اگر تاریخ کا فلٹر لگا ہو تو ہیڈرز کے بعد والی روز کی تاریخ چیک کریں
-        if (index > 0 && (startDate || endDate)) {
-          let rowText = Array.from(cols).map(c => c.innerText).join(" ");
-          // rowText میں سے ڈیٹ نکالنے کی کوشش یا براہ راست رو پر فلٹر
-        }
         csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/\n/g, ' ')}"`).join(","));
       });
 
-      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;"});
       let a = document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
       a.download = filename;
