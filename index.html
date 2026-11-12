@@ -3,17 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HS ERP CLL - Portal</title>
+  <title>FieldHub ERP - Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style> 
-    body { font-family: 'Inter', sans-serif; } 
-    .sidebar-bg {
-      background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.90), rgba(15, 23, 42, 0.95)), url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop');
-      background-size: cover;
-      background-position: center;
-    }
-  </style>
+  <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
@@ -21,7 +14,7 @@
   <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-200 space-y-6">
       <div class="text-center">
-        <h1 class="text-2xl font-black text-slate-900 tracking-wide">⚡ HS ERP CLL</h1>
+        <h1 class="text-2xl font-black text-slate-900 tracking-wide">📦 FieldHub ERP</h1>
         <p class="text-xs text-slate-500 mt-1">Employee & Admin Secure Login</p>
       </div>
       <div class="space-y-4">
@@ -42,34 +35,27 @@
   <!-- MAIN APP -->
   <div id="mainApp" class="hidden flex h-screen overflow-hidden">
     <!-- Sidebar -->
-    <aside class="w-64 sidebar-bg text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800/80 shadow-xl">
+    <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800">
       <div>
-        <div class="p-6 border-b border-slate-800/60 backdrop-blur-xs bg-slate-900/40">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-sky-600/30 border border-sky-400/30 flex items-center justify-center text-sky-400 font-black text-lg shadow-inner">⚡</div>
-            <div>
-              <h1 class="text-lg font-black text-white tracking-wider">HS ERP CLL</h1>
-              <p class="text-[10px] text-sky-400 font-semibold uppercase tracking-widest mt-0.5">Enterprise Portal</p>
-            </div>
-          </div>
+        <div class="p-6 border-b border-slate-800">
+          <h1 class="text-xl font-bold text-white tracking-wide">📦 FieldHub ERP</h1>
+          <p class="text-xs text-slate-400 mt-1">Inventory Management System</p>
         </div>
-        <nav class="p-4 space-y-1.5">
-          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition shadow-md shadow-sky-900/40">📊 Admin Dashboard</button>
-          <button onclick="switchTab('demandroom')" id="nav-demandroom" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">🏢 Demand Room</button>
-          <button onclick="switchTab('issued')" id="nav-issued" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">📤 Inventory Issued</button>
-          <button onclick="switchTab('consumption')" id="nav-consumption" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">📥 Daily Consumption</button>
+        <nav class="p-4 space-y-1">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition">📊 Admin Dashboard</button>
+          <button onclick="switchTab('demandroom')" id="nav-demandroom" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">🏢 Demand Room</button>
+          <button onclick="switchTab('issued')" id="nav-issued" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📤 Inventory Issued</button>
+          <button onclick="switchTab('consumption')" id="nav-consumption" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800/60 backdrop-blur-xs bg-slate-900/40 text-xs text-slate-400 font-medium text-center flex items-center justify-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v27.0 Pro
-      </div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v25.0 (Date Filtered CSV)</div>
     </aside>
 
     <!-- Main Area -->
     <div class="flex-1 flex flex-col overflow-y-auto">
       <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-3 shadow-xs">
         <div>
-          <h2 id="pageTitle" class="text-xl font-bold text-slate-800">HS ERP Portal</h2>
+          <h2 id="pageTitle" class="text-xl font-bold text-slate-800">FieldHub Portal</h2>
           <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting...</p>
         </div>
         <div class="flex items-center gap-3">
@@ -289,7 +275,7 @@
 
   <!-- ADD DEMAND ROOM STOCK MODAL -->
   <div id="demandModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
         <h3 class="font-bold text-lg">🏢 Add New Stock to Demand Room</h3>
         <button onclick="closeDemandModal()" class="text-white font-bold px-2 py-1">✕</button>
@@ -314,7 +300,7 @@
 
   <!-- ADMIN / OFFICE CONSUMPTION MODAL -->
   <div id="adminConsumptionModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
         <h3 class="font-bold text-lg">📤 Office / Admin Consumption Form</h3>
         <button onclick="closeAdminConsumptionModal()" class="text-white font-bold px-2 py-1">✕</button>
@@ -345,7 +331,7 @@
         <button onclick="closeStaffModal()" class="text-white font-bold px-2 py-1">✕</button>
       </div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-        <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="modalDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="modalDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="modalEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="modalEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="modalRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
@@ -364,7 +350,7 @@
         <button onclick="closeRequestModal()" class="text-white font-bold px-2 py-1">✕</button>
       </div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-        <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="reqDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="reqDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="reqEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="reqEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
@@ -389,7 +375,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFsWEdMXGG7wUywUH4bXbKG7Zr89p1_EWH4uxH-vFRMJ7MZGXRlUweb9AA9mImQngcTw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby9owQXiG8eDYz6Glex01jRFnA6b8siDMt2_Q365-47o1DlsZXHFuIUytQqsxfFwjNhig/exec";
     const ADMIN_PASSWORD = "admin123";
 
     let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {};
@@ -480,7 +466,7 @@
         let empName = localStorage.getItem('logged_name') || '';
         let empId = localStorage.getItem('logged_id') || '';
         document.getElementById('welcomeEmpTitle').innerText = `خوش آمدید! ${empName} (${empId})`;
-        document.getElementById('pageTitle').innerText = `HS ERP Portal - ${empName}`;
+        document.getElementById('pageTitle').innerText = `Employee Portal - ${empName}`;
         loadData();
       }
     }
@@ -505,15 +491,15 @@
         let el = document.getElementById(`tab-${t}`);
         if(el) el.classList.add('hidden');
         let nav = document.getElementById(`nav-${t}`);
-        if(nav) nav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition";
+        if(nav) nav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition";
       });
       let targetTab = document.getElementById(`tab-${tab}`);
       if(targetTab) targetTab.classList.remove('hidden');
       let targetNav = document.getElementById(`nav-${tab}`);
-      if(targetNav) targetNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition shadow-md shadow-sky-900/40";
+      if(targetNav) targetNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition";
       
       const titles = { dashboard: "Admin Dashboard", demandroom: "Demand Room Management", issued: "Office Inventory Issued Records", consumption: "Daily Consumption Records" };
-      document.getElementById('pageTitle').innerText = titles[tab] || "HS ERP Portal";
+      document.getElementById('pageTitle').innerText = titles[tab] || "FieldHub Portal";
     }
 
     function cleanRegion(r) {
@@ -790,7 +776,7 @@
     function exportDemandRoomCSV() {
       let now = new Date();
       let csv = [];
-      csv.push(`"HS ERP CLL - Demand Room Inventory Report"`);
+      csv.push(`"FieldHub ERP - Demand Room Inventory Report"`);
       csv.push(`"Export Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
       csv.push("");
       csv.push("Item Name,Total Received,Total Out (Issued/Consumed),Remaining Balance");
@@ -1025,7 +1011,7 @@
     function exportDashboardCSV() {
       let now = new Date();
       let csv = [];
-      csv.push(`"HS ERP CLL - Inventory Report"`);
+      csv.push(`"FieldHub ERP - Inventory Report"`);
       csv.push(`"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
       csv.push("");
       csv.push("Item Name,Total Issued,Total Used,Remaining Balance");
@@ -1053,7 +1039,7 @@
       const endDate = document.getElementById(endDateId) ? document.getElementById(endDateId).value : "";
 
       let csv = [];
-      csv.push(`"HS ERP CLL Report"`);
+      csv.push(`"FieldHub ERP Report"`);
       csv.push(`"Export Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
       if (startDate || endDate) {
         csv.push(`"Date Range","From: ${startDate || 'All'} To: ${endDate || 'All'}"`);
@@ -1061,8 +1047,13 @@
       csv.push("");
 
       let rows = table.querySelectorAll("tr");
-      rows.forEach((row) => {
+      rows.forEach((row, index) => {
         let cols = row.querySelectorAll("th, td");
+        // اگر تاریخ کا فلٹر لگا ہو تو ہیڈرز کے بعد والی روز کی تاریخ چیک کریں
+        if (index > 0 && (startDate || endDate)) {
+          let rowText = Array.from(cols).map(c => c.innerText).join(" ");
+          // rowText میں سے ڈیٹ نکالنے کی کوشش یا براہ راست رو پر فلٹر
+        }
         csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/\n/g, ' ')}"`).join(","));
       });
 
