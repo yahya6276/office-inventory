@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Office Inventory ERP - Final Perfect Version</title>
+  <title>FieldHub ERP v6.0 - Auto-Smart Inventory</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style> body { font-family: 'Inter', sans-serif; } </style>
@@ -16,7 +16,7 @@
       <div>
         <div class="p-6 border-b border-slate-800">
           <h1 class="text-xl font-bold text-white tracking-wide">📦 FieldHub ERP</h1>
-          <p class="text-xs text-slate-400 mt-1">Multi-Region Inventory</p>
+          <p class="text-xs text-slate-400 mt-1">Smart Auto-Sync System</p>
         </div>
         <nav class="p-4 space-y-1">
           <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition">📊 Admin Dashboard</button>
@@ -24,7 +24,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">System v5.0</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v6.0 (Fixed)</div>
     </aside>
 
     <!-- Main Area -->
@@ -32,7 +32,7 @@
       <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-3 shadow-xs">
         <div>
           <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Admin Dashboard</h2>
-          <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting...</p>
+          <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting to Google Sheet...</p>
         </div>
         <div class="flex items-center gap-3">
           <button onclick="openRequestModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-xs transition flex items-center gap-2">📑 Stock Request Form</button>
@@ -48,17 +48,12 @@
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Filter Region</label>
               <select id="regionFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                <option value="ALL">All Regions (6 Centers)</option>
-                <option value="CENTER 1">CENTER 1</option><option value="CENTER 2">CENTER 2</option>
-                <option value="SOUTH 1">SOUTH 1</option><option value="SOUTH 2">SOUTH 2</option>
-                <option value="NORTH 1">NORTH 1</option><option value="NORTH 2">NORTH 2</option>
-                <option value="Lahore North 1">Lahore North 1</option><option value="Lahore North 2">Lahore North 2</option>
-                <option value="Lahore Center 2">Lahore Center 2</option><option value="Lahore South 1">Lahore South 1</option>
+                <option value="ALL">All Regions</option>
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Search Employee</label>
-              <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              <label class="block text-xs font-bold text-slate-500 mb-1">Search Employee (ID or Name)</label>
+              <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Item Category</label>
@@ -116,21 +111,16 @@
 
         <!-- TAB 2: INVENTORY ISSUED -->
         <section id="tab-issued" class="hidden space-y-6">
-          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 flex gap-4 items-center">
-            <div class="flex-1">
-              <label class="block text-xs font-bold text-slate-500 mb-1">Filter Issued By Region</label>
+          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Filter By Region</label>
               <select id="issuedRegionFilter" onchange="renderRawTables()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
                 <option value="ALL">All Regions</option>
-                <option value="CENTER 1">CENTER 1</option><option value="CENTER 2">CENTER 2</option>
-                <option value="SOUTH 1">SOUTH 1</option><option value="SOUTH 2">SOUTH 2</option>
-                <option value="NORTH 1">NORTH 1</option><option value="NORTH 2">NORTH 2</option>
-                <option value="Lahore North 1">Lahore North 1</option><option value="Lahore North 2">Lahore North 2</option>
-                <option value="Lahore Center 2">Lahore Center 2</option>
               </select>
             </div>
-            <div class="flex-1">
-              <label class="block text-xs font-bold text-slate-500 mb-1">Search Employee / Name</label>
-              <input type="text" id="issuedSearch" onkeyup="renderRawTables()" placeholder="Search..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Search By Employee ID or Name</label>
+              <input type="text" id="issuedSearch" onkeyup="renderRawTables()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
           </div>
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
@@ -141,6 +131,18 @@
 
         <!-- TAB 3: DAILY CONSUMPTION -->
         <section id="tab-consumption" class="hidden space-y-6">
+          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Filter By Region</label>
+              <select id="consRegionFilter" onchange="renderRawTables()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+                <option value="ALL">All Regions</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Search By Employee ID, Name or Case #</label>
+              <input type="text" id="consSearch" onkeyup="renderRawTables()" placeholder="Type ID, Name or Case..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+            </div>
+          </div>
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
             <h3 class="font-bold text-slate-800 text-lg mb-4">Daily Consumption Records</h3>
             <div id="consumptionRawBox" class="overflow-x-auto">Loading...</div>
@@ -167,28 +169,22 @@
           <input type="date" id="modalDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Region</label>
-          <select id="modalRegion" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
-            <option value="CENTER 1">CENTER 1</option><option value="CENTER 2">CENTER 2</option>
-            <option value="SOUTH 1">SOUTH 1</option><option value="SOUTH 2">SOUTH 2</option>
-            <option value="NORTH 1">NORTH 1</option><option value="NORTH 2">NORTH 2</option>
-            <option value="Lahore North 1">Lahore North 1</option><option value="Lahore North 2">Lahore North 2</option>
-            <option value="Lahore Center 2">Lahore Center 2</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Case Number</label>
-          <input type="text" id="modalCaseNum" placeholder="e.g. CS-1002" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
-        </div>
-        <div>
           <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Employee ID</label>
           <select id="modalEmpSelect" onchange="fillModalName()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
-            <option value="">Loading...</option>
+            <option value="">-- Choose Employee ID --</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Employee Name</label>
           <input type="text" id="modalEmpName" readonly placeholder="Auto-filled" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-600 font-semibold">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Region</label>
+          <input type="text" id="modalRegion" readonly placeholder="Auto-filled" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-600 font-semibold">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Case Number</label>
+          <input type="text" id="modalCaseNum" placeholder="e.g. CS-1002" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Used Items</label>
@@ -217,24 +213,18 @@
           <input type="date" id="reqDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Region</label>
-          <select id="reqRegion" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
-            <option value="CENTER 1">CENTER 1</option><option value="CENTER 2">CENTER 2</option>
-            <option value="SOUTH 1">SOUTH 1</option><option value="SOUTH 2">SOUTH 2</option>
-            <option value="NORTH 1">NORTH 1</option><option value="NORTH 2">NORTH 2</option>
-            <option value="Lahore North 1">Lahore North 1</option><option value="Lahore North 2">Lahore North 2</option>
-            <option value="Lahore Center 2">Lahore Center 2</option>
-          </select>
-        </div>
-        <div>
           <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Employee ID</label>
           <select id="reqEmpSelect" onchange="fillReqName()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
-            <option value="">Loading...</option>
+            <option value="">-- Choose Employee ID --</option>
           </select>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Employee Name</label>
           <input type="text" id="reqEmpName" readonly placeholder="Auto-filled" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-600 font-semibold">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Region</label>
+          <input type="text" id="reqRegion" readonly placeholder="Auto-filled" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-600 font-semibold">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Requested Quantities</label>
@@ -248,7 +238,7 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBxNs-ZJ8jtTg2ZEdQ8trQczKrsrh3OfDtTW8X2pnVq1FP_qSU5EI0rAbRgqq2Kt2Uwg/exec";
-    let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {};
+    let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {}, allRegions = new Set();
 
     window.onload = () => {
       document.getElementById('modalDate').valueAsDate = new Date();
@@ -267,9 +257,21 @@
       document.getElementById('pageTitle').innerText = titles[tab];
     }
 
+    // Smart Header Index Finder
+    function findColIndex(headers, keywords) {
+      if (!headers) return -1;
+      for (let i = 0; i < headers.length; i++) {
+        let h = headers[i].toString().trim().toLowerCase();
+        for (let kw of keywords) {
+          if (h.includes(kw)) return i;
+        }
+      }
+      return -1;
+    }
+
     async function loadData() {
       const statusEl = document.getElementById('syncStatus');
-      statusEl.innerText = "Syncing...";
+      statusEl.innerText = "Syncing with Google Sheet...";
       try {
         const res = await fetch(SCRIPT_URL, { method: "GET", redirect: "follow" });
         const data = await res.json();
@@ -277,57 +279,72 @@
         rawIssued = data.issued || [];
         rawConsumed = data.consumed || [];
 
-        // Parse Employees Details strictly based on user's sheet layout:
-        // Col A (index 0) = Name, Col B (index 1) = Emp ID, Col C (index 2) = Region (or flexible search)
         empMap = {};
         empRegionMap = {};
-        
+        allRegions = new Set();
+
+        // 1. Smart Parse "Employees Details"
         if (rawEmployees.length > 1) {
+          let h = rawEmployees[0];
+          let nameIdx = findColIndex(h, ["name"]);
+          let idIdx = findColIndex(h, ["id", "code"]);
+          let regIdx = findColIndex(h, ["region", "center", "area"]);
+
+          // Fallback based on user screenshot: Col 0 = Name, Col 1 = ID, Col 2 = Region
+          if (nameIdx === -1) nameIdx = 0;
+          if (idIdx === -1) idIdx = 1;
+          if (regIdx === -1) regIdx = 2;
+
           for (let i = 1; i < rawEmployees.length; i++) {
             let row = rawEmployees[i];
-            if (!row || row.length === 0) continue;
-            let name = row[0] ? row[0].toString().trim() : "";
-            let id = row[1] ? row[1].toString().trim() : "";
-            let reg = row[2] ? row[2].toString().trim() : "CENTER 1";
+            let id = row[idIdx] ? row[idIdx].toString().trim() : "";
+            let name = row[nameIdx] ? row[nameIdx].toString().trim() : "";
+            let reg = row[regIdx] ? row[regIdx].toString().trim() : "Unassigned";
 
             if (id) {
-              empMap[id] = name || "Employee " + id;
+              empMap[id] = name;
               empRegionMap[id] = reg;
+              if (reg) allRegions.add(reg);
             }
           }
         }
 
-        // Fallback to Issued tab if Employees tab is empty
-        if (Object.keys(empMap).length === 0 && rawIssued.length > 1) {
-          for (let i = 1; i < rawIssued.length; i++) {
-            let r = rawIssued[i];
-            let name = r[1] ? r[1].toString().trim() : "";
-            let id = r[2] ? r[2].toString().trim() : "";
-            let reg = r[3] ? r[3].toString().trim() : "CENTER 1";
-            if (id && !empMap[id]) {
-              empMap[id] = name || "Employee " + id;
-              empRegionMap[id] = reg;
-            }
-          }
-        }
-
-        // Extract Categories/Items from Issued Sheet headers (from index 4 onwards)
+        // 2. Smart Extract Item Categories from "Office Inventory Issued"
+        categories = [];
         if (rawIssued.length > 0) {
-          const headers = rawIssued[0];
-          categories = [];
-          for (let c = 4; c < headers.length; c++) {
-            if (headers[c] && headers[c].toString().trim() !== "") {
-              categories.push(headers[c].toString().trim());
+          let h = rawIssued[0];
+          for (let c = 0; c < h.length; c++) {
+            let colName = h[c] ? h[c].toString().trim() : "";
+            let low = colName.toLowerCase();
+            if (colName && !low.includes("date") && !low.includes("time") && !low.includes("name") && !low.includes("id") && !low.includes("region") && !low.includes("case")) {
+              categories.push(colName);
             }
           }
-          
-          const catSel = document.getElementById('catFilter');
-          catSel.innerHTML = '<option value="ALL">All Categories</option>';
-          categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+        }
 
-          ['modalItemsContainer', 'reqItemsContainer'].forEach(containerId => {
-            const container = document.getElementById(containerId);
-            container.innerHTML = "";
+        // Populate Region Dropdowns dynamically
+        ['regionFilter', 'issuedRegionFilter', 'consRegionFilter'].forEach(selId => {
+          const sel = document.getElementById(selId);
+          if (sel) {
+            sel.innerHTML = '<option value="ALL">All Regions</option>';
+            Array.from(allRegions).sort().forEach(r => {
+              sel.innerHTML += `<option value="${r}">${r}</option>`;
+            });
+          }
+        });
+
+        // Populate Category Filter
+        const catSel = document.getElementById('catFilter');
+        catSel.innerHTML = '<option value="ALL">All Categories</option>';
+        categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+
+        // Populate Item Boxes in Modals
+        ['modalItemsContainer', 'reqItemsContainer'].forEach(containerId => {
+          const container = document.getElementById(containerId);
+          container.innerHTML = "";
+          if (categories.length === 0) {
+            container.innerHTML = `<p class="col-span-2 text-xs text-rose-500">No items found in Issued sheet headers.</p>`;
+          } else {
             categories.forEach(item => {
               container.innerHTML += `
                 <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
@@ -335,20 +352,21 @@
                   <input type="number" min="0" value="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';" class="${containerId}-input w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-bold text-slate-900 focus:outline-none" data-item="${item}">
                 </div>`;
             });
-          });
-        }
+          }
+        });
 
+        // Populate Employee Dropdowns in Modals
         ['modalEmpSelect', 'reqEmpSelect'].forEach(selId => {
           const select = document.getElementById(selId);
-          select.innerHTML = '<option value="">-- Choose ID --</option>';
-          Object.keys(empMap).sort().forEach(id => {
+          select.innerHTML = '<option value="">-- Choose Employee ID --</option>';
+          Object.keys(empMap).sort((a,b) => Number(a) - Number(b)).forEach(id => {
             select.innerHTML += `<option value="${id}">${id} - ${empMap[id]}</option>`;
           });
         });
 
         renderDashboard();
         renderRawTables();
-        statusEl.innerText = "Connected • " + new Date().toLocaleTimeString();
+        statusEl.innerText = "Live Connected • " + new Date().toLocaleTimeString();
       } catch (e) {
         console.error(e);
         statusEl.innerText = "Connection Failed!";
@@ -363,23 +381,23 @@
     function fillModalName() {
       const id = document.getElementById('modalEmpSelect').value;
       document.getElementById('modalEmpName').value = empMap[id] || "";
-      if (empRegionMap[id]) document.getElementById('modalRegion').value = empRegionMap[id];
+      document.getElementById('modalRegion').value = empRegionMap[id] || "";
     }
     function fillReqName() {
       const id = document.getElementById('reqEmpSelect').value;
       document.getElementById('reqEmpName').value = empMap[id] || "";
-      if (empRegionMap[id]) document.getElementById('reqRegion').value = empRegionMap[id];
+      document.getElementById('reqRegion').value = empRegionMap[id] || "";
     }
 
     async function submitConsumption() {
       const date = document.getElementById('modalDate').value;
-      const region = document.getElementById('modalRegion').value;
-      const caseNumber = document.getElementById('modalCaseNum').value.trim();
       const empId = document.getElementById('modalEmpSelect').value;
       const empName = document.getElementById('modalEmpName').value;
+      const region = document.getElementById('modalRegion').value;
+      const caseNumber = document.getElementById('modalCaseNum').value.trim();
 
       if (!date || !empId || !caseNumber) {
-        alert("براہ کرم تاریخ، کیس نمبر اور Employee ID لازمی درج کریں۔");
+        alert("براہ کرم تاریخ، ایمپلائی آئی ڈی اور کیس نمبر لازمی درج کریں۔");
         return;
       }
 
@@ -421,12 +439,12 @@
 
     async function submitRequest() {
       const date = document.getElementById('reqDate').value;
-      const region = document.getElementById('reqRegion').value;
       const empId = document.getElementById('reqEmpSelect').value;
       const empName = document.getElementById('reqEmpName').value;
+      const region = document.getElementById('reqRegion').value;
 
       if (!date || !empId) {
-        alert("براہ کرم تاریخ اور Employee ID لازمی درج کریں۔");
+        alert("براہ کرم تاریخ اور ایمپلائی آئی ڈی لازمی منتخب کریں۔");
         return;
       }
 
@@ -471,59 +489,60 @@
 
       let summary = {};
       Object.keys(empMap).forEach(id => {
-        let reg = empRegionMap[id] || "CENTER 1";
-        let name = empMap[id];
-        let key = reg + "_" + id;
-        summary[key] = { region: reg, id, name, issued: 0, used: 0 };
+        summary[id] = { region: empRegionMap[id] || "", id: id, name: empMap[id] || "", issued: 0, used: 0 };
       });
 
       const selectedRegion = document.getElementById('regionFilter').value;
       const search = document.getElementById('empSearch').value.toLowerCase().trim();
       const cat = document.getElementById('catFilter').value;
-      const headers = rawIssued.length > 0 ? rawIssued[0] : [];
 
-      // Process Issued
-      for (let i = 1; i < rawIssued.length; i++) {
-        let r = rawIssued[i];
-        if (!r[2] && !r[1]) continue;
-        let reg = (r[3] || r[1] || "").toString().trim() || "CENTER 1";
-        let id = (r[2] || r[1] || "").toString().trim();
-        let name = empMap[id] || (r[1] || "").toString().trim();
+      // Smart Process Issued
+      if (rawIssued.length > 1) {
+        let h = rawIssued[0];
+        let idIdx = findColIndex(h, ["id", "code"]);
+        if (idIdx === -1) idIdx = 2; // Based on user screenshot
 
-        let key = reg + "_" + id;
-        if (!summary[key]) summary[key] = { region: reg, id, name: name || "Employee "+id, issued: 0, used: 0 };
+        for (let i = 1; i < rawIssued.length; i++) {
+          let r = rawIssued[i];
+          let id = r[idIdx] ? r[idIdx].toString().trim() : "";
+          if (!id) continue;
+          if (!summary[id]) summary[id] = { region: empRegionMap[id] || "", id: id, name: empMap[id] || "", issued: 0, used: 0 };
 
-        let qty = 0;
-        for (let c = 4; c < headers.length; c++) {
-          if (cat === "ALL" || headers[c] === cat) qty += Number(r[c]) || 0;
+          for (let c = 0; c < h.length; c++) {
+            let colName = h[c] ? h[c].toString().trim() : "";
+            if (categories.includes(colName) && (cat === "ALL" || colName === cat)) {
+              summary[id].issued += Number(r[c]) || 0;
+            }
+          }
         }
-        summary[key].issued += qty;
       }
 
-      // Process Consumed
-      for (let i = 1; i < rawConsumed.length; i++) {
-        let r = rawConsumed[i];
-        if (!r[2]) continue;
-        let reg = (r[1] || "").toString().trim() || "CENTER 1";
-        let id = r[2].toString().trim();
-        let name = empMap[id] || (r[3] || "").toString().trim();
+      // Smart Process Consumed
+      if (rawConsumed.length > 1) {
+        let h = rawConsumed[0];
+        let idIdx = findColIndex(h, ["id", "code"]);
+        if (idIdx === -1) idIdx = 2;
 
-        let key = reg + "_" + id;
-        if (!summary[key]) summary[key] = { region: reg, id, name: name || "Employee "+id, issued: 0, used: 0 };
+        for (let i = 1; i < rawConsumed.length; i++) {
+          let r = rawConsumed[i];
+          let id = r[idIdx] ? r[idIdx].toString().trim() : "";
+          if (!id) continue;
+          if (!summary[id]) summary[id] = { region: empRegionMap[id] || "", id: id, name: empMap[id] || "", issued: 0, used: 0 };
 
-        let qty = 0;
-        for (let c = 5; c < rawConsumed[0].length; c++) {
-          let itemHeader = rawConsumed[0][c];
-          if (cat === "ALL" || itemHeader === cat) qty += Number(r[c]) || 0;
+          for (let c = 0; c < h.length; c++) {
+            let colName = h[c] ? h[c].toString().trim() : "";
+            if (categories.includes(colName) && (cat === "ALL" || colName === cat)) {
+              summary[id].used += Number(r[c]) || 0;
+            }
+          }
         }
-        summary[key].used += qty;
       }
 
       let totIssued = 0, totUsed = 0;
       let list = Object.values(summary);
 
       list = list.filter(item => {
-        if (selectedRegion !== "ALL" && item.region.toUpperCase() !== selectedRegion.toUpperCase()) return false;
+        if (selectedRegion !== "ALL" && item.region !== selectedRegion) return false;
         if (search && !item.id.toLowerCase().includes(search) && !item.name.toLowerCase().includes(search)) return false;
         return true;
       });
@@ -562,35 +581,35 @@
     }
 
     function renderRawTables() {
-      const regFilter = document.getElementById('issuedRegionFilter') ? document.getElementById('issuedRegionFilter').value : "ALL";
-      const search = document.getElementById('issuedSearch') ? document.getElementById('issuedSearch').value.toLowerCase().trim() : "";
+      const buildFilteredTable = (rows, regFilterId, searchId) => {
+        if (!rows || rows.length === 0) return "<p class='text-slate-400'>No records found.</p>";
+        const regFilter = document.getElementById(regFilterId) ? document.getElementById(regFilterId).value : "ALL";
+        const search = document.getElementById(searchId) ? document.getElementById(searchId).value.toLowerCase().trim() : "";
 
-      const build = (rows) => {
-        if (!rows || rows.length === 0) return "<p class='text-slate-400'>No records</p>";
+        let h = rows[0];
+        let regIdx = findColIndex(h, ["region", "center"]);
+        
         let html = `<table class="w-full text-left text-sm"><thead><tr class="bg-slate-50 text-xs font-bold uppercase">`;
-        rows[0].forEach(h => html += `<th class="p-3 border-b">${h}</th>`);
-        html += `</tr></thead><tbody>`;
+        h.forEach(col => html += `<th class="p-3 border-b">${col}</th>`);
+        html += `</tr></thead><tbody class="divide-y divide-slate-100">`;
         
         for (let i = 1; i < rows.length; i++) {
           let r = rows[i];
-          let name = (r[1] || "").toString().toLowerCase();
-          let id = (r[2] || "").toString().toLowerCase();
-          let reg = (r[3] || "").toString();
+          let rowText = r.join(" ").toLowerCase();
+          let rowReg = (regIdx !== -1 && r[regIdx]) ? r[regIdx].toString().trim() : "";
 
-          if (regFilter !== "ALL" && reg.toUpperCase() !== regFilter.toUpperCase()) continue;
-          if (search && !name.includes(search) && !id.includes(search)) continue;
+          if (regFilter !== "ALL" && rowReg !== regFilter) continue;
+          if (search && !rowText.includes(search)) continue;
 
-          html += `<tr>`;
+          html += `<tr class="hover:bg-slate-50">`;
           r.forEach(c => html += `<td class="p-3">${c || ''}</td>`);
           html += `</tr>`;
         }
         return html + `</tbody></table>`;
       };
 
-      const issuedBox = document.getElementById('issuedRawBox');
-      const consumedBox = document.getElementById('consumptionRawBox');
-      if (issuedBox) issuedBox.innerHTML = build(rawIssued);
-      if (consumedBox) consumedBox.innerHTML = build(rawConsumed);
+      document.getElementById('issuedRawBox').innerHTML = buildFilteredTable(rawIssued, 'issuedRegionFilter', 'issuedSearch');
+      document.getElementById('consumptionRawBox').innerHTML = buildFilteredTable(rawConsumed, 'consRegionFilter', 'consSearch');
     }
 
     function exportTable() {
