@@ -10,7 +10,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
-  <!-- LOGIN SCREEN (DEFAULT) -->
+  <!-- LOGIN SCREEN -->
   <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-200 space-y-6">
       <div class="text-center">
@@ -20,12 +20,11 @@
       <div class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID / Username</label>
-          <input type="text" id="loginUser" placeholder="Enter Employee ID or Admin..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <input type="text" id="loginUser" placeholder="Enter ID or Admin..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
           <input type="password" id="loginPassword" placeholder="Enter password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
-          <p class="text-[10px] text-slate-400 mt-1">* ملازمین کے لیے پہلا پاسورڈ ان کی اپنی Employee ID ہے</p>
         </div>
         <button onclick="handleLogin()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Login to Portal</button>
         <div id="loginError" class="hidden text-rose-600 text-xs text-center font-bold">غلط آئی ڈی یا پاسورڈ! دوبارہ کوشش کریں۔</div>
@@ -33,7 +32,7 @@
     </div>
   </div>
 
-  <!-- MAIN APP (HIDDEN UNTIL LOGIN) -->
+  <!-- MAIN APP -->
   <div id="mainApp" class="hidden flex h-screen overflow-hidden">
     <!-- Sidebar -->
     <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800">
@@ -49,7 +48,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v20.0 (Demand Room)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v21.0 (Demand Room Form)</div>
     </aside>
 
     <!-- Main Area -->
@@ -68,7 +67,7 @@
       </header>
 
       <main class="p-6 space-y-6">
-        <!-- TAB 1: DASHBOARD (ADMIN ONLY) -->
+        <!-- TAB 1: DASHBOARD -->
         <section id="tab-dashboard" class="admin-only space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
             <div>
@@ -124,7 +123,7 @@
             <div class="p-5 border-b border-slate-200 bg-slate-900 text-white flex justify-between items-center">
               <div>
                 <h3 class="font-bold text-base">📦 Items Summary Report <span id="summaryReportTitle" class="text-sky-400 text-xs font-normal ml-2">(Overall Summary)</span></h3>
-                <p class="text-xs text-slate-400 mt-0.5">Quantity breakdown per item (filtered by date range & employee)</p>
+                <p class="text-xs text-slate-400 mt-0.5">Quantity breakdown per item</p>
               </div>
             </div>
             <div class="overflow-x-auto max-h-96">
@@ -138,7 +137,7 @@
                   </tr>
                 </thead>
                 <tbody id="itemsSummaryTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading items summary...</td></tr>
+                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -171,14 +170,17 @@
           </div>
         </section>
 
-        <!-- TAB 1.5: DEMAND ROOM (ADMIN STOCK MANAGEMENT) -->
+        <!-- TAB 1.5: DEMAND ROOM -->
         <section id="tab-demandroom" class="admin-only hidden space-y-6">
-          <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex justify-between items-center">
+          <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
             <div>
               <h3 class="font-bold text-slate-900 text-lg">🏢 Demand Room Inventory Ledger</h3>
-              <p class="text-xs text-slate-500 mt-1">آپ کے پاس کل کتنا سامان کس تاریخ کو آیا اور ملازمین کو کتنا دیا گیا، اس کا مکمل حساب کتاب۔</p>
+              <p class="text-xs text-slate-500 mt-1">نیا آنے والا سامان درج کریں اور کل اسٹاک کا حساب دیکھیں۔</p>
             </div>
-            <button onclick="exportDemandRoomCSV()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export Demand Room CSV</button>
+            <div class="flex items-center gap-3">
+              <button onclick="openDemandModal()" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs flex items-center gap-2">➕ Add New Stock (Demand Room)</button>
+              <button onclick="exportDemandRoomCSV()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export CSV</button>
+            </div>
           </div>
 
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
@@ -187,24 +189,24 @@
                 <thead>
                   <tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
                     <th class="p-4">Item Category / Name</th>
-                    <th class="p-4 text-center">Total Received (In Demand Room)</th>
+                    <th class="p-4 text-center">Total Received (Demand Room)</th>
                     <th class="p-4 text-center">Total Issued to Employees</th>
                     <th class="p-4 text-center">Remaining Stock Balance</th>
                     <th class="p-4">Status</th>
                   </tr>
                 </thead>
                 <tbody id="demandRoomTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="5" class="p-6 text-center text-slate-400">Loading Demand Room data...</td></tr>
+                  <tr><td colspan="5" class="p-6 text-center text-slate-400">Loading Demand Room...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
         </section>
 
-        <!-- WELCOME BANNER FOR EMPLOYEES -->
+        <!-- EMPLOYEE WELCOME -->
         <section id="employeeWelcome" class="hidden bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-4">
           <h2 id="welcomeEmpTitle" class="text-2xl font-black text-slate-900">خوش آمدید!</h2>
-          <p class="text-sm text-slate-600 max-w-lg mx-auto">اوپر دیے گئے بٹنوں (**Stock Request Form** یا **Daily Consumption Form**) پر کلک کر کے اپنی ریکویسٹ یا ڈیلی کنزمپشن درج کریں۔ آپ صرف اپنی آئی ڈی سے فارم جمع کر سکتے ہیں۔</p>
+          <p class="text-sm text-slate-600 max-w-lg mx-auto">اوپر دیے گئے بٹنوں سے اپنی ریکویسٹ یا ڈیلی کنزمپشن درج کریں۔</p>
         </section>
 
         <!-- TAB 2: INVENTORY ISSUED -->
@@ -262,6 +264,25 @@
     </div>
   </div>
 
+  <!-- ADD DEMAND ROOM STOCK MODAL -->
+  <div id="demandModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-base">🏢 Add New Stock to Demand Room</h3>
+        <button onclick="closeDemandModal()" class="text-white font-bold px-2 py-1">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><label class="block text-xs font-bold text-slate-600 mb-1">Date Received</label><input type="date" id="demandDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Item Category / Name</label>
+          <select id="demandItemName" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none"></select>
+        </div>
+        <div><label class="block text-xs font-bold text-slate-600 mb-1">Quantity Received</label><input type="number" min="1" id="demandQty" value="1" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
+        <button onclick="submitDemandStock()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Save Stock Entry</button>
+      </div>
+    </div>
+  </div>
+
   <!-- DAILY CONSUMPTION MODAL -->
   <div id="staffModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
@@ -314,16 +335,17 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFsWEdMXGG7wUywUH4bXbKG7Zr89p1_EWH4uxH-vFRMJ7MZGXRlUweb9AA9mImQngcTw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlpl2Iav5Y3FCVVvc9SaqEVAm_eMwa2-HO77SCm1KCAkw9ogASOuhmNO9N1bWkNJH4UQ/exec";
     const ADMIN_PASSWORD = "admin123";
 
-    let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {};
+    let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], categories = [], empMap = {}, empRegionMap = {};
     let lastMatchingEmployees = [];
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
 
     window.onload = function() {
       document.getElementById('modalDate').valueAsDate = new Date();
       document.getElementById('reqDate').valueAsDate = new Date();
+      document.getElementById('demandDate').valueAsDate = new Date();
       
       let sessionRole = localStorage.getItem('erp_role');
       if (sessionRole) {
@@ -349,7 +371,6 @@
         rawEmployees = data.employees || [];
 
         let foundId = "", foundName = "", foundReg = "Center 1";
-
         if (rawEmployees.length > 1) {
           for (let i = 1; i < rawEmployees.length; i++) {
             let row = rawEmployees[i];
@@ -359,10 +380,7 @@
             let reg = cleanRegion(row[2]);
 
             if (id && (id.toLowerCase() === username.toLowerCase() || name.toLowerCase() === username.toLowerCase())) {
-              foundId = id;
-              foundName = name;
-              foundReg = reg;
-              break;
+              foundId = id; foundName = name; foundReg = reg; break;
             }
           }
         }
@@ -378,18 +396,14 @@
             return;
           }
         }
-
         errBox.classList.remove('hidden');
       } catch (e) {
-        alert("لاگ ان میں خرابی پیش آگئی۔ انٹرنیٹ کنکشن چیک کریں۔");
+        alert("لاگ ان میں خرابی پیش آگئی۔");
       }
     }
 
     function logout() {
-      localStorage.removeItem('erp_role');
-      localStorage.removeItem('logged_id');
-      localStorage.removeItem('logged_name');
-      localStorage.removeItem('logged_reg');
+      localStorage.clear();
       location.reload();
     }
 
@@ -422,14 +436,11 @@
       let newPass = document.getElementById('newPasswordInput').value.trim();
       let role = localStorage.getItem('erp_role');
       if (!newPass) { alert("پاسورڈ خالی نہیں ہو سکتا!"); return; }
-
       if (role === 'employee') {
         let empId = localStorage.getItem('logged_id');
         localStorage.setItem('emp_pass_' + empId, newPass);
         alert("✅ پاسورڈ کامیابی سے تبدیل ہو گیا!");
         closePasswordModal();
-      } else {
-        alert("ایڈمن پاسورڈ کے لیے کوڈ میں تبدیلی کریں۔");
       }
     }
 
@@ -483,10 +494,9 @@
         rawEmployees = data.employees || [];
         rawIssued = data.issued || [];
         rawConsumed = data.consumed || [];
+        rawDemand = data.demand || [];
 
-        empMap = {};
-        empRegionMap = {};
-
+        empMap = {}; empRegionMap = {};
         if (rawEmployees.length > 1) {
           for (let i = 1; i < rawEmployees.length; i++) {
             let row = rawEmployees[i];
@@ -494,11 +504,7 @@
             let name = row[0] ? row[0].toString().trim() : "";
             let id = row[1] ? row[1].toString().trim() : "";
             let reg = cleanRegion(row[2]);
-
-            if (id) {
-              empMap[id] = name || "Employee " + id;
-              empRegionMap[id] = reg;
-            }
+            if (id) { empMap[id] = name || "Employee " + id; empRegionMap[id] = reg; }
           }
         }
 
@@ -518,6 +524,12 @@
         if(catSel) {
           catSel.innerHTML = '<option value="ALL">All Categories</option>';
           categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+        }
+
+        const demandItemSelect = document.getElementById('demandItemName');
+        if(demandItemSelect) {
+          demandItemSelect.innerHTML = "";
+          categories.forEach(c => demandItemSelect.innerHTML += `<option value="${c}">${c}</option>`);
         }
 
         ['modalItemsContainer', 'reqItemsContainer'].forEach(containerId => {
@@ -546,8 +558,7 @@
     }
 
     function openStaffModal() {
-      let role = localStorage.getItem('erp_role');
-      if (role === 'employee') {
+      if (localStorage.getItem('erp_role') === 'employee') {
         document.getElementById('modalEmpId').value = localStorage.getItem('logged_id');
         document.getElementById('modalEmpName').value = localStorage.getItem('logged_name');
         document.getElementById('modalRegion').value = localStorage.getItem('logged_reg');
@@ -557,8 +568,7 @@
     function closeStaffModal() { document.getElementById('staffModal').classList.add('hidden'); }
 
     function openRequestModal() {
-      let role = localStorage.getItem('erp_role');
-      if (role === 'employee') {
+      if (localStorage.getItem('erp_role') === 'employee') {
         document.getElementById('reqEmpId').value = localStorage.getItem('logged_id');
         document.getElementById('reqEmpName').value = localStorage.getItem('logged_name');
         document.getElementById('reqRegion').value = localStorage.getItem('logged_reg');
@@ -566,6 +576,25 @@
       document.getElementById('requestModal').classList.remove('hidden');
     }
     function closeRequestModal() { document.getElementById('requestModal').classList.add('hidden'); }
+
+    function openDemandModal() { document.getElementById('demandModal').classList.remove('hidden'); }
+    function closeDemandModal() { document.getElementById('demandModal').classList.add('hidden'); }
+
+    async function submitDemandStock() {
+      const date = document.getElementById('demandDate').value;
+      const itemName = document.getElementById('demandItemName').value;
+      const quantity = Number(document.getElementById('demandQty').value) || 0;
+      const addedBy = localStorage.getItem('logged_id') || 'Admin';
+
+      if (!date || !itemName || quantity <= 0) { alert("تاریخ اور مقدار درست درج کریں۔"); return; }
+
+      try {
+        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "demand", date, itemName, quantity, addedBy }) });
+        alert("✅ Demand Room میں اسٹاک کامیابی سے شامل ہو گیا!");
+        closeDemandModal();
+        loadData();
+      } catch (err) { alert("ایرر: " + err); }
+    }
 
     async function submitConsumption() {
       const date = document.getElementById('modalDate').value;
@@ -610,9 +639,23 @@
       const tbody = document.getElementById('demandRoomTableBody');
       if (!tbody) return;
 
+      let itemReceivedTotals = {};
       let itemIssuedTotals = {};
-      categories.forEach(cat => { itemIssuedTotals[cat] = 0; });
+      categories.forEach(cat => { itemReceivedTotals[cat] = 0; itemIssuedTotals[cat] = 0; });
 
+      // Calculate received from Demand Room sheet
+      if (rawDemand.length > 1) {
+        for (let i = 1; i < rawDemand.length; i++) {
+          let r = rawDemand[i];
+          let itemName = r[1] ? r[1].toString().trim() : "";
+          let qty = Number(r[2]) || 0;
+          if (itemReceivedTotals.hasOwnProperty(itemName)) {
+            itemReceivedTotals[itemName] += qty;
+          }
+        }
+      }
+
+      // Calculate issued from Issued sheet
       if (rawIssued.length > 1) {
         let h = rawIssued[0];
         for (let i = 1; i < rawIssued.length; i++) {
@@ -629,18 +672,18 @@
 
       tbody.innerHTML = "";
       categories.forEach(cat => {
+        let received = itemReceivedTotals[cat];
         let issued = itemIssuedTotals[cat];
-        // یہاں آپ Demand Room میں آنے والا کل سامان خود درج یا ایڈجسٹ کر سکتے ہیں (فی الحال کل جاری شدہ کو بیس بنایا گیا ہے)
-        let received = issued + 50; // مثال کے طور پر آپ اس میں ایڈجسٹمنٹ رکھ سکتے ہیں
         let balance = received - issued;
+        let balColor = balance < 0 ? "text-rose-600 font-bold" : "text-emerald-700 font-extrabold";
 
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="p-4 font-bold text-slate-800">${cat}</td>
             <td class="p-4 text-center font-bold text-sky-600">${received}</td>
             <td class="p-4 text-center font-semibold text-amber-600">${issued}</td>
-            <td class="p-4 text-center font-extrabold text-emerald-700">${balance}</td>
-            <td class="p-4"><span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">In Stock</span></td>
+            <td class="p-4 text-center ${balColor}">${balance}</td>
+            <td class="p-4"><span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">Active</span></td>
           </tr>`;
       });
     }
@@ -651,7 +694,7 @@
       csv.push(`"FieldHub ERP - Demand Room Inventory Report"`);
       csv.push(`"Export Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
       csv.push("");
-      csv.push("Item Name,Total Received,Total Issued to Employees,Remaining Stock Balance");
+      csv.push("Item Name,Total Received,Total Issued,Remaining Balance");
 
       document.querySelectorAll("#demandRoomTableBody tr").forEach(row => {
         let cols = row.querySelectorAll("td");
@@ -877,23 +920,9 @@
 
     function exportDashboardCSV() {
       let now = new Date();
-      let dateStr = now.toLocaleDateString();
-      let timeStr = now.toLocaleTimeString();
-      let searchVal = document.getElementById('empSearch').value.trim();
-      let startDate = document.getElementById('startDateFilter').value;
-      let endDate = document.getElementById('endDateFilter').value;
-
       let csv = [];
       csv.push(`"FieldHub ERP - Inventory Report"`);
-      csv.push(`"Report Date & Time","${dateStr} ${timeStr}"`);
-      csv.push(`"Date Range","${startDate || 'Start'} to ${endDate || 'End'}"`);
-      
-      if (searchVal && lastMatchingEmployees.length > 0) {
-        csv.push(`"Employee ID(s)","${lastMatchingEmployees.map(e => e.id).join(', ')}"`);
-        csv.push(`"Employee Name(s)","${lastMatchingEmployees.map(e => e.name).join(', ')}"`);
-      } else {
-        csv.push(`"Report Filter","All Employees / Overall Summary"`);
-      }
+      csv.push(`"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
       csv.push("");
       csv.push("Item Name,Total Issued,Total Used,Remaining Balance");
 
@@ -907,14 +936,14 @@
       let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
       let a = document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
-      a.download = searchVal ? `employee_${searchVal}_report.csv` : "overall_inventory_report.csv";
+      a.download = "overall_inventory_report.csv";
       a.click();
     }
 
     function exportRawTable(tableId, filename) {
       let now = new Date();
       let table = document.getElementById(tableId);
-      if (!table) { alert("No data available to export!"); return; }
+      if (!table) { alert("No data available!"); return; }
       
       let csv = [];
       csv.push(`"FieldHub ERP Report"`);
