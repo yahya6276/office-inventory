@@ -24,7 +24,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v12.0 (Multi-CSV & Reports)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v13.0 (Item Summary)</div>
     </aside>
 
     <!-- Main Area -->
@@ -85,7 +85,32 @@
             </div>
           </div>
 
-          <!-- Table -->
+          <!-- NEW SECTION: ALL 39 ITEMS TOTAL SUMMARY -->
+          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 bg-slate-900 text-white flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-base">📦 All 39 Items Stock Summary (Total Issued, Used & Balance)</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Overall quantity breakdown for each inventory item</p>
+              </div>
+            </div>
+            <div class="overflow-x-auto max-h-96">
+              <table class="w-full text-left border-collapse">
+                <thead class="sticky top-0 bg-slate-100 text-slate-600 text-xs font-bold uppercase">
+                  <tr>
+                    <th class="p-3 border-b">Item Name / Category</th>
+                    <th class="p-3 border-b text-center">Total Issued</th>
+                    <th class="p-3 border-b text-center">Total Used</th>
+                    <th class="p-3 border-b text-center">Remaining Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="itemsSummaryTableBody" class="divide-y divide-slate-100 text-sm">
+                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading items summary...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Employee Reconciliation Table -->
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
             <div class="p-5 border-b border-slate-200 flex justify-between items-center">
               <h3 class="font-bold text-slate-800 text-base">Employee Stock Reconciliation</h3>
@@ -201,7 +226,7 @@
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
         <button onclick="submitRequest()" id="reqSubBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Request</button>
-        <div id="reqMsgBox" class="hidden p-3 rounded-xl text-center text-sm font-semibold"></div>
+        <div id="modalMsgBox" class="hidden p-3 rounded-xl text-center text-sm font-semibold"></div>
       </div>
     </div>
   </div>
@@ -367,17 +392,24 @@
 
     function renderDashboard() {
       const tbody = document.getElementById('erpTableBody');
-      if (!tbody) return;
+      const itemsSummaryBody = document.getElementById('itemsSummaryTableBody');
+      if (!tbody || !itemsSummaryBody) return;
 
       let summary = {};
+      let itemTotals = {};
+      categories.forEach(cat => {
+        itemTotals[cat] = { issued: 0, used: 0 };
+      });
+
       Object.keys(empMap).forEach(id => {
         summary[id] = { region: empRegionMap[id] || "Center 1", id: id, name: empMap[id] || "", issued: 0, used: 0 };
       });
 
       const selectedRegion = document.getElementById('regionFilter').value;
       const search = document.getElementById('empSearch').value.toLowerCase().trim();
-      const cat = document.getElementById('catFilter').value;
+      const catFilter = document.getElementById('catFilter').value;
 
+      // 1. Process Issued Sheet
       if (rawIssued.length > 1) {
         let h = rawIssued[0];
         for (let i = 1; i < rawIssued.length; i++) {
@@ -388,17 +420,30 @@
             if (empMap[val]) { id = val; break; }
           }
           if (!id && r[2]) id = r[2].toString().trim();
-          if (!id || !summary[id]) continue;
+
+          let rowReg = "Center 1";
+          for (let cell of r) {
+            let val = cell ? cell.toString().trim() : "";
+            let clean = cleanRegion(val);
+            if (clean) { rowReg = clean; break; }
+          }
 
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
-            if (categories.includes(colName) && (cat === "ALL" || colName === cat)) {
-              summary[id].issued += Number(r[c]) || 0;
+            let valNum = Number(r[c]) || 0;
+            if (categories.includes(colName)) {
+              if (selectedRegion === "ALL" || rowReg.toUpperCase() === selectedRegion.toUpperCase()) {
+                itemTotals[colName].issued += valNum;
+              }
+              if (id && summary[id]) {
+                summary[id].issued += valNum;
+              }
             }
           }
         }
       }
 
+      // 2. Process Consumed Sheet
       if (rawConsumed.length > 1) {
         let h = rawConsumed[0];
         for (let i = 1; i < rawConsumed.length; i++) {
@@ -409,21 +454,50 @@
             if (empMap[val]) { id = val; break; }
           }
           if (!id && r[2]) id = r[2].toString().trim();
-          if (!id || !summary[id]) continue;
+
+          let rowReg = "Center 1";
+          for (let cell of r) {
+            let val = cell ? cell.toString().trim() : "";
+            let clean = cleanRegion(val);
+            if (clean) { rowReg = clean; break; }
+          }
 
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
-            if (categories.includes(colName) && (cat === "ALL" || colName === cat)) {
-              summary[id].used += Number(r[c]) || 0;
+            let valNum = Number(r[c]) || 0;
+            if (categories.includes(colName)) {
+              if (selectedRegion === "ALL" || rowReg.toUpperCase() === selectedRegion.toUpperCase()) {
+                itemTotals[colName].used += valNum;
+              }
+              if (id && summary[id]) {
+                summary[id].used += valNum;
+              }
             }
           }
         }
       }
 
-      let totIssued = 0, totUsed = 0;
-      let list = Object.values(summary);
+      // Render Item Summary Table (All 39 Items)
+      itemsSummaryBody.innerHTML = "";
+      categories.forEach(item => {
+        if (catFilter !== "ALL" && item !== catFilter) return;
+        let itIssued = itemTotals[item].issued;
+        let itUsed = itemTotals[item].used;
+        let itBal = itIssued - itUsed;
+        let balColor = itBal < 0 ? "text-rose-600 font-bold" : "text-emerald-700 font-bold";
 
-      list = list.filter(item => {
+        itemsSummaryBody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-bold text-slate-700">${item}</td>
+            <td class="p-3 text-center text-indigo-600 font-semibold">${itIssued}</td>
+            <td class="p-3 text-center text-amber-600 font-semibold">${itUsed}</td>
+            <td class="p-3 text-center ${balColor}">${itBal}</td>
+          </tr>`;
+      });
+
+      // Render Employee Table
+      let totIssued = 0, totUsed = 0;
+      let list = Object.values(summary).filter(item => {
         if (selectedRegion !== "ALL" && item.region.toUpperCase() !== selectedRegion.toUpperCase()) return false;
         if (search && !item.id.toLowerCase().includes(search) && !item.name.toLowerCase().includes(search)) return false;
         return true;
