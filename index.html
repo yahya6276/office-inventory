@@ -3,14 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FieldHub ERP - Inventory & Stock Management</title>
+  <title>FieldHub ERP - Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
-  <div class="flex h-screen overflow-hidden">
+  <!-- LOGIN SCREEN (DEFAULT) -->
+  <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-200 space-y-6">
+      <div class="text-center">
+        <h1 class="text-2xl font-black text-slate-900 tracking-wide">📦 FieldHub ERP</h1>
+        <p class="text-xs text-slate-500 mt-1">Employee & Admin Portal Login</p>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Enter Portal Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+        </div>
+        <button onclick="handleLogin()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Login to Portal</button>
+        <div id="loginError" class="hidden text-rose-600 text-xs text-center font-bold">غلط پاسورڈ! دوبارہ کوشش کریں۔</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP (HIDDEN UNTIL LOGIN) -->
+  <div id="mainApp" class="hidden flex h-screen overflow-hidden">
     <!-- Sidebar -->
     <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800">
       <div>
@@ -19,31 +38,31 @@
           <p class="text-xs text-slate-400 mt-1">Inventory Management System</p>
         </div>
         <nav class="p-4 space-y-1">
-          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition">📊 Admin Dashboard</button>
-          <button onclick="switchTab('issued')" id="nav-issued" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📤 Inventory Issued</button>
-          <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition">📊 Admin Dashboard</button>
+          <button onclick="switchTab('issued')" id="nav-issued" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📤 Inventory Issued</button>
+          <button onclick="switchTab('consumption')" id="nav-consumption" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v17.0 (Date Range Filter)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v18.0 (Secure Login)</div>
     </aside>
 
     <!-- Main Area -->
     <div class="flex-1 flex flex-col overflow-y-auto">
       <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-3 shadow-xs">
         <div>
-          <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Admin Dashboard</h2>
+          <h2 id="pageTitle" class="text-xl font-bold text-slate-800">FieldHub Portal</h2>
           <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting...</p>
         </div>
         <div class="flex items-center gap-3">
           <button onclick="openRequestModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-xs transition flex items-center gap-2">📑 Stock Request Form</button>
           <button onclick="openStaffModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-xs transition flex items-center gap-2">📝 Daily Consumption Form</button>
-          <button onclick="loadData()" id="refreshBtn" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-xs transition flex items-center gap-2">🔄 Refresh</button>
+          <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-sm font-semibold transition">🔒 Logout</button>
         </div>
       </header>
 
       <main class="p-6 space-y-6">
-        <!-- TAB 1: DASHBOARD -->
-        <section id="tab-dashboard" class="space-y-6">
+        <!-- TAB 1: DASHBOARD (ADMIN ONLY) -->
+        <section id="tab-dashboard" class="admin-only space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Filter Region</label>
@@ -145,8 +164,14 @@
           </div>
         </section>
 
+        <!-- WELCOME BANNER FOR EMPLOYEES -->
+        <section id="employeeWelcome" class="hidden bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-4">
+          <h2 class="text-2xl font-black text-slate-900">خوش آمدید! FieldHub Portal میں</h2>
+          <p class="text-sm text-slate-600 max-w-lg mx-auto">اوپر دیے گئے بٹنوں (**Stock Request Form** یا **Daily Consumption Form**) پر کلک کر کے اپنی ریکویسٹ یا ڈیلی کنزمپشن درج کریں۔</p>
+        </section>
+
         <!-- TAB 2: INVENTORY ISSUED -->
-        <section id="tab-issued" class="hidden space-y-6">
+        <section id="tab-issued" class="admin-only hidden space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Filter Region</label>
@@ -172,7 +197,7 @@
         </section>
 
         <!-- TAB 3: DAILY CONSUMPTION -->
-        <section id="tab-consumption" class="hidden space-y-6">
+        <section id="tab-consumption" class="admin-only hidden space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Filter Region</label>
@@ -246,6 +271,11 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFsWEdMXGG7wUywUH4bXbKG7Zr89p1_EWH4uxH-vFRMJ7MZGXRlUweb9AA9mImQngcTw/exec";
+    
+    // Passwords (آپ اپنے حساب سے تبدیل کر سکتے ہیں)
+    const ADMIN_PASSWORD = "admin123";
+    const EMPLOYEE_PASSWORD = "staff123";
+
     let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {};
     let lastMatchingEmployees = [];
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
@@ -253,16 +283,59 @@
     window.onload = function() {
       document.getElementById('modalDate').valueAsDate = new Date();
       document.getElementById('reqDate').valueAsDate = new Date();
-      loadData();
+      
+      let sessionRole = localStorage.getItem('erp_role');
+      if (sessionRole) {
+        initPortal(sessionRole);
+      }
     };
+
+    function handleLogin() {
+      let pass = document.getElementById('loginPassword').value.trim();
+      let errBox = document.getElementById('loginError');
+
+      if (pass === ADMIN_PASSWORD) {
+        localStorage.setItem('erp_role', 'admin');
+        initPortal('admin');
+      } else if (pass === EMPLOYEE_PASSWORD) {
+        localStorage.setItem('erp_role', 'employee');
+        initPortal('employee');
+      } else {
+        errBox.classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('erp_role');
+      location.reload();
+    }
+
+    function initPortal(role) {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+
+      if (role === 'employee') {
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
+        document.getElementById('employeeWelcome').classList.remove('hidden');
+        document.getElementById('pageTitle').innerText = "Employee Portal - Forms";
+      } else {
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+        document.getElementById('employeeWelcome').classList.add('hidden');
+      }
+      loadData();
+    }
 
     function switchTab(tab) {
       ['dashboard', 'issued', 'consumption'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
-        document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition";
+        let el = document.getElementById(`tab-${t}`);
+        if(el) el.classList.add('hidden');
+        let nav = document.getElementById(`nav-${t}`);
+        if(nav) nav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition";
       });
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      document.getElementById(`nav-${tab}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition";
+      let targetTab = document.getElementById(`tab-${tab}`);
+      if(targetTab) targetTab.classList.remove('hidden');
+      let targetNav = document.getElementById(`nav-${tab}`);
+      if(targetNav) targetNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition";
       document.getElementById('pageTitle').innerText = { dashboard: "Admin Dashboard", issued: "Office Inventory Issued Records", consumption: "Daily Consumption Records" }[tab];
     }
 
@@ -332,11 +405,14 @@
         }
 
         const catSel = document.getElementById('catFilter');
-        catSel.innerHTML = '<option value="ALL">All Categories</option>';
-        categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+        if(catSel) {
+          catSel.innerHTML = '<option value="ALL">All Categories</option>';
+          categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+        }
 
         ['modalItemsContainer', 'reqItemsContainer'].forEach(containerId => {
           const container = document.getElementById(containerId);
+          if(!container) return;
           container.innerHTML = "";
           categories.forEach(item => {
             container.innerHTML += `
@@ -348,13 +424,17 @@
         });
 
         const datalist = document.getElementById('empList');
-        datalist.innerHTML = "";
-        Object.keys(empMap).sort((a,b) => Number(a) - Number(b)).forEach(id => {
-          datalist.innerHTML += `<option value="${id} - ${empMap[id]}">`;
-        });
+        if(datalist) {
+          datalist.innerHTML = "";
+          Object.keys(empMap).sort((a,b) => Number(a) - Number(b)).forEach(id => {
+            datalist.innerHTML += `<option value="${id} - ${empMap[id]}">`;
+          });
+        }
 
-        renderDashboard();
-        renderRawTables();
+        if(localStorage.getItem('erp_role') === 'admin') {
+          renderDashboard();
+          renderRawTables();
+        }
         statusEl.innerText = "Connected • " + new Date().toLocaleTimeString();
       } catch (e) {
         console.error(e);
@@ -449,12 +529,10 @@
         categories.forEach(cat => { summary[id].items[cat] = { issued: 0, used: 0 }; });
       });
 
-      // 1. Process Issued Sheet (with Date Range Filter)
       if (rawIssued.length > 1) {
         let h = rawIssued[0];
         for (let i = 1; i < rawIssued.length; i++) {
           let r = rawIssued[i];
-          
           let rowDate = getRowDate(r);
           if (startDate && rowDate && rowDate < startDate) continue;
           if (endDate && rowDate && rowDate > endDate) continue;
@@ -489,12 +567,10 @@
         }
       }
 
-      // 2. Process Consumed Sheet (with Date Range Filter)
       if (rawConsumed.length > 1) {
         let h = rawConsumed[0];
         for (let i = 1; i < rawConsumed.length; i++) {
           let r = rawConsumed[i];
-
           let rowDate = getRowDate(r);
           if (startDate && rowDate && rowDate < startDate) continue;
           if (endDate && rowDate && rowDate > endDate) continue;
