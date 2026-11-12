@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Office Inventory ERP - Request & Consumption</title>
+  <title>Office Inventory ERP - Fixed Employee Details</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style> body { font-family: 'Inter', sans-serif; } </style>
@@ -24,7 +24,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">System v4.0</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">System v4.1</div>
     </aside>
 
     <!-- Main Area -->
@@ -226,7 +226,7 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBxNs-ZJ8jtTg2ZEdQ8trQczKrsrh3OfDtTW8X2pnVq1FP_qSU5EI0rAbRgqq2Kt2Uwg/exec";
-    let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {};
+    let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {};
 
     window.onload = () => {
       document.getElementById('modalDate').valueAsDate = new Date();
@@ -255,7 +255,6 @@
         rawIssued = data.issued || [];
         rawConsumed = data.consumed || [];
 
-        // Extract Items from Issued Headers (Assuming items start at col index 4)
         if (rawIssued.length > 0) {
           const headers = rawIssued[0];
           categories = headers.slice(4).filter(c => c.toString().trim() !== "");
@@ -264,7 +263,6 @@
           catSel.innerHTML = '<option value="ALL">All Categories</option>';
           categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
 
-          // Populate Item Inputs for both Modals
           ['modalItemsContainer', 'reqItemsContainer'].forEach(containerId => {
             const container = document.getElementById(containerId);
             container.innerHTML = "";
@@ -278,26 +276,38 @@
           });
         }
 
-        // Load Employees from "Employees Details" tab or fallback to Issued tab
+        // Parse Employees Details strictly: Col A = Region, Col B = Emp ID, Col C = Name
         empMap = {};
+        empRegionMap = {};
         if (rawEmployees.length > 1) {
           for (let i = 1; i < rawEmployees.length; i++) {
-            let id = rawEmployees[i][0] ? rawEmployees[i][0].toString().trim() : "";
-            let name = rawEmployees[i][1] ? rawEmployees[i][1].toString().trim() : "";
-            if (id) empMap[id] = name;
+            let reg = rawEmployees[i][0] ? rawEmployees[i][0].toString().trim() : "";
+            let id = rawEmployees[i][1] ? rawEmployees[i][1].toString().trim() : "";
+            let name = rawEmployees[i][2] ? rawEmployees[i][2].toString().trim() : "";
+            if (id) {
+              empMap[id] = name;
+              empRegionMap[id] = reg;
+            }
           }
-        } else {
+        }
+
+        // Fallback to Issued tab if Employees tab is empty
+        if (Object.keys(empMap).length === 0 && rawIssued.length > 1) {
           for (let i = 1; i < rawIssued.length; i++) {
+            let reg = rawIssued[i][1] ? rawIssued[i][1].toString().trim() : "";
             let id = rawIssued[i][2] ? rawIssued[i][2].toString().trim() : "";
             let name = rawIssued[i][3] ? rawIssued[i][3].toString().trim() : "";
-            if (id && !empMap[id]) empMap[id] = name;
+            if (id && !empMap[id]) {
+              empMap[id] = name;
+              empRegionMap[id] = reg;
+            }
           }
         }
 
         ['modalEmpSelect', 'reqEmpSelect'].forEach(selId => {
           const select = document.getElementById(selId);
           select.innerHTML = '<option value="">-- Choose ID --</option>';
-          Object.keys(empMap.length ? empMap : {}).sort().forEach(id => {
+          Object.keys(empMap).sort().forEach(id => {
             select.innerHTML += `<option value="${id}">${id} - ${empMap[id]}</option>`;
           });
         });
@@ -318,10 +328,16 @@
     function fillModalName() {
       const id = document.getElementById('modalEmpSelect').value;
       document.getElementById('modalEmpName').value = empMap[id] || "";
+      if (empRegionMap[id]) {
+        document.getElementById('modalRegion').value = empRegionMap[id];
+      }
     }
     function fillReqName() {
       const id = document.getElementById('reqEmpSelect').value;
       document.getElementById('reqEmpName').value = empMap[id] || "";
+      if (empRegionMap[id]) {
+        document.getElementById('reqRegion').value = empRegionMap[id];
+      }
     }
 
     async function submitConsumption() {
@@ -441,7 +457,7 @@
         if (selectedRegion !== "ALL" && reg !== selectedRegion) continue;
 
         let id = r[2].toString().trim();
-        let name = (r[3] || "").toString().trim();
+        let name = empMap[id] || (r[3] || "").toString().trim();
         if (search && !id.toLowerCase().includes(search) && !name.toLowerCase().includes(search)) continue;
 
         let key = reg + "_" + id;
@@ -462,7 +478,7 @@
         if (selectedRegion !== "ALL" && reg !== selectedRegion) continue;
 
         let id = r[2].toString().trim();
-        let name = (r[3] || "").toString().trim();
+        let name = empMap[id] || (r[3] || "").toString().trim();
         if (search && !id.toLowerCase().includes(search) && !name.toLowerCase().includes(search)) continue;
 
         let key = reg + "_" + id;
