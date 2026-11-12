@@ -48,7 +48,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v21.0 (Demand Room Form)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v23.0 (Demand Room Final)</div>
     </aside>
 
     <!-- Main Area -->
@@ -175,7 +175,7 @@
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
             <div>
               <h3 class="font-bold text-slate-900 text-lg">🏢 Demand Room Inventory Ledger</h3>
-              <p class="text-xs text-slate-500 mt-1">نیا آنے والا سامان درج کریں اور کل اسٹاک کا حساب دیکھیں۔</p>
+              <p class="text-xs text-slate-500 mt-1">تمام آئٹمز (بشمول بیگز اور ٹونر) کا اسٹاک اور ڈیمانڈ روم کا ریکارڈ۔</p>
             </div>
             <div class="flex items-center gap-3">
               <button onclick="openDemandModal()" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs flex items-center gap-2">➕ Add New Stock (Demand Room)</button>
@@ -265,19 +265,21 @@
   </div>
 
   <!-- ADD DEMAND ROOM STOCK MODAL -->
-  <div id="demandModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-      <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
-        <h3 class="font-bold text-base">🏢 Add New Stock to Demand Room</h3>
+  <div id="demandModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
+        <h3 class="font-bold text-lg">🏢 Add New Stock to Demand Room (All 42 Items)</h3>
         <button onclick="closeDemandModal()" class="text-white font-bold px-2 py-1">✕</button>
       </div>
-      <div class="p-6 space-y-4">
-        <div><label class="block text-xs font-bold text-slate-600 mb-1">Date Received</label><input type="date" id="demandDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Item Category / Name</label>
-          <select id="demandItemName" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none"></select>
+      <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-xs font-bold text-slate-600 mb-1">Date Received</label><input type="date" id="demandDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
+          <div><label class="block text-xs font-bold text-slate-600 mb-1">Added By</label><input type="text" id="demandAddedBy" placeholder="Your Name/ID..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
         </div>
-        <div><label class="block text-xs font-bold text-slate-600 mb-1">Quantity Received</label><input type="number" min="1" id="demandQty" value="1" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-2">Quantities for All Items</label>
+          <div id="demandItemsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+        </div>
         <button onclick="submitDemandStock()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Save Stock Entry</button>
       </div>
     </div>
@@ -296,7 +298,7 @@
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="modalEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="modalRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Case Number</label><input type="text" id="modalCaseNum" placeholder="e.g. 321001-01-01" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
-        <div><label class="block text-xs font-bold text-slate-500 mb-2">Used Items</label><div id="modalItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-2">Used Items (Field Items)</label><div id="modalItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
         <button onclick="submitConsumption()" id="modalSubBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Consumption</button>
       </div>
     </div>
@@ -314,7 +316,7 @@
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="reqEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="reqEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
-        <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items (Field Items)</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
         <button onclick="submitRequest()" id="reqSubBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Request</button>
       </div>
     </div>
@@ -335,12 +337,15 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlpl2Iav5Y3FCVVvc9SaqEVAm_eMwa2-HO77SCm1KCAkw9ogASOuhmNO9N1bWkNJH4UQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1CbOosD4e7uCKUn4HbNRP7J3fPEWv3UHmMwHZsu3Ih8nsCBE4TR0nlGHWhNFr2ffgWw/exec";
     const ADMIN_PASSWORD = "admin123";
 
-    let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], categories = [], empMap = {}, empRegionMap = {};
+    let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {};
     let lastMatchingEmployees = [];
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
+
+    // وہ آئٹمز جو ملازمین کے فارم میں شو نہیں ہونی چاہئیں لیکن ڈیمانڈ روم میں ہوں گی
+    const EXCLUDED_FIELD_ITEMS = ["SMALL BAG", "LARGE BAG", "ICE POUCH", "ICE PACK", "TONER 05A", "TONER 79", "OTHERS"];
 
     window.onload = function() {
       document.getElementById('modalDate').valueAsDate = new Date();
@@ -423,7 +428,7 @@
         
         let empName = localStorage.getItem('logged_name') || '';
         let empId = localStorage.getItem('logged_id') || '';
-        document.getElementById('welcomeEmpTitle').innerText = `خوش آمدید! ${empName} (${empId})`;
+        document.getElementById('welcomeEmpTitle', `خوش آمدید! ${empName} (${empId})`);
         document.getElementById('pageTitle').innerText = `Employee Portal - ${empName}`;
         loadData();
       }
@@ -495,6 +500,9 @@
         rawIssued = data.issued || [];
         rawConsumed = data.consumed || [];
         rawDemand = data.demand || [];
+        allCategories = data.allItems || [];
+
+        fieldCategories = allCategories.filter(item => !EXCLUDED_FIELD_ITEMS.includes(item.toUpperCase().trim()));
 
         empMap = {}; empRegionMap = {};
         if (rawEmployees.length > 1) {
@@ -508,35 +516,31 @@
           }
         }
 
-        categories = [];
-        if (rawIssued.length > 0) {
-          let h = rawIssued[0];
-          for (let c = 0; c < h.length; c++) {
-            let colName = h[c] ? h[c].toString().trim() : "";
-            let low = colName.toLowerCase();
-            if (colName && !low.includes("date") && !low.includes("time") && !low.includes("name") && !low.includes("id") && !low.includes("region") && !low.includes("case")) {
-              categories.push(colName);
-            }
-          }
-        }
-
         const catSel = document.getElementById('catFilter');
         if(catSel) {
           catSel.innerHTML = '<option value="ALL">All Categories</option>';
-          categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+          allCategories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
         }
 
-        const demandItemSelect = document.getElementById('demandItemName');
-        if(demandItemSelect) {
-          demandItemSelect.innerHTML = "";
-          categories.forEach(c => demandItemSelect.innerHTML += `<option value="${c}">${c}</option>`);
+        // Demand Room gets ALL items (42 items)
+        const demandContainer = document.getElementById('demandItemsContainer');
+        if(demandContainer) {
+          demandContainer.innerHTML = "";
+          allCategories.forEach(item => {
+            demandContainer.innerHTML += `
+              <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+                <label class="block text-xs font-bold text-slate-700 mb-1">${item}</label>
+                <input type="number" min="0" value="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';" class="demandItemsContainer-input w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-sm font-bold text-slate-900 focus:outline-none" data-item="${item}">
+              </div>`;
+          });
         }
 
+        // Employee forms get ONLY field categories (without bags/toners)
         ['modalItemsContainer', 'reqItemsContainer'].forEach(containerId => {
           const container = document.getElementById(containerId);
           if(!container) return;
           container.innerHTML = "";
-          categories.forEach(item => {
+          fieldCategories.forEach(item => {
             container.innerHTML += `
               <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
                 <label class="block text-xs font-bold text-slate-700 mb-1">${item}</label>
@@ -577,19 +581,23 @@
     }
     function closeRequestModal() { document.getElementById('requestModal').classList.add('hidden'); }
 
-    function openDemandModal() { document.getElementById('demandModal').classList.remove('hidden'); }
+    function openDemandModal() {
+      document.getElementById('demandAddedBy').value = localStorage.getItem('logged_name') || localStorage.getItem('logged_id') || 'Admin';
+      document.getElementById('demandModal').classList.remove('hidden');
+    }
     function closeDemandModal() { document.getElementById('demandModal').classList.add('hidden'); }
 
     async function submitDemandStock() {
       const date = document.getElementById('demandDate').value;
-      const itemName = document.getElementById('demandItemName').value;
-      const quantity = Number(document.getElementById('demandQty').value) || 0;
-      const addedBy = localStorage.getItem('logged_id') || 'Admin';
+      const addedBy = document.getElementById('demandAddedBy').value.trim();
 
-      if (!date || !itemName || quantity <= 0) { alert("تاریخ اور مقدار درست درج کریں۔"); return; }
+      if (!date || !addedBy) { alert("تاریخ اور نام درج کرنا لازمی ہے۔"); return; }
+
+      let items = {};
+      document.querySelectorAll('.demandItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
 
       try {
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "demand", date, itemName, quantity, addedBy }) });
+        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "demand", date, addedBy, items }) });
         alert("✅ Demand Room میں اسٹاک کامیابی سے شامل ہو گیا!");
         closeDemandModal();
         loadData();
@@ -641,16 +649,19 @@
 
       let itemReceivedTotals = {};
       let itemIssuedTotals = {};
-      categories.forEach(cat => { itemReceivedTotals[cat] = 0; itemIssuedTotals[cat] = 0; });
+      allCategories.forEach(cat => { itemReceivedTotals[cat] = 0; itemIssuedTotals[cat] = 0; });
 
       // Calculate received from Demand Room sheet
       if (rawDemand.length > 1) {
+        let h = rawDemand[0];
         for (let i = 1; i < rawDemand.length; i++) {
           let r = rawDemand[i];
-          let itemName = r[1] ? r[1].toString().trim() : "";
-          let qty = Number(r[2]) || 0;
-          if (itemReceivedTotals.hasOwnProperty(itemName)) {
-            itemReceivedTotals[itemName] += qty;
+          for (let c = 2; c < h.length; c++) {
+            let colName = h[c] ? h[c].toString().trim() : "";
+            let valNum = Number(r[c]) || 0;
+            if (itemReceivedTotals.hasOwnProperty(colName)) {
+              itemReceivedTotals[colName] += valNum;
+            }
           }
         }
       }
@@ -663,7 +674,7 @@
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
             let valNum = Number(r[c]) || 0;
-            if (categories.includes(colName)) {
+            if (itemIssuedTotals.hasOwnProperty(colName)) {
               itemIssuedTotals[colName] += valNum;
             }
           }
@@ -671,7 +682,7 @@
       }
 
       tbody.innerHTML = "";
-      categories.forEach(cat => {
+      allCategories.forEach(cat => {
         let received = itemReceivedTotals[cat];
         let issued = itemIssuedTotals[cat];
         let balance = received - issued;
@@ -723,12 +734,12 @@
       const endDate = document.getElementById('endDateFilter').value;
 
       let itemTotals = {};
-      categories.forEach(cat => { itemTotals[cat] = { issued: 0, used: 0 }; });
+      fieldCategories.forEach(cat => { itemTotals[cat] = { issued: 0, used: 0 }; });
 
       let summary = {};
       Object.keys(empMap).forEach(id => {
         summary[id] = { region: empRegionMap[id] || "Center 1", id: id, name: empMap[id] || "", issued: 0, used: 0, items: {} };
-        categories.forEach(cat => { summary[id].items[cat] = { issued: 0, used: 0 }; });
+        fieldCategories.forEach(cat => { summary[id].items[cat] = { issued: 0, used: 0 }; });
       });
 
       if (rawIssued.length > 1) {
@@ -756,7 +767,7 @@
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
             let valNum = Number(r[c]) || 0;
-            if (categories.includes(colName)) {
+            if (fieldCategories.includes(colName)) {
               if (selectedRegion === "ALL" || rowReg.toUpperCase() === selectedRegion.toUpperCase()) {
                 itemTotals[colName].issued += valNum;
               }
@@ -794,7 +805,7 @@
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
             let valNum = Number(r[c]) || 0;
-            if (categories.includes(colName)) {
+            if (fieldCategories.includes(colName)) {
               if (selectedRegion === "ALL" || rowReg.toUpperCase() === selectedRegion.toUpperCase()) {
                 itemTotals[colName].used += valNum;
               }
@@ -814,26 +825,26 @@
       });
 
       let displayItemTotals = {};
-      categories.forEach(cat => { displayItemTotals[cat] = { issued: 0, used: 0 }; });
+      fieldCategories.forEach(cat => { displayItemTotals[cat] = { issued: 0, used: 0 }; });
 
       if (search && lastMatchingEmployees.length > 0) {
         reportTitle.innerText = `(Filtered Report for: ${lastMatchingEmployees.map(e => e.name + ' (' + e.id + ')').join(', ')})`;
         lastMatchingEmployees.forEach(emp => {
-          categories.forEach(cat => {
+          fieldCategories.forEach(cat => {
             displayItemTotals[cat].issued += emp.items[cat].issued;
             displayItemTotals[cat].used += emp.items[cat].used;
           });
         });
       } else {
         reportTitle.innerText = "(Overall Summary)";
-        categories.forEach(cat => {
+        fieldCategories.forEach(cat => {
           displayItemTotals[cat].issued = itemTotals[cat].issued;
           displayItemTotals[cat].used = itemTotals[cat].used;
         });
       }
 
       itemsSummaryBody.innerHTML = "";
-      categories.forEach(item => {
+      fieldCategories.forEach(item => {
         if (catFilter !== "ALL" && item !== catFilter) return;
         let itIssued = displayItemTotals[item].issued;
         let itUsed = displayItemTotals[item].used;
