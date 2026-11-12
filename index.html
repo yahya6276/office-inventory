@@ -15,15 +15,20 @@
     <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-200 space-y-6">
       <div class="text-center">
         <h1 class="text-2xl font-black text-slate-900 tracking-wide">📦 FieldHub ERP</h1>
-        <p class="text-xs text-slate-500 mt-1">Employee & Admin Portal Login</p>
+        <p class="text-xs text-slate-500 mt-1">Employee & Admin Secure Login</p>
       </div>
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Enter Portal Password</label>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID / Username</label>
+          <input type="text" id="loginUser" placeholder="Enter Employee ID (e.g. 101) or Admin..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
           <input type="password" id="loginPassword" placeholder="Enter password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <p class="text-[10px] text-slate-400 mt-1">* ملازمین کے لیے پہلا پاسورڈ ان کی اپنی Employee ID ہے</p>
         </div>
         <button onclick="handleLogin()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Login to Portal</button>
-        <div id="loginError" class="hidden text-rose-600 text-xs text-center font-bold">غلط پاسورڈ! دوبارہ کوشش کریں۔</div>
+        <div id="loginError" class="hidden text-rose-600 text-xs text-center font-bold">غلط آئی ڈی یا پاسورڈ! دوبارہ کوشش کریں۔</div>
       </div>
     </div>
   </div>
@@ -43,7 +48,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v18.0 (Secure Login)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v19.0 (Secure User Portal)</div>
     </aside>
 
     <!-- Main Area -->
@@ -56,6 +61,7 @@
         <div class="flex items-center gap-3">
           <button onclick="openRequestModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-xs transition flex items-center gap-2">📑 Stock Request Form</button>
           <button onclick="openStaffModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-xs transition flex items-center gap-2">📝 Daily Consumption Form</button>
+          <button onclick="openPasswordModal()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-xl text-sm font-semibold transition">🔑 Change Password</button>
           <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-xl text-sm font-semibold transition">🔒 Logout</button>
         </div>
       </header>
@@ -166,8 +172,8 @@
 
         <!-- WELCOME BANNER FOR EMPLOYEES -->
         <section id="employeeWelcome" class="hidden bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-4">
-          <h2 class="text-2xl font-black text-slate-900">خوش آمدید! FieldHub Portal میں</h2>
-          <p class="text-sm text-slate-600 max-w-lg mx-auto">اوپر دیے گئے بٹنوں (**Stock Request Form** یا **Daily Consumption Form**) پر کلک کر کے اپنی ریکویسٹ یا ڈیلی کنزمپشن درج کریں۔</p>
+          <h2 id="welcomeEmpTitle" class="text-2xl font-black text-slate-900">خوش آمدید!</h2>
+          <p class="text-sm text-slate-600 max-w-lg mx-auto">اوپر دیے گئے بٹنوں (**Stock Request Form** یا **Daily Consumption Form**) پر کلک کر کے اپنی ریکویسٹ یا ڈیلی کنزمپشن درج کریں۔ آپ صرف اپنی آئی ڈی سے فارম جمع کر سکتے ہیں۔</p>
         </section>
 
         <!-- TAB 2: INVENTORY ISSUED -->
@@ -234,11 +240,7 @@
       </div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="modalDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 mb-1">Employee ID & Name (Type to search)</label>
-          <input type="text" id="modalEmpInput" list="empList" onchange="fillModalName()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none">
-          <datalist id="empList"></datalist>
-        </div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="modalEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="modalEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="modalRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Case Number</label><input type="text" id="modalCaseNum" placeholder="e.g. 321001-01-01" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
@@ -257,10 +259,7 @@
       </div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="reqDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
-        <div>
-          <label class="block text-xs font-bold text-slate-500 mb-1">Employee ID & Name (Type to search)</label>
-          <input type="text" id="reqEmpInput" list="empList" onchange="fillReqName()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none">
-        </div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="reqEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="reqEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
@@ -269,12 +268,23 @@
     </div>
   </div>
 
+  <!-- CHANGE PASSWORD MODAL -->
+  <div id="passwordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-base">🔑 Change Password</h3>
+        <button onclick="closePasswordModal()" class="text-white font-bold px-2 py-1">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div><label class="block text-xs font-bold text-slate-600 mb-1">New Password</label><input type="password" id="newPasswordInput" placeholder="Enter new password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
+        <button onclick="saveNewPassword()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 rounded-xl text-sm">Save Password</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFsWEdMXGG7wUywUH4bXbKG7Zr89p1_EWH4uxH-vFRMJ7MZGXRlUweb9AA9mImQngcTw/exec";
-    
-    // Passwords (آپ اپنے حساب سے تبدیل کر سکتے ہیں)
     const ADMIN_PASSWORD = "admin123";
-    const EMPLOYEE_PASSWORD = "staff123";
 
     let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {};
     let lastMatchingEmployees = [];
@@ -286,43 +296,113 @@
       
       let sessionRole = localStorage.getItem('erp_role');
       if (sessionRole) {
-        initPortal(sessionRole);
+        loadDataAndInitSession();
       }
     };
 
-    function handleLogin() {
+    async function handleLogin() {
+      let username = document.getElementById('loginUser').value.trim();
       let pass = document.getElementById('loginPassword').value.trim();
       let errBox = document.getElementById('loginError');
 
-      if (pass === ADMIN_PASSWORD) {
+      if (username.toLowerCase() === 'admin' && pass === ADMIN_PASSWORD) {
         localStorage.setItem('erp_role', 'admin');
-        initPortal('admin');
-      } else if (pass === EMPLOYEE_PASSWORD) {
-        localStorage.setItem('erp_role', 'employee');
-        initPortal('employee');
-      } else {
+        localStorage.setItem('logged_id', 'admin');
+        loadDataAndInitSession();
+        return;
+      }
+
+      // Fetch latest employee data to verify credentials
+      try {
+        const res = await fetch(SCRIPT_URL + "?v=" + new Date().getTime());
+        const data = await res.json();
+        rawEmployees = data.employees || [];
+
+        let foundId = "";
+        let foundName = "";
+        let foundReg = "Center 1";
+
+        if (rawEmployees.length > 1) {
+          for (let i = 1; i < rawEmployees.length; i++) {
+            let row = rawEmployees[i];
+            if (!row || row.length === 0) continue;
+            let name = row[0] ? row[0].toString().trim() : "";
+            let id = row[1] ? row[1].toString().trim() : "";
+            let reg = cleanRegion(row[2]);
+
+            if (id && (id.toLowerCase() === username.toLowerCase() || name.toLowerCase() === username.toLowerCase())) {
+              foundId = id;
+              foundName = name;
+              foundReg = reg;
+              break;
+            }
+          }
+        }
+
+        if (foundId) {
+          let savedPass = localStorage.getItem('emp_pass_' + foundId) || foundId; // Default pass is Employee ID
+          if (pass === savedPass) {
+            localStorage.setItem('erp_role', 'employee');
+            localStorage.setItem('logged_id', foundId);
+            localStorage.setItem('logged_name', foundName);
+            localStorage.setItem('logged_reg', foundReg);
+            loadDataAndInitSession();
+            return;
+          }
+        }
+
         errBox.classList.remove('hidden');
+      } catch (e) {
+        alert("لاگ ان میں خرابی پیش آگئی۔ انٹرنیٹ کنکشن چیک کریں۔");
       }
     }
 
     function logout() {
       localStorage.removeItem('erp_role');
+      localStorage.removeItem('logged_id');
+      localStorage.removeItem('logged_name');
+      localStorage.removeItem('logged_reg');
       location.reload();
     }
 
-    function initPortal(role) {
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('mainApp').classList.remove('hidden');
-
-      if (role === 'employee') {
-        document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
-        document.getElementById('employeeWelcome').classList.remove('hidden');
-        document.getElementById('pageTitle').innerText = "Employee Portal - Forms";
-      } else {
+    async function loadDataAndInitSession() {
+      let role = localStorage.getItem('erp_role');
+      if (role === 'admin') {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
         document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
         document.getElementById('employeeWelcome').classList.add('hidden');
+        loadData();
+      } else if (role === 'employee') {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
+        document.getElementById('employeeWelcome').classList.remove('hidden');
+        
+        let empName = localStorage.getItem('logged_name') || '';
+        let empId = localStorage.getItem('logged_id') || '';
+        document.getElementById('welcomeEmpTitle').innerText = `خوش آمدید! ${empName} (${empId})`;
+        document.getElementById('pageTitle').innerText = `Employee Portal - ${empName}`;
+        loadData();
       }
-      loadData();
+    }
+
+    function openPasswordModal() { document.getElementById('passwordModal').classList.remove('hidden'); }
+    function closePasswordModal() { document.getElementById('passwordModal').classList.add('hidden'); }
+
+    function saveNewPassword() {
+      let newPass = document.getElementById('newPasswordInput').value.trim();
+      let role = localStorage.getItem('erp_role');
+      if (!newPass) { alert("پاسورڈ خالی نہیں ہو سکتا!"); return; }
+
+      if (role === 'employee') {
+        let empId = localStorage.getItem('logged_id');
+        localStorage.setItem('emp_pass_' + empId, newPass);
+        alert("✅ پاسورڈ کامیابی سے تبدیل ہو گیا!");
+        closePasswordModal();
+      } else {
+        alert("ایڈمن پاسورڈ کے لیے کوڈ میں تبدیلی کریں۔");
+      }
     }
 
     function switchTab(tab) {
@@ -423,14 +503,6 @@
           });
         });
 
-        const datalist = document.getElementById('empList');
-        if(datalist) {
-          datalist.innerHTML = "";
-          Object.keys(empMap).sort((a,b) => Number(a) - Number(b)).forEach(id => {
-            datalist.innerHTML += `<option value="${id} - ${empMap[id]}">`;
-          });
-        }
-
         if(localStorage.getItem('erp_role') === 'admin') {
           renderDashboard();
           renderRawTables();
@@ -442,35 +514,31 @@
       }
     }
 
-    function openStaffModal() { document.getElementById('staffModal').classList.remove('hidden'); }
+    function openStaffModal() {
+      let role = localStorage.getItem('erp_role');
+      if (role === 'employee') {
+        document.getElementById('modalEmpId').value = localStorage.getItem('logged_id');
+        document.getElementById('modalEmpName').value = localStorage.getItem('logged_name');
+        document.getElementById('modalRegion').value = localStorage.getItem('logged_reg');
+      }
+      document.getElementById('staffModal').classList.remove('hidden');
+    }
     function closeStaffModal() { document.getElementById('staffModal').classList.add('hidden'); }
-    function openRequestModal() { document.getElementById('requestModal').classList.remove('hidden'); }
+
+    function openRequestModal() {
+      let role = localStorage.getItem('erp_role');
+      if (role === 'employee') {
+        document.getElementById('reqEmpId').value = localStorage.getItem('logged_id');
+        document.getElementById('reqEmpName').value = localStorage.getItem('logged_name');
+        document.getElementById('reqRegion').value = localStorage.getItem('logged_reg');
+      }
+      document.getElementById('requestModal').classList.remove('hidden');
+    }
     function closeRequestModal() { document.getElementById('requestModal').classList.add('hidden'); }
-
-    function extractEmpId(val) {
-      if (!val) return "";
-      let parts = val.split(" - ");
-      return parts[0].trim();
-    }
-
-    function fillModalName() {
-      let inputVal = document.getElementById('modalEmpInput').value;
-      let id = extractEmpId(inputVal);
-      document.getElementById('modalEmpName').value = empMap[id] || "";
-      document.getElementById('modalRegion').value = empRegionMap[id] || "";
-    }
-
-    function fillReqName() {
-      let inputVal = document.getElementById('reqEmpInput').value;
-      let id = extractEmpId(inputVal);
-      document.getElementById('reqEmpName').value = empMap[id] || "";
-      document.getElementById('reqRegion').value = empRegionMap[id] || "";
-    }
 
     async function submitConsumption() {
       const date = document.getElementById('modalDate').value;
-      let inputVal = document.getElementById('modalEmpInput').value;
-      const empId = extractEmpId(inputVal);
+      const empId = document.getElementById('modalEmpId').value;
       const empName = document.getElementById('modalEmpName').value;
       const region = document.getElementById('modalRegion').value;
       const caseNumber = document.getElementById('modalCaseNum').value.trim();
@@ -490,8 +558,7 @@
 
     async function submitRequest() {
       const date = document.getElementById('reqDate').value;
-      let inputVal = document.getElementById('reqEmpInput').value;
-      const empId = extractEmpId(inputVal);
+      const empId = document.getElementById('reqEmpId').value;
       const empName = document.getElementById('reqEmpName').value;
       const region = document.getElementById('reqRegion').value;
 
