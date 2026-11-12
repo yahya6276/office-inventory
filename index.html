@@ -24,7 +24,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v14.0 (Filtered Report)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v14.1 (Stable)</div>
     </aside>
 
     <!-- Main Area -->
@@ -207,7 +207,6 @@
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Case Number</label><input type="text" id="modalCaseNum" placeholder="e.g. 321001-01-01" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Used Items</label><div id="modalItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
         <button onclick="submitConsumption()" id="modalSubBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Consumption</button>
-        <div id="modalMsgBox" class="hidden p-3 rounded-xl text-center text-sm font-semibold"></div>
       </div>
     </div>
   </div>
@@ -226,7 +225,6 @@
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
         <button onclick="submitRequest()" id="reqSubBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Request</button>
-        <div id="modalMsgBox" class="hidden p-3 rounded-xl text-center text-sm font-semibold"></div>
       </div>
     </div>
   </div>
@@ -236,7 +234,7 @@
     let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {};
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
 
-    window.onload = () => {
+    window.onload = function() {
       document.getElementById('modalDate').valueAsDate = new Date();
       document.getElementById('reqDate').valueAsDate = new Date();
       loadData();
@@ -465,4 +463,160 @@
 
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
-            let
+            let valNum = Number(r[c]) || 0;
+            if (categories.includes(colName)) {
+              if (selectedRegion === "ALL" || rowReg.toUpperCase() === selectedRegion.toUpperCase()) {
+                itemTotals[colName].used += valNum;
+              }
+              if (id && summary[id]) {
+                summary[id].used += valNum;
+                summary[id].items[colName].used += valNum;
+              }
+            }
+          }
+        }
+      }
+
+      let matchingEmployees = Object.values(summary).filter(emp => {
+        if (selectedRegion !== "ALL" && emp.region.toUpperCase() !== selectedRegion.toUpperCase()) return false;
+        if (search && !emp.id.toLowerCase().includes(search) && !emp.name.toLowerCase().includes(search)) return false;
+        return true;
+      });
+
+      let displayItemTotals = {};
+      categories.forEach(cat => { displayItemTotals[cat] = { issued: 0, used: 0 }; });
+
+      if (search && matchingEmployees.length > 0) {
+        reportTitle.innerText = `(Filtered Report for: ${matchingEmployees.map(e => e.name + ' (' + e.id + ')').join(', ')})`;
+        matchingEmployees.forEach(emp => {
+          categories.forEach(cat => {
+            displayItemTotals[cat].issued += emp.items[cat].issued;
+            displayItemTotals[cat].used += emp.items[cat].used;
+          });
+        });
+      } else {
+        reportTitle.innerText = "(Overall Summary)";
+        categories.forEach(cat => {
+          displayItemTotals[cat].issued = itemTotals[cat].issued;
+          displayItemTotals[cat].used = itemTotals[cat].used;
+        });
+      }
+
+      itemsSummaryBody.innerHTML = "";
+      categories.forEach(item => {
+        if (catFilter !== "ALL" && item !== catFilter) return;
+        let itIssued = displayItemTotals[item].issued;
+        let itUsed = displayItemTotals[item].used;
+        let itBal = itIssued - itUsed;
+        let balColor = itBal < 0 ? "text-rose-600 font-bold" : "text-emerald-700 font-bold";
+
+        itemsSummaryBody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-bold text-slate-700">${item}</td>
+            <td class="p-3 text-center text-indigo-600 font-semibold">${itIssued}</td>
+            <td class="p-3 text-center text-amber-600 font-semibold">${itUsed}</td>
+            <td class="p-3 text-center ${balColor}">${itBal}</td>
+          </tr>`;
+      });
+
+      let totIssued = 0, totUsed = 0;
+      document.getElementById('empCount').innerText = `${matchingEmployees.length} Employees`;
+      tbody.innerHTML = "";
+
+      if (matchingEmployees.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No matching records found.</td></tr>`;
+        return;
+      }
+
+      matchingEmployees.forEach(item => {
+        let bal = item.issued - item.used;
+        totIssued += item.issued;
+        totUsed += item.used;
+        let badge = bal < 0 
+          ? `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold">Shortage (${bal})</span>` 
+          : `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">In Hand</span>`;
+        
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 font-bold text-sky-700">${item.region}</td>
+            <td class="p-4 font-semibold text-slate-700">${item.id}</td>
+            <td class="p-4 font-medium text-slate-900">${item.name}</td>
+            <td class="p-4 text-slate-600">${item.issued}</td>
+            <td class="p-4 text-slate-600">${item.used}</td>
+            <td class="p-4 font-bold text-slate-900">${bal}</td>
+            <td class="p-4">${badge}</td>
+          </tr>`;
+      });
+
+      document.getElementById('kpiIssued').innerText = totIssued;
+      document.getElementById('kpiUsed').innerText = totUsed;
+      document.getElementById('kpiBal').innerText = totIssued - totUsed;
+    }
+
+    function renderRawTables() {
+      const buildFilteredTable = (rows, regFilterId, searchId, tableId) => {
+        if (!rows || rows.length === 0) return "<p class='text-slate-400'>No records found.</p>";
+        const regFilter = document.getElementById(regFilterId) ? document.getElementById(regFilterId).value : "ALL";
+        const search = document.getElementById(searchId) ? document.getElementById(searchId).value.toLowerCase().trim() : "";
+
+        let h = rows[0];
+        let html = `<table id="${tableId}" class="w-full text-left text-sm"><thead><tr class="bg-slate-50 text-xs font-bold uppercase">`;
+        h.forEach(col => html += `<th class="p-3 border-b">${col}</th>`);
+        html += `</tr></thead><tbody class="divide-y divide-slate-100">`;
+        
+        for (let i = 1; i < rows.length; i++) {
+          let r = rows[i];
+          let rowText = r.join(" ").toLowerCase();
+          let rowReg = "Center 1";
+          for (let cell of r) {
+            let val = cell ? cell.toString().trim() : "";
+            let clean = cleanRegion(val);
+            if (clean) { rowReg = clean; break; }
+          }
+
+          if (regFilter !== "ALL" && rowReg.toUpperCase() !== regFilter.toUpperCase()) continue;
+          if (search && !rowText.includes(search)) continue;
+
+          html += `<tr class="hover:bg-slate-50">`;
+          r.forEach(c => html += `<td class="p-3">${c || ''}</td>`);
+          html += `</tr>`;
+        }
+        return html + `</tbody></table>`;
+      };
+
+      document.getElementById('issuedRawBox').innerHTML = buildFilteredTable(rawIssued, 'issuedRegionFilter', 'issuedSearch', 'issuedRawTable');
+      document.getElementById('consumptionRawBox').innerHTML = buildFilteredTable(rawConsumed, 'consRegionFilter', 'consSearch', 'consumptionRawTable');
+    }
+
+    function exportDashboardCSV() {
+      let csv = ["Item Name,Total Issued,Total Used,Remaining Balance"];
+      document.querySelectorAll("#itemsSummaryTableBody tr").forEach(row => {
+        let cols = row.querySelectorAll("td");
+        if (cols.length === 4) {
+          csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
+        }
+      });
+      let blob = new Blob([csv.join("\n")], { type: "text/csv" });
+      let a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = "employee_item_wise_report.csv";
+      a.click();
+    }
+
+    function exportRawTable(tableId, filename) {
+      let table = document.getElementById(tableId);
+      if (!table) { alert("No data available to export!"); return; }
+      let csv = [];
+      table.querySelectorAll("tr").forEach(row => {
+        let cols = row.querySelectorAll("th, td");
+        csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/\n/g, ' ')}"`).join(","));
+      });
+      let blob = new Blob([csv.join("\n")], { type: "text/csv" });
+      let a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+    }
+  </script>
+</body>
+</html>
