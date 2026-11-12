@@ -24,7 +24,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v14.1 (Stable)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v15.0 (Detailed CSV)</div>
     </aside>
 
     <!-- Main Area -->
@@ -85,7 +85,7 @@
             </div>
           </div>
 
-          <!-- ITEMS SUMMARY TABLE (FILTERS BY EMPLOYEE SEARCH) -->
+          <!-- ITEMS SUMMARY TABLE -->
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
             <div class="p-5 border-b border-slate-200 bg-slate-900 text-white flex justify-between items-center">
               <div>
@@ -232,6 +232,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFsWEdMXGG7wUywUH4bXbKG7Zr89p1_EWH4uxH-vFRMJ7MZGXRlUweb9AA9mImQngcTw/exec";
     let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {};
+    let lastMatchingEmployees = []; // Store current filtered employees for export
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
 
     window.onload = function() {
@@ -477,7 +478,7 @@
         }
       }
 
-      let matchingEmployees = Object.values(summary).filter(emp => {
+      lastMatchingEmployees = Object.values(summary).filter(emp => {
         if (selectedRegion !== "ALL" && emp.region.toUpperCase() !== selectedRegion.toUpperCase()) return false;
         if (search && !emp.id.toLowerCase().includes(search) && !emp.name.toLowerCase().includes(search)) return false;
         return true;
@@ -486,9 +487,9 @@
       let displayItemTotals = {};
       categories.forEach(cat => { displayItemTotals[cat] = { issued: 0, used: 0 }; });
 
-      if (search && matchingEmployees.length > 0) {
-        reportTitle.innerText = `(Filtered Report for: ${matchingEmployees.map(e => e.name + ' (' + e.id + ')').join(', ')})`;
-        matchingEmployees.forEach(emp => {
+      if (search && lastMatchingEmployees.length > 0) {
+        reportTitle.innerText = `(Filtered Report for: ${lastMatchingEmployees.map(e => e.name + ' (' + e.id + ')').join(', ')})`;
+        lastMatchingEmployees.forEach(emp => {
           categories.forEach(cat => {
             displayItemTotals[cat].issued += emp.items[cat].issued;
             displayItemTotals[cat].used += emp.items[cat].used;
@@ -520,15 +521,15 @@
       });
 
       let totIssued = 0, totUsed = 0;
-      document.getElementById('empCount').innerText = `${matchingEmployees.length} Employees`;
+      document.getElementById('empCount').innerText = `${lastMatchingEmployees.length} Employees`;
       tbody.innerHTML = "";
 
-      if (matchingEmployees.length === 0) {
+      if (lastMatchingEmployees.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No matching records found.</td></tr>`;
         return;
       }
 
-      matchingEmployees.forEach(item => {
+      lastMatchingEmployees.forEach(item => {
         let bal = item.issued - item.used;
         totIssued += item.issued;
         totUsed += item.used;
@@ -589,29 +590,53 @@
     }
 
     function exportDashboardCSV() {
-      let csv = ["Item Name,Total Issued,Total Used,Remaining Balance"];
+      let now = new Date();
+      let dateStr = now.toLocaleDateString();
+      let timeStr = now.toLocaleTimeString();
+      let searchVal = document.getElementById('empSearch').value.trim();
+
+      let csv = [];
+      csv.push(`"FieldHub ERP - Inventory Report"`);
+      csv.push(`"Report Date & Time","${dateStr} ${timeStr}"`);
+      
+      if (searchVal && lastMatchingEmployees.length > 0) {
+        csv.push(`"Employee ID(s)","${lastMatchingEmployees.map(e => e.id).join(', ')}"`);
+        csv.push(`"Employee Name(s)","${lastMatchingEmployees.map(e => e.name).join(', ')}"`);
+      } else {
+        csv.push(`"Report Filter","All Employees / Overall Summary"`);
+      }
+      csv.push(""); // Empty line
+      csv.push("Item Name,Total Issued,Total Used,Remaining Balance");
+
       document.querySelectorAll("#itemsSummaryTableBody tr").forEach(row => {
         let cols = row.querySelectorAll("td");
         if (cols.length === 4) {
           csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
         }
       });
-      let blob = new Blob([csv.join("\n")], { type: "text/csv" });
+
+      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
       let a = document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
-      a.download = "employee_item_wise_report.csv";
+      a.download = searchVal ? `employee_${searchVal}_report.csv` : "overall_inventory_report.csv";
       a.click();
     }
 
     function exportRawTable(tableId, filename) {
+      let now = new Date();
       let table = document.getElementById(tableId);
       if (!table) { alert("No data available to export!"); return; }
+      
       let csv = [];
+      csv.push(`"FieldHub ERP Report"`);
+      csv.push(`"Export Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
+      csv.push("");
+
       table.querySelectorAll("tr").forEach(row => {
         let cols = row.querySelectorAll("th, td");
         csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/\n/g, ' ')}"`).join(","));
       });
-      let blob = new Blob([csv.join("\n")], { type: "text/csv" });
+      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
       let a = document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
       a.download = filename;
