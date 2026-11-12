@@ -2,21 +2,26 @@ async function loadData() {
   const statusEl = document.getElementById('syncStatus');
   statusEl.innerText = "Syncing...";
   try {
-    const res = await fetch(SCRIPT_URL, { method: "GET", redirect: "follow" });
-    const data = await res.json();
+    // URL کے آگے ?v=9.0 لگانے سے براؤزر پرانی کیش استعمال نہیں کرے گا
+    const res = await fetch(SCRIPT_URL + "?v=" + new Date().getTime(), { method: "GET", redirect: "follow" });
+    const textRes = await res.text();
+    console.log("Raw Response from Script:", textRes);
     
-    console.log("Fetched Data from Sheet:", data); // یہ کنسول میں ڈیٹا دکھائے گا
+    const data = JSON.parse(textRes);
     
     rawEmployees = data.employees || [];
     rawIssued = data.issued || [];
     rawConsumed = data.consumed || [];
 
-    alert("Data Loaded Successfully! Rows in Employees: " + rawEmployees.length);
+    console.log("Parsed Employees:", rawEmployees.length);
+    console.log("Parsed Issued:", rawIssued.length);
     
+    alert("کامیابی! ملازمین کی تعداد: " + (rawEmployees.length - 1));
+
     statusEl.innerText = "Connected • " + new Date().toLocaleTimeString();
   } catch (e) {
     console.error(e);
     statusEl.innerText = "Connection Failed!";
-    alert("Connection Error: " + e.message);
+    alert("ایرر آ گیا: " + e.message);
   }
 }
