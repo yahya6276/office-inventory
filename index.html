@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Inventory ERP Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+  <div class="flex h-screen overflow-hidden">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800">
+      <div>
+        <div class="p-6 border-b border-slate-800">
+          <h1 class="text-xl font-bold text-white tracking-wide">📦 FieldHub ERP</h1>
+          <p class="text-xs text-slate-400 mt-1">Inventory & Stock Management</p>
+        </div>
+        <nav class="p-4 space-y-1">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition">
+            📊 Dashboard
+          </button>
+          <button onclick="switchTab('issued')" id="nav-issued" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">
+            📤 Stock Issued
+          </button>
+          <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">
+            📥 Daily Consumption
+          </button>
+        </nav>
+      </div>
+      <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+        Office Management System v2.0
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col overflow-y-auto">
+      
+      <!-- Top Bar -->
+      <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-xs">
+        <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Dashboard Overview</h2>
+        <button onclick="loadData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-xs transition flex items-center gap-2">
+          🔄 Refresh Data
+        </button>
+      </header>
+
+      <!-- Content Body -->
+      <main class="p-6">
+
+        <!-- TAB 1: DASHBOARD / RECONCILIATION -->
+        <section id="tab-dashboard" class="space-y-6">
+          <!-- Filters Bar -->
+          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Period</label>
+              <select id="periodFilter" onchange="applyPeriod()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                <option value="all">All Time</option>
+                <option value="today">Today</option>
+                <option value="week">Last 7 Days</option>
+                <option value="month" selected>This Month</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Search Employee</label>
+              <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Item Category</label>
+              <select id="catFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                <option value="ALL">All Categories</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button onclick="exportTable()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">
+                📥 Export CSV Report
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Summary Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-sky-500">
+              <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL ISSUED</span>
+              <div id="kpiIssued" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-amber-500">
+              <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL CONSUMED</span>
+              <div id="kpiUsed" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-emerald-500">
+              <span class="text-xs font-bold text-slate-400 tracking-wider">REMAINING BALANCE</span>
+              <div id="kpiBal" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-200">
+              <h3 class="font-bold text-slate-800 text-base">Employee Stock Reconciliation</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                    <th class="p-4">Emp ID</th>
+                    <th class="p-4">Employee Name</th>
+                    <th class="p-4">Total Issued</th>
+                    <th class="p-4">Total Used</th>
+                    <th class="p-4">Balance</th>
+                    <th class="p-4">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="erpTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 2: STOCK ISSUED LOG -->
+        <section id="tab-issued" class="hidden space-y-6">
+          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
+            <h3 class="font-bold text-slate-800 text-lg mb-4">Raw Stock Issued Records</h3>
+            <div id="issuedRawBox" class="overflow-x-auto">Loading...</div>
+          </div>
+        </section>
+
+        <!-- TAB 3: DAILY CONSUMPTION LOG -->
+        <section id="tab-consumption" class="hidden space-y-6">
+          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
+            <h3 class="font-bold text-slate-800 text-lg mb-4">Daily Consumption Records</h3>
+            <div id="consumptionRawBox" class="overflow-x-auto">Loading...</div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBxNs-ZJ8jtTg2ZEdQ8trQczKrsrh3OfDtTW8X2pnVq1FP_qSU5EI0rAbRgqq2Kt2Uwg/exec";
+    let rawIssued = [], rawConsumed = [], categories = [];
+
+    window.onload = () => {
+      applyPeriod();
+      loadData();
+    };
+
+    function switchTab(tab) {
+      ['dashboard', 'issued', 'consumption'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition";
+      });
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      document.getElementById(`nav-${tab}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition";
+      
+      const titles = { dashboard: "Dashboard Overview", issued: "Stock Issued Records", consumption: "Daily Consumption Records" };
+      document.getElementById('pageTitle').innerText = titles[tab];
+    }
+
+    function applyPeriod() {
+      const p = document.getElementById('periodFilter').value;
+      renderDashboard();
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        rawIssued = data.issued || [];
+        rawConsumed = data.consumed || [];
+
+        if (rawIssued.length > 0) {
+          categories = rawIssued[0].slice(3).filter(c => c.toString().trim() !== "");
+          const catSel = document.getElementById('catFilter');
+          catSel.innerHTML = '<option value="ALL">All Categories</option>';
+          categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+        }
+        renderDashboard();
+        renderRawTables();
+      } catch (e) {
+        alert("Failed to load data from Google Sheet. Check Script URL.");
+      }
+    }
+
+    function renderDashboard() {
+      if (rawIssued.length < 2) return;
+      const headers = rawIssued[0];
+      const search = document.getElementById('empSearch').value.toLowerCase();
+      const cat = document.getElementById('catFilter').value;
+
+      let summary = {};
+
+      const processRows = (rows, type) => {
+        for (let i = 1; i < rows.length; i++) {
+          let r = rows[i];
+          if (!r[1]) continue;
+          let id = r[1].toString().trim();
+          let name = (r[2] || "").toString().trim();
+          if (search && !id.toLowerCase().includes(search) && !name.toLowerCase().includes(search)) continue;
+
+          if (!summary[id]) summary[id] = { id, name, issued: 0, used: 0 };
+
+          let qty = 0;
+          for (let c = 3; c < headers.length; c++) {
+            if (cat === "ALL" || headers[c] === cat) {
+              qty += Number(r[c]) || 0;
+            }
+          }
+          summary[id][type] += qty;
+        }
+      };
+
+      processRows(rawIssued, "issued");
+      processRows(rawConsumed, "used");
+
+      let totIssued = 0, totUsed = 0;
+      const tbody = document.getElementById('erpTableBody');
+      tbody.innerHTML = "";
+
+      Object.values(summary).forEach(emp => {
+        let bal = emp.issued - emp.used;
+        totIssued += emp.issued;
+        totUsed += emp.used;
+        let badge = bal < 0 
+          ? `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold">Shortage (${bal})</span>` 
+          : `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">Normal</span>`;
+        
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 font-semibold text-slate-700">${emp.id}</td>
+            <td class="p-4 font-medium text-slate-900">${emp.name}</td>
+            <td class="p-4 text-slate-600">${emp.issued}</td>
+            <td class="p-4 text-slate-600">${emp.used}</td>
+            <td class="p-4 font-bold text-slate-900">${bal}</td>
+            <td class="p-4">${badge}</td>
+          </tr>`;
+      });
+
+      document.getElementById('kpiIssued').innerText = totIssued;
+      document.getElementById('kpiUsed').innerText = totUsed;
+      document.getElementById('kpiBal').innerText = totIssued - totUsed;
+    }
+
+    function renderRawTables() {
+      const buildTable = (rows) => {
+        if (!rows || rows.length === 0) return "<p>No data</p>";
+        let html = '<table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase">';
+        rows[0].forEach(h => html += `<th class="p-3 border-b">${h}</th>`);
+        html += '</tr></thead><tbody class="divide-y divide-slate-100">';
+        for (let i = 1; i < rows.length; i++) {
+          html += '<tr>';
+          rows[i].forEach(cell => html += `<td class="p-3">${cell}</td>`);
+          html += '</tr>';
+        }
+        return html + '</tbody></table>';
+      };
+      document.getElementById('issuedRawBox').innerHTML = buildTable(rawIssued);
+      document.getElementById('consumptionRawBox').innerHTML = buildTable(rawConsumed);
+    }
+
+    function exportTable() {
+      let csv = [];
+      let rows = document.querySelectorAll("#erpTableBody tr");
+      csv.push("Emp ID,Employee Name,Total Issued,Total Used,Balance,Status");
+      rows.forEach(row => {
+        let cols = row.querySelectorAll("td");
+        let data = Array.from(cols).map(c => `"${c.innerText.replace(/"/g, '""')}"`);
+        csv.push(data.join(","));
+      });
+      let blob = new Blob([csv.join("\n")], { type: "text/csv" });
+      let url = window.URL.createObjectURL(blob);
+      let a = document.createElement("a");
+      a.setAttribute("href", url);
+      a.setAttribute("download", "inventory_report.csv");
+      a.click();
+    }
+  </script>
+</body>
+</html>
