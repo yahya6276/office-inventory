@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FieldHub ERP v7.0 - Final Edition</title>
+  <title>FieldHub ERP - Inventory & Stock Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style> body { font-family: 'Inter', sans-serif; } </style>
@@ -16,7 +16,7 @@
       <div>
         <div class="p-6 border-b border-slate-800">
           <h1 class="text-xl font-bold text-white tracking-wide">📦 FieldHub ERP</h1>
-          <p class="text-xs text-slate-400 mt-1">Inventory & ERP System</p>
+          <p class="text-xs text-slate-400 mt-1">Inventory Management System</p>
         </div>
         <nav class="p-4 space-y-1">
           <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition">📊 Admin Dashboard</button>
@@ -24,7 +24,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v7.0 (Strict Regions)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v8.0 (Final)</div>
     </aside>
 
     <!-- Main Area -->
@@ -49,12 +49,12 @@
               <label class="block text-xs font-bold text-slate-500 mb-1">Filter Region</label>
               <select id="regionFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
                 <option value="ALL">All Regions (6 Centers)</option>
-                <option value="CENTER 1">CENTER 1</option>
-                <option value="CENTER 2">CENTER 2</option>
-                <option value="SOUTH 1">SOUTH 1</option>
-                <option value="SOUTH 2">SOUTH 2</option>
-                <option value="NORTH 1">NORTH 1</option>
-                <option value="NORTH 2">NORTH 2</option>
+                <option value="Center 1">Center 1</option>
+                <option value="Center 2">Center 2</option>
+                <option value="South 1">South 1</option>
+                <option value="South 2">South 2</option>
+                <option value="North 1">North 1</option>
+                <option value="North 2">North 2</option>
               </select>
             </div>
             <div>
@@ -122,9 +122,9 @@
               <label class="block text-xs font-bold text-slate-500 mb-1">Filter By Region</label>
               <select id="issuedRegionFilter" onchange="renderRawTables()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
                 <option value="ALL">All Regions</option>
-                <option value="CENTER 1">CENTER 1</option><option value="CENTER 2">CENTER 2</option>
-                <option value="SOUTH 1">SOUTH 1</option><option value="SOUTH 2">SOUTH 2</option>
-                <option value="NORTH 1">NORTH 1</option><option value="NORTH 2">NORTH 2</option>
+                <option value="Center 1">Center 1</option><option value="Center 2">Center 2</option>
+                <option value="South 1">South 1</option><option value="South 2">South 2</option>
+                <option value="North 1">North 1</option><option value="North 2">North 2</option>
               </select>
             </div>
             <div>
@@ -145,9 +145,9 @@
               <label class="block text-xs font-bold text-slate-500 mb-1">Filter By Region</label>
               <select id="consRegionFilter" onchange="renderRawTables()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
                 <option value="ALL">All Regions</option>
-                <option value="CENTER 1">CENTER 1</option><option value="CENTER 2">CENTER 2</option>
-                <option value="SOUTH 1">SOUTH 1</option><option value="SOUTH 2">SOUTH 2</option>
-                <option value="NORTH 1">NORTH 1</option><option value="NORTH 2">NORTH 2</option>
+                <option value="Center 1">Center 1</option><option value="Center 2">Center 2</option>
+                <option value="South 1">South 1</option><option value="South 2">South 2</option>
+                <option value="North 1">North 1</option><option value="North 2">North 2</option>
               </select>
             </div>
             <div>
@@ -166,7 +166,7 @@
 
   <!-- DAILY CONSUMPTION MODAL -->
   <div id="staffModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
         <div>
           <h3 class="font-bold text-lg">📝 Daily Consumption Form</h3>
@@ -196,10 +196,10 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Case Number</label>
-          <input type="text" id="modalCaseNum" placeholder="e.g. CS-1002" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
+          <input type="text" id="modalCaseNum" placeholder="e.g. 321001-01-01" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm font-medium focus:outline-none">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Used Items</label>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Used Items (All 39 Items)</label>
           <div id="modalItemsContainer" class="grid grid-cols-2 gap-3"></div>
         </div>
         <button onclick="submitConsumption()" id="modalSubBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md transition">✅ Submit Consumption</button>
@@ -210,7 +210,7 @@
 
   <!-- STOCK REQUEST FORM MODAL -->
   <div id="requestModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
         <div>
           <h3 class="font-bold text-lg">📑 Stock Request Form</h3>
@@ -239,7 +239,7 @@
           <input type="text" id="reqRegion" readonly placeholder="Auto-filled" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-600 font-semibold">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Requested Quantities</label>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Requested Quantities (All 39 Items)</label>
           <div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div>
         </div>
         <button onclick="submitRequest()" id="reqSubBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md transition">🚀 Submit Stock Request</button>
@@ -251,7 +251,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBxNs-ZJ8jtTg2ZEdQ8trQczKrsrh3OfDtTW8X2pnVq1FP_qSU5EI0rAbRgqq2Kt2Uwg/exec";
     let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {};
-    const VALID_REGIONS = ["CENTER 1", "CENTER 2", "SOUTH 1", "SOUTH 2", "NORTH 1", "NORTH 2"];
+    const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
 
     window.onload = () => {
       document.getElementById('modalDate').valueAsDate = new Date();
@@ -271,12 +271,12 @@
     }
 
     function cleanRegion(r) {
-      if (!r) return "CENTER 1";
-      let val = r.toString().trim().toUpperCase();
+      if (!r) return "Center 1";
+      let val = r.toString().trim();
       for (let vr of VALID_REGIONS) {
-        if (val.includes(vr)) return vr;
+        if (val.toUpperCase() === vr.toUpperCase() || val.toUpperCase().includes(vr.toUpperCase())) return vr;
       }
-      return "CENTER 1";
+      return "Center 1";
     }
 
     async function loadData() {
@@ -292,7 +292,7 @@
         empMap = {};
         empRegionMap = {};
 
-        // 1. Strict Parse "Employees Details" (Col 0 = Name, Col 1 = ID, Col 2 = Region)
+        // 1. Parse Employees Details strictly: Col 0 = Name, Col 1 = ID, Col 2 = Region
         if (rawEmployees.length > 1) {
           for (let i = 1; i < rawEmployees.length; i++) {
             let row = rawEmployees[i];
@@ -451,7 +451,7 @@
 
         const msgBox = document.getElementById('reqMsgBox');
         msgBox.className = "p-3 rounded-xl text-center text-sm font-semibold bg-emerald-100 text-emerald-800 mt-2";
-        msgBox.innerText = "✅ اسٹاک ریکویسٹ شیٹ میں شامل ہو گئی ہے۔";
+        msgBox.innerText = "✅ اسٹاک ریکویسٹ شیٹ میں شامل ہو گئی ہے!";
         msgBox.classList.remove('hidden');
         
         setTimeout(() => {
@@ -473,7 +473,7 @@
 
       let summary = {};
       Object.keys(empMap).forEach(id => {
-        summary[id] = { region: empRegionMap[id] || "CENTER 1", id: id, name: empMap[id] || "", issued: 0, used: 0 };
+        summary[id] = { region: empRegionMap[id] || "Center 1", id: id, name: empMap[id] || "", issued: 0, used: 0 };
       });
 
       const selectedRegion = document.getElementById('regionFilter').value;
@@ -486,7 +486,6 @@
         for (let i = 1; i < rawIssued.length; i++) {
           let r = rawIssued[i];
           let id = "";
-          // Find ID column or check index 2
           for (let col = 0; col < r.length; col++) {
             let val = r[col] ? r[col].toString().trim() : "";
             if (empMap[val]) { id = val; break; }
@@ -529,7 +528,7 @@
       let list = Object.values(summary);
 
       list = list.filter(item => {
-        if (selectedRegion !== "ALL" && item.region !== selectedRegion) return false;
+        if (selectedRegion !== "ALL" && item.region.toUpperCase() !== selectedRegion.toUpperCase()) return false;
         if (search && !item.id.toLowerCase().includes(search) && !item.name.toLowerCase().includes(search)) return false;
         return true;
       });
@@ -581,15 +580,14 @@
         for (let i = 1; i < rows.length; i++) {
           let r = rows[i];
           let rowText = r.join(" ").toLowerCase();
-          let rowReg = "CENTER 1";
+          let rowReg = "Center 1";
           for (let cell of r) {
-            let val = cell ? cell.toString().trim().toUpperCase() : "";
-            for (let vr of VALID_REGIONS) {
-              if (val.includes(vr)) { rowReg = vr; break; }
-            }
+            let val = cell ? cell.toString().trim() : "";
+            let clean = cleanRegion(val);
+            if (clean) { rowReg = clean; break; }
           }
 
-          if (regFilter !== "ALL" && rowReg !== regFilter) continue;
+          if (regFilter !== "ALL" && rowReg.toUpperCase() !== regFilter.toUpperCase()) continue;
           if (search && !rowText.includes(search)) continue;
 
           html += `<tr class="hover:bg-slate-50">`;
