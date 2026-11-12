@@ -24,7 +24,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v15.0 (Detailed CSV)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v16.0 (Searchable Form)</div>
     </aside>
 
     <!-- Main Area -->
@@ -201,7 +201,11 @@
       </div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="modalDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
-        <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><select id="modalEmpSelect" onchange="fillModalName()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"><option value="">-- Choose --</option></select></div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Employee ID & Name (Type to search)</label>
+          <input type="text" id="modalEmpInput" list="empList" onchange="fillModalName()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none">
+          <datalist id="empList"></datalist>
+        </div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="modalEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="modalRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Case Number</label><input type="text" id="modalCaseNum" placeholder="e.g. 321001-01-01" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
@@ -220,7 +224,10 @@
       </div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="reqDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
-        <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><select id="reqEmpSelect" onchange="fillReqName()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"><option value="">-- Choose --</option></select></div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Employee ID & Name (Type to search)</label>
+          <input type="text" id="reqEmpInput" list="empList" onchange="fillReqName()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm focus:outline-none">
+        </div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="reqEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
@@ -232,7 +239,7 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFsWEdMXGG7wUywUH4bXbKG7Zr89p1_EWH4uxH-vFRMJ7MZGXRlUweb9AA9mImQngcTw/exec";
     let rawEmployees = [], rawIssued = [], rawConsumed = [], categories = [], empMap = {}, empRegionMap = {};
-    let lastMatchingEmployees = []; // Store current filtered employees for export
+    let lastMatchingEmployees = [];
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
 
     window.onload = function() {
@@ -317,12 +324,10 @@
           });
         });
 
-        ['modalEmpSelect', 'reqEmpSelect'].forEach(selId => {
-          const select = document.getElementById(selId);
-          select.innerHTML = '<option value="">-- Choose ID --</option>';
-          Object.keys(empMap).sort((a,b) => Number(a) - Number(b)).forEach(id => {
-            select.innerHTML += `<option value="${id}">${id} - ${empMap[id]}</option>`;
-          });
+        const datalist = document.getElementById('empList');
+        datalist.innerHTML = "";
+        Object.keys(empMap).sort((a,b) => Number(a) - Number(b)).forEach(id => {
+          datalist.innerHTML += `<option value="${id} - ${empMap[id]}">`;
         });
 
         renderDashboard();
@@ -339,20 +344,30 @@
     function openRequestModal() { document.getElementById('requestModal').classList.remove('hidden'); }
     function closeRequestModal() { document.getElementById('requestModal').classList.add('hidden'); }
 
+    function extractEmpId(val) {
+      if (!val) return "";
+      let parts = val.split(" - ");
+      return parts[0].trim();
+    }
+
     function fillModalName() {
-      const id = document.getElementById('modalEmpSelect').value;
+      let inputVal = document.getElementById('modalEmpInput').value;
+      let id = extractEmpId(inputVal);
       document.getElementById('modalEmpName').value = empMap[id] || "";
       document.getElementById('modalRegion').value = empRegionMap[id] || "";
     }
+
     function fillReqName() {
-      const id = document.getElementById('reqEmpSelect').value;
+      let inputVal = document.getElementById('reqEmpInput').value;
+      let id = extractEmpId(inputVal);
       document.getElementById('reqEmpName').value = empMap[id] || "";
       document.getElementById('reqRegion').value = empRegionMap[id] || "";
     }
 
     async function submitConsumption() {
       const date = document.getElementById('modalDate').value;
-      const empId = document.getElementById('modalEmpSelect').value;
+      let inputVal = document.getElementById('modalEmpInput').value;
+      const empId = extractEmpId(inputVal);
       const empName = document.getElementById('modalEmpName').value;
       const region = document.getElementById('modalRegion').value;
       const caseNumber = document.getElementById('modalCaseNum').value.trim();
@@ -372,7 +387,8 @@
 
     async function submitRequest() {
       const date = document.getElementById('reqDate').value;
-      const empId = document.getElementById('reqEmpSelect').value;
+      let inputVal = document.getElementById('reqEmpInput').value;
+      const empId = extractEmpId(inputVal);
       const empName = document.getElementById('reqEmpName').value;
       const region = document.getElementById('reqRegion').value;
 
@@ -605,7 +621,7 @@
       } else {
         csv.push(`"Report Filter","All Employees / Overall Summary"`);
       }
-      csv.push(""); // Empty line
+      csv.push("");
       csv.push("Item Name,Total Issued,Total Used,Remaining Balance");
 
       document.querySelectorAll("#itemsSummaryTableBody tr").forEach(row => {
