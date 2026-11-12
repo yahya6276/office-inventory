@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Vials Consumption Entry</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex items-center justify-center p-4">
+
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+    
+    <!-- Header -->
+    <div class="bg-slate-900 text-white p-6 text-center">
+      <h1 class="text-xl font-bold tracking-wide">📦 FieldHub Staff Portal</h1>
+      <p class="text-xs text-slate-400 mt-1">Daily Stock Consumption Report</p>
+    </div>
+
+    <!-- Form Body -->
+    <div class="p-6 space-y-5">
+      
+      <!-- Date -->
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Date</label>
+        <input type="date" id="entryDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none">
+      </div>
+
+      <!-- Employee ID Dropdown -->
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Employee ID</label>
+        <select id="empSelect" onchange="fillName()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none">
+          <option value="">Loading Employees...</option>
+        </select>
+      </div>
+
+      <!-- Auto-filled Name -->
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Employee Name</label>
+        <input type="text" id="empName" readonly placeholder="Auto-filled after selecting ID" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-600 font-semibold cursor-not-allowed">
+      </div>
+
+      <!-- Dynamic Items Grid -->
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Used Vials / Items Today</label>
+        <div id="itemsContainer" class="grid grid-cols-2 gap-3">
+          <p class="col-span-2 text-xs text-slate-400 text-center py-4">Loading item categories...</p>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button onclick="submitData()" id="subBtn" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2">
+        ✅ Submit Daily Consumption
+      </button>
+
+      <!-- Status Message -->
+      <div id="msgBox" class="hidden p-3 rounded-xl text-center text-sm font-semibold"></div>
+
+    </div>
+
+    <div class="bg-slate-50 border-t border-slate-200 p-3 text-center text-xs text-slate-400">
+      Office Inventory Management System
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBxNs-ZJ8jtTg2ZEdQ8trQczKrsrh3OfDtTW8X2pnVq1FP_qSU5EI0rAbRgqq2Kt2Uwg/exec";
+    let empMap = {};
+    let itemHeaders = [];
+
+    // Set Today's Date
+    document.getElementById('entryDate').valueAsDate = new Date();
+
+    window.onload = async () => {
+      try {
+        const res = await fetch(SCRIPT_URL, { method: "GET", redirect: "follow" });
+        const data = await res.json();
+        const rows = data.issued || [];
+
+        if (rows.length > 0) {
+          const headers = rows[0];
+          itemHeaders = headers.slice(3).filter(h => h.toString().trim() !== "");
+
+          const container = document.getElementById('itemsContainer');
+          container.innerHTML = "";
+          itemHeaders.forEach(item => {
+            container.innerHTML += `
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <label class="block text-xs font-bold text-slate-700 mb-1">${item}</label>
+                <input type="number" min="0" value="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';" class="item-input w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-sky-500 focus:outline-none" data-item="${item}">
+              </div>`;
+          });
+
+          // Extract Unique Employees
+          for (let i = 1; i < rows.length; i++) {
+            let id = rows[i][1] ? rows[i][1].toString().trim() : "";
+            let name = rows[i][2] ? rows[i][2].toString().trim() : "";
+            if (id && !empMap[id]) {
+              empMap[id] = name;
+            }
+          }
+
+          const select = document.getElementById('empSelect');
+          select.innerHTML = '<option value="">-- Choose Your ID --</option>';
+          Object.keys(empMap).sort().forEach(id => {
+            select.innerHTML += `<option value="${id}">${id} - ${empMap[id]}</option>`;
+          });
+        }
+      } catch (e) {
+        showMsg("⚠️ Failed to load employees. Check internet or Script URL.", "error");
+      }
+    };
+
+    function fillName() {
+      const id = document.getElementById('empSelect').value;
+      document.getElementById('empName').value = empMap[id] || "";
+    }
+
+    async function submitData() {
+      const empId = document.getElementById('empSelect').value;
+      const empName = document.getElementById('empName').value;
+      const date = document.getElementById('entryDate').value;
+
+      if (!date || !empId) {
+        alert("براہ کرم تاریخ اور اپنی Employee ID منتخب کریں۔");
+        return;
+      }
+
+      let items = {};
+      let totalEntered = 0;
+      document.querySelectorAll('.item-input').forEach(inp => {
+        let val = Number(inp.value) || 0;
+        items[inp.dataset.item] = val;
+        totalEntered += val;
+      });
+
+      if (totalEntered === 0) {
+        if (!confirm("تمام آئٹمز کی تعداد 0 ہے۔ کیا آپ واقعی جمع کرانا چاہتے ہیں؟")) return;
+      }
+
+      const btn = document.getElementById('subBtn');
+      btn.disabled = true;
+      btn.innerText = "⏳ Submitting Report...";
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ date, empId, empName, items })
+        });
+
+        showMsg("✅ آپ کی آج کی رپورٹ کامیابی سے جمع ہو گئی ہے!", "success");
+        document.querySelectorAll('.item-input').forEach(inp => inp.value = 0);
+      } catch (err) {
+        showMsg("⚠️ ڈیٹا جمع کرانے میں مسئلہ پیش آیا، دوبارہ کوشش کریں۔", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "✅ Submit Daily Consumption";
+      }
+    }
+
+    function showMsg(text, type) {
+      const box = document.getElementById('msgBox');
+      box.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+      if (type === "success") {
+        box.classList.add('bg-emerald-100', 'text-emerald-800');
+      } else {
+        box.classList.add('bg-rose-100', 'text-rose-800');
+      }
+      box.innerText = text;
+    }
+  </script>
+</body>
+</html>
