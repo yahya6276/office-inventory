@@ -510,3 +510,66 @@
   </script>
 </body>
 </html>
+async function loadData() {
+  const statusEl = document.getElementById('syncStatus');
+  statusEl.innerText = "Syncing with Google Sheet...";
+  
+  try {
+    console.log("Fetching from URL:", SCRIPT_URL);
+    const res = await fetch(SCRIPT_URL, { method: "GET" });
+    const textData = await res.text();
+    
+    console.log("Raw Text Received:", textData);
+    
+    let data;
+    try {
+      data = JSON.parse(textData);
+    } catch(err) {
+      alert("ایرر: گوگل سکرپٹ نے JSON ڈیٹا نہیں بلکہ یہ بھیجا ہے:\n" + textData.substring(0, 100));
+      return;
+    }
+
+    rawEmployees = data.employees || [];
+    rawIssued = data.issued || [];
+    rawConsumed = data.consumed || [];
+
+    console.log("Employees Loaded:", rawEmployees.length);
+
+    empMap = {};
+    empRegionMap = {};
+
+    if (rawEmployees.length > 1) {
+      for (let i = 1; i < rawEmployees.length; i++) {
+        let row = rawEmployees[i];
+        if (!row || row.length < 2) continue;
+        let name = row[0] ? row[0].toString().trim() : "";
+        let id = row[1] ? row[1].toString().trim() : "";
+        let reg = row[2] ? row[2].toString().trim() : "Center 1";
+
+        if (id) {
+          empMap[id] = name || "Employee " + id;
+          empRegionMap[id] = reg;
+        }
+      }
+    }
+
+    // Populate Dropdowns
+    ['modalEmpSelect', 'reqEmpSelect'].forEach(selId => {
+      const select = document.getElementById(selId);
+      if(select) {
+        select.innerHTML = '<option value="">-- Choose ID --</option>';
+        Object.keys(empMap).sort((a,b) => Number(a) - Number(b)).forEach(id => {
+          select.innerHTML += `<option value="${id}">${id} - ${empMap[id]}</option>`;
+        });
+      }
+    });
+
+    renderDashboard();
+    statusEl.innerText = "Connected Successfully • " + new Date().toLocaleTimeString();
+    
+  } catch (e) {
+    console.error("Fetch Exception:", e);
+    statusEl.innerText = "Connection Failed!";
+    alert("کنکشن ایرر: " + e.message);
+  }
+}
