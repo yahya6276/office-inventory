@@ -16,7 +16,7 @@
 
   <div class="flex h-screen overflow-hidden">
     
-    <!-- Sidebar -->
+    <!-- Sidebar (Desktop) -->
     <aside class="w-64 bg-slate-900 text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800">
       <div>
         <div class="p-6 border-b border-slate-800">
@@ -36,7 +36,7 @@
         </nav>
       </div>
       <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-        Office Management System v2.0
+        Office Management System v2.1
       </div>
     </aside>
 
@@ -44,12 +44,22 @@
     <div class="flex-1 flex flex-col overflow-y-auto">
       
       <!-- Top Bar -->
-      <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-xs">
-        <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Dashboard Overview</h2>
-        <button onclick="loadData()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-xs transition flex items-center gap-2">
+      <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-3 shadow-sm">
+        <div>
+          <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Dashboard Overview</h2>
+          <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting to Google Sheet...</p>
+        </div>
+        <button onclick="loadData()" id="refreshBtn" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
           🔄 Refresh Data
         </button>
       </header>
+
+      <!-- Mobile Navigation Bar -->
+      <div class="flex md:hidden bg-slate-900 text-white p-2 gap-2 justify-around">
+        <button onclick="switchTab('dashboard')" id="m-nav-dashboard" class="flex-1 py-2 text-xs font-bold rounded-lg bg-sky-600">📊 Dashboard</button>
+        <button onclick="switchTab('issued')" id="m-nav-issued" class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-300">📤 Issued</button>
+        <button onclick="switchTab('consumption')" id="m-nav-consumption" class="flex-1 py-2 text-xs font-bold rounded-lg text-slate-300">📥 Used</button>
+      </div>
 
       <!-- Content Body -->
       <main class="p-6">
@@ -57,14 +67,14 @@
         <!-- TAB 1: DASHBOARD / RECONCILIATION -->
         <section id="tab-dashboard" class="space-y-6">
           <!-- Filters Bar -->
-          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Period</label>
-              <select id="periodFilter" onchange="applyPeriod()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
-                <option value="all">All Time</option>
-                <option value="today">Today</option>
-                <option value="week">Last 7 Days</option>
-                <option value="month" selected>This Month</option>
+              <select id="periodFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none">
+                <option value="all" selected>All Time</option>
+                <option value="today">Today (Daily)</option>
+                <option value="week">Last 7 Days (Weekly)</option>
+                <option value="month">This Month (Monthly)</option>
               </select>
             </div>
             <div>
@@ -78,7 +88,7 @@
               </select>
             </div>
             <div class="flex items-end">
-              <button onclick="exportTable()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">
+              <button onclick="exportTable()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-sm">
                 📥 Export CSV Report
               </button>
             </div>
@@ -86,24 +96,25 @@
 
           <!-- KPI Summary Cards -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-sky-500">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-sky-500">
               <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL ISSUED</span>
               <div id="kpiIssued" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-amber-500">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-amber-500">
               <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL CONSUMED</span>
               <div id="kpiUsed" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-emerald-500">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-emerald-500">
               <span class="text-xs font-bold text-slate-400 tracking-wider">REMAINING BALANCE</span>
               <div id="kpiBal" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
             </div>
           </div>
 
           <!-- Table -->
-          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
-            <div class="p-5 border-b border-slate-200">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center">
               <h3 class="font-bold text-slate-800 text-base">Employee Stock Reconciliation</h3>
+              <span id="empCount" class="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full">0 Employees</span>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
@@ -117,7 +128,9 @@
                     <th class="p-4">Status</th>
                   </tr>
                 </thead>
-                <tbody id="erpTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+                <tbody id="erpTableBody" class="divide-y divide-slate-100 text-sm">
+                  <tr><td colspan="6" class="p-6 text-center text-slate-400">Loading data from Google Sheet...</td></tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -125,7 +138,7 @@
 
         <!-- TAB 2: STOCK ISSUED LOG -->
         <section id="tab-issued" class="hidden space-y-6">
-          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden p-6">
             <h3 class="font-bold text-slate-800 text-lg mb-4">Raw Stock Issued Records</h3>
             <div id="issuedRawBox" class="overflow-x-auto">Loading...</div>
           </div>
@@ -133,7 +146,7 @@
 
         <!-- TAB 3: DAILY CONSUMPTION LOG -->
         <section id="tab-consumption" class="hidden space-y-6">
-          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden p-6">
             <h3 class="font-bold text-slate-800 text-lg mb-4">Daily Consumption Records</h3>
             <div id="consumptionRawBox" class="overflow-x-auto">Loading...</div>
           </div>
@@ -144,12 +157,10 @@
   </div>
 
   <script>
-    // اپنا Google Apps Script کا Web App URL یہاں درج کریں
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBxNs-ZJ8jtTg2ZEdQ8trQczKrsrh3OfDtTW8X2pnVq1FP_qSU5EI0rAbRgqq2Kt2Uwg/exec";
     let rawIssued = [], rawConsumed = [], categories = [];
 
     window.onload = () => {
-      applyPeriod();
       loadData();
     };
 
@@ -157,22 +168,31 @@
       ['dashboard', 'issued', 'consumption'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add('hidden');
         document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition";
+        document.getElementById(`m-nav-${t}`).className = "flex-1 py-2 text-xs font-bold rounded-lg text-slate-300";
       });
       document.getElementById(`tab-${tab}`).classList.remove('hidden');
       document.getElementById(`nav-${tab}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition";
+      document.getElementById(`m-nav-${tab}`).className = "flex-1 py-2 text-xs font-bold rounded-lg bg-sky-600 text-white";
       
       const titles = { dashboard: "Dashboard Overview", issued: "Stock Issued Records", consumption: "Daily Consumption Records" };
       document.getElementById('pageTitle').innerText = titles[tab];
     }
 
-    function applyPeriod() {
-      const p = document.getElementById('periodFilter').value;
-      renderDashboard();
-    }
-
     async function loadData() {
+      const statusEl = document.getElementById('syncStatus');
+      const btn = document.getElementById('refreshBtn');
+      statusEl.innerText = "Syncing with Google Sheet...";
+      statusEl.className = "text-xs text-amber-600 font-medium mt-0.5";
+      btn.disabled = true;
+
       try {
-        const res = await fetch(SCRIPT_URL);
+        const res = await fetch(SCRIPT_URL, {
+          method: "GET",
+          redirect: "follow"
+        });
+        
+        if (!res.ok) throw new Error("Network response was not ok");
+        
         const data = await res.json();
         rawIssued = data.issued || [];
         rawConsumed = data.consumed || [];
@@ -183,17 +203,52 @@
           catSel.innerHTML = '<option value="ALL">All Categories</option>';
           categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
         }
+
         renderDashboard();
         renderRawTables();
+        statusEl.innerText = "Live Connected • Last updated: " + new Date().toLocaleTimeString();
+        statusEl.className = "text-xs text-emerald-600 font-medium mt-0.5";
       } catch (e) {
-        alert("Failed to load data from Google Sheet. Check Script URL.");
+        console.error(e);
+        statusEl.innerText = "Connection Failed! Ensure Apps Script 'Who has access' is set to 'Anyone'.";
+        statusEl.className = "text-xs text-rose-600 font-bold mt-0.5";
+        document.getElementById('erpTableBody').innerHTML = `<tr><td colspan="6" class="p-6 text-center text-rose-600 font-semibold">⚠️ Could not fetch data. Make sure your Google Apps Script deployment is set to "Anyone" and contains valid JSON output.</td></tr>`;
+      } finally {
+        btn.disabled = false;
       }
     }
 
+    function isDateInPeriod(dateVal, period) {
+      if (period === "all" || !dateVal) return true;
+      const rowDate = new Date(dateVal);
+      if (isNaN(rowDate.getTime())) return true;
+
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      if (period === "today") {
+        return rowDate >= todayStart;
+      } else if (period === "week") {
+        const weekAgo = new Date(todayStart);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return rowDate >= weekAgo;
+      } else if (period === "month") {
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        return rowDate >= monthStart;
+      }
+      return true;
+    }
+
     function renderDashboard() {
-      if (rawIssued.length < 2) return;
-      const headers = rawIssued[0];
-      const search = document.getElementById('empSearch').value.toLowerCase();
+      const tbody = document.getElementById('erpTableBody');
+      if (rawIssued.length < 2 && rawConsumed.length < 2) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No records found in Google Sheet.</td></tr>`;
+        return;
+      }
+
+      const headers = rawIssued.length > 0 ? rawIssued[0] : rawConsumed[0];
+      const period = document.getElementById('periodFilter').value;
+      const search = document.getElementById('empSearch').value.toLowerCase().trim();
       const cat = document.getElementById('catFilter').value;
 
       let summary = {};
@@ -202,6 +257,8 @@
         for (let i = 1; i < rows.length; i++) {
           let r = rows[i];
           if (!r[1]) continue;
+          if (!isDateInPeriod(r[0], period)) continue;
+
           let id = r[1].toString().trim();
           let name = (r[2] || "").toString().trim();
           if (search && !id.toLowerCase().includes(search) && !name.toLowerCase().includes(search)) continue;
@@ -222,16 +279,21 @@
       processRows(rawConsumed, "used");
 
       let totIssued = 0, totUsed = 0;
-      const tbody = document.getElementById('erpTableBody');
+      const empList = Object.values(summary);
+      document.getElementById('empCount').innerText = `${empList.length} Employees`;
       tbody.innerHTML = "";
 
-      Object.values(summary).forEach(emp => {
+      if (empList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No matching records for selected filter.</td></tr>`;
+      }
+
+      empList.forEach(emp => {
         let bal = emp.issued - emp.used;
         totIssued += emp.issued;
         totUsed += emp.used;
         let badge = bal < 0 
           ? `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold">Shortage (${bal})</span>` 
-          : `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">Normal</span>`;
+          : `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">In Hand</span>`;
         
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
@@ -250,14 +312,21 @@
     }
 
     function renderRawTables() {
+      const formatCell = (cell, idx) => {
+        if (idx === 0 && cell && !isNaN(new Date(cell).getTime())) {
+          return new Date(cell).toLocaleDateString();
+        }
+        return cell;
+      };
+
       const buildTable = (rows) => {
-        if (!rows || rows.length === 0) return "<p>No data</p>";
+        if (!rows || rows.length === 0) return "<p class='text-slate-400 text-sm'>No records available yet.</p>";
         let html = '<table class="w-full text-left border-collapse text-sm"><thead><tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase">';
         rows[0].forEach(h => html += `<th class="p-3 border-b">${h}</th>`);
         html += '</tr></thead><tbody class="divide-y divide-slate-100">';
         for (let i = 1; i < rows.length; i++) {
-          html += '<tr>';
-          rows[i].forEach(cell => html += `<td class="p-3">${cell}</td>`);
+          html += '<tr class="hover:bg-slate-50">';
+          rows[i].forEach((cell, idx) => html += `<td class="p-3">${formatCell(cell, idx)}</td>`);
           html += '</tr>';
         }
         return html + '</tbody></table>';
@@ -271,17 +340,4 @@
       let rows = document.querySelectorAll("#erpTableBody tr");
       csv.push("Emp ID,Employee Name,Total Issued,Total Used,Balance,Status");
       rows.forEach(row => {
-        let cols = row.querySelectorAll("td");
-        let data = Array.from(cols).map(c => `"${c.innerText.replace(/"/g, '""')}"`);
-        csv.push(data.join(","));
-      });
-      let blob = new Blob([csv.join("\n")], { type: "text/csv" });
-      let url = window.URL.createObjectURL(blob);
-      let a = document.createElement("a");
-      a.setAttribute("href", url);
-      a.setAttribute("download", "inventory_report.csv");
-      a.click();
-    }
-  </script>
-</body>
-</html>
+        let cols =
