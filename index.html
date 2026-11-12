@@ -24,7 +24,7 @@
           <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
-      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v13.0 (Item Summary)</div>
+      <div class="p-4 border-t border-slate-800 text-xs text-emerald-400 font-bold text-center">System v14.0 (Filtered Report)</div>
     </aside>
 
     <!-- Main Area -->
@@ -56,7 +56,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Search Employee</label>
-              <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+              <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="Type ID or Name (e.g. 245)..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Item Category</label>
@@ -85,12 +85,12 @@
             </div>
           </div>
 
-          <!-- NEW SECTION: ALL 39 ITEMS TOTAL SUMMARY -->
+          <!-- ITEMS SUMMARY TABLE (FILTERS BY EMPLOYEE SEARCH) -->
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
             <div class="p-5 border-b border-slate-200 bg-slate-900 text-white flex justify-between items-center">
               <div>
-                <h3 class="font-bold text-base">📦 All 39 Items Stock Summary (Total Issued, Used & Balance)</h3>
-                <p class="text-xs text-slate-400 mt-0.5">Overall quantity breakdown for each inventory item</p>
+                <h3 class="font-bold text-base">📦 Items Summary Report <span id="summaryReportTitle" class="text-sky-400 text-xs font-normal ml-2">(Overall Summary)</span></h3>
+                <p class="text-xs text-slate-400 mt-0.5">Quantity breakdown per item (updates automatically when employee is searched)</p>
               </div>
             </div>
             <div class="overflow-x-auto max-h-96">
@@ -393,21 +393,21 @@
     function renderDashboard() {
       const tbody = document.getElementById('erpTableBody');
       const itemsSummaryBody = document.getElementById('itemsSummaryTableBody');
+      const reportTitle = document.getElementById('summaryReportTitle');
       if (!tbody || !itemsSummaryBody) return;
-
-      let summary = {};
-      let itemTotals = {};
-      categories.forEach(cat => {
-        itemTotals[cat] = { issued: 0, used: 0 };
-      });
-
-      Object.keys(empMap).forEach(id => {
-        summary[id] = { region: empRegionMap[id] || "Center 1", id: id, name: empMap[id] || "", issued: 0, used: 0 };
-      });
 
       const selectedRegion = document.getElementById('regionFilter').value;
       const search = document.getElementById('empSearch').value.toLowerCase().trim();
       const catFilter = document.getElementById('catFilter').value;
+
+      let itemTotals = {};
+      categories.forEach(cat => { itemTotals[cat] = { issued: 0, used: 0 }; });
+
+      let summary = {};
+      Object.keys(empMap).forEach(id => {
+        summary[id] = { region: empRegionMap[id] || "Center 1", id: id, name: empMap[id] || "", issued: 0, used: 0, items: {} };
+        categories.forEach(cat => { summary[id].items[cat] = { issued: 0, used: 0 }; });
+      });
 
       // 1. Process Issued Sheet
       if (rawIssued.length > 1) {
@@ -437,6 +437,7 @@
               }
               if (id && summary[id]) {
                 summary[id].issued += valNum;
+                summary[id].items[colName].issued += valNum;
               }
             }
           }
@@ -464,140 +465,4 @@
 
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
-            let valNum = Number(r[c]) || 0;
-            if (categories.includes(colName)) {
-              if (selectedRegion === "ALL" || rowReg.toUpperCase() === selectedRegion.toUpperCase()) {
-                itemTotals[colName].used += valNum;
-              }
-              if (id && summary[id]) {
-                summary[id].used += valNum;
-              }
-            }
-          }
-        }
-      }
-
-      // Render Item Summary Table (All 39 Items)
-      itemsSummaryBody.innerHTML = "";
-      categories.forEach(item => {
-        if (catFilter !== "ALL" && item !== catFilter) return;
-        let itIssued = itemTotals[item].issued;
-        let itUsed = itemTotals[item].used;
-        let itBal = itIssued - itUsed;
-        let balColor = itBal < 0 ? "text-rose-600 font-bold" : "text-emerald-700 font-bold";
-
-        itemsSummaryBody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-3 font-bold text-slate-700">${item}</td>
-            <td class="p-3 text-center text-indigo-600 font-semibold">${itIssued}</td>
-            <td class="p-3 text-center text-amber-600 font-semibold">${itUsed}</td>
-            <td class="p-3 text-center ${balColor}">${itBal}</td>
-          </tr>`;
-      });
-
-      // Render Employee Table
-      let totIssued = 0, totUsed = 0;
-      let list = Object.values(summary).filter(item => {
-        if (selectedRegion !== "ALL" && item.region.toUpperCase() !== selectedRegion.toUpperCase()) return false;
-        if (search && !item.id.toLowerCase().includes(search) && !item.name.toLowerCase().includes(search)) return false;
-        return true;
-      });
-
-      document.getElementById('empCount').innerText = `${list.length} Employees`;
-      tbody.innerHTML = "";
-
-      if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No matching records found.</td></tr>`;
-        return;
-      }
-
-      list.forEach(item => {
-        let bal = item.issued - item.used;
-        totIssued += item.issued;
-        totUsed += item.used;
-        let badge = bal < 0 
-          ? `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold">Shortage (${bal})</span>` 
-          : `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">In Hand</span>`;
-        
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-4 font-bold text-sky-700">${item.region}</td>
-            <td class="p-4 font-semibold text-slate-700">${item.id}</td>
-            <td class="p-4 font-medium text-slate-900">${item.name}</td>
-            <td class="p-4 text-slate-600">${item.issued}</td>
-            <td class="p-4 text-slate-600">${item.used}</td>
-            <td class="p-4 font-bold text-slate-900">${bal}</td>
-            <td class="p-4">${badge}</td>
-          </tr>`;
-      });
-
-      document.getElementById('kpiIssued').innerText = totIssued;
-      document.getElementById('kpiUsed').innerText = totUsed;
-      document.getElementById('kpiBal').innerText = totIssued - totUsed;
-    }
-
-    function renderRawTables() {
-      const buildFilteredTable = (rows, regFilterId, searchId, tableId) => {
-        if (!rows || rows.length === 0) return "<p class='text-slate-400'>No records found.</p>";
-        const regFilter = document.getElementById(regFilterId) ? document.getElementById(regFilterId).value : "ALL";
-        const search = document.getElementById(searchId) ? document.getElementById(searchId).value.toLowerCase().trim() : "";
-
-        let h = rows[0];
-        let html = `<table id="${tableId}" class="w-full text-left text-sm"><thead><tr class="bg-slate-50 text-xs font-bold uppercase">`;
-        h.forEach(col => html += `<th class="p-3 border-b">${col}</th>`);
-        html += `</tr></thead><tbody class="divide-y divide-slate-100">`;
-        
-        for (let i = 1; i < rows.length; i++) {
-          let r = rows[i];
-          let rowText = r.join(" ").toLowerCase();
-          let rowReg = "Center 1";
-          for (let cell of r) {
-            let val = cell ? cell.toString().trim() : "";
-            let clean = cleanRegion(val);
-            if (clean) { rowReg = clean; break; }
-          }
-
-          if (regFilter !== "ALL" && rowReg.toUpperCase() !== regFilter.toUpperCase()) continue;
-          if (search && !rowText.includes(search)) continue;
-
-          html += `<tr class="hover:bg-slate-50">`;
-          r.forEach(c => html += `<td class="p-3">${c || ''}</td>`);
-          html += `</tr>`;
-        }
-        return html + `</tbody></table>`;
-      };
-
-      document.getElementById('issuedRawBox').innerHTML = buildFilteredTable(rawIssued, 'issuedRegionFilter', 'issuedSearch', 'issuedRawTable');
-      document.getElementById('consumptionRawBox').innerHTML = buildFilteredTable(rawConsumed, 'consRegionFilter', 'consSearch', 'consumptionRawTable');
-    }
-
-    function exportDashboardCSV() {
-      let csv = ["Region,Emp ID,Employee Name,Total Issued,Total Used,Balance,Status"];
-      document.querySelectorAll("#erpTableBody tr").forEach(row => {
-        let cols = row.querySelectorAll("td");
-        if (cols.length === 7) csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
-      });
-      let blob = new Blob([csv.join("\n")], { type: "text/csv" });
-      let a = document.createElement("a");
-      a.href = window.URL.createObjectURL(blob);
-      a.download = "dashboard_inventory_report.csv";
-      a.click();
-    }
-
-    function exportRawTable(tableId, filename) {
-      let table = document.getElementById(tableId);
-      if (!table) { alert("No data available to export!"); return; }
-      let csv = [];
-      table.querySelectorAll("tr").forEach(row => {
-        let cols = row.querySelectorAll("th, td");
-        csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/\n/g, ' ')}"`).join(","));
-      });
-      let blob = new Blob([csv.join("\n")], { type: "text/csv" });
-      let a = document.createElement("a");
-      a.href = window.URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-    }
-  </script>
-</body>
-</html>
+            let
