@@ -13,9 +13,22 @@
       background-size: cover;
       background-position: center;
     }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .spinner { animation: spin 1s linear infinite; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
+
+  <!-- GLOBAL LOADING SPINNER OVERLAY -->
+  <div id="globalLoader" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 flex flex-col items-center justify-center space-y-3 transition-opacity duration-300">
+    <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full spinner"></div>
+    <p id="loaderText" class="text-white text-sm font-semibold tracking-wide">Connecting & Loading Data...</p>
+  </div>
+
+  <!-- SCROLL TO TOP BUTTON -->
+  <button onclick="scrollToTop()" id="scrollTopBtn" class="hidden fixed bottom-6 right-6 z-40 bg-sky-600 hover:bg-sky-700 text-white p-3 rounded-full shadow-2xl transition transform hover:scale-110 flex items-center justify-center">
+    ⬆️
+  </button>
 
   <!-- LOGIN SCREEN -->
   <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
@@ -42,36 +55,41 @@
   <!-- MAIN APP -->
   <div id="mainApp" class="hidden flex h-screen overflow-hidden">
     <!-- Sidebar -->
-    <aside class="w-64 sidebar-bg text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800/80 shadow-xl">
+    <aside id="sidebar" class="w-64 sidebar-bg text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800/80 shadow-xl transition-all duration-300">
       <div>
-        <div class="p-6 border-b border-slate-800/60 backdrop-blur-xs bg-slate-900/50">
+        <div class="p-6 border-b border-slate-800/60 backdrop-blur-xs bg-slate-900/50 flex justify-between items-center">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-sky-600/30 border border-sky-400/30 flex items-center justify-center text-sky-400 font-black text-lg shadow-inner">⚡</div>
             <div>
               <h1 class="text-lg font-black text-white tracking-wider">HS ERP CLL</h1>
-              <p class="text-[10px] text-sky-400 font-semibold uppercase tracking-widest mt-0.5">Inventory Managment Portal</p>
+              <p class="text-[10px] text-sky-400 font-semibold uppercase tracking-widest mt-0.5">Enterprise Portal</p>
             </div>
           </div>
         </div>
         <nav class="p-4 space-y-1.5">
           <button onclick="switchTab('dashboard')" id="nav-dashboard" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition shadow-md shadow-sky-900/40">📊 Admin Dashboard</button>
           <button onclick="switchTab('demandroom')" id="nav-demandroom" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">🏢 Demand Room</button>
-          <button onclick="switchTab('requests')" id="nav-requests" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">📋 Stock Requests</button>
+          <button onclick="switchTab('requests')" id="nav-requests" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">📋 Stock Requests <span id="reqBadge" class="hidden ml-auto px-2 py-0.5 bg-rose-500 text-white text-[10px] font-bold rounded-full">New</span></button>
+          <button onclick="switchTab('riders')" id="nav-riders" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">🚴 Rider Management</button>
+          <button onclick="switchTab('categories')" id="nav-categories" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">⚙️ Categories & Thresholds</button>
           <button onclick="switchTab('issued')" id="nav-issued" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">📤 Inventory Issued</button>
           <button onclick="switchTab('consumption')" id="nav-consumption" class="admin-only w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition">📥 Daily Consumption</button>
         </nav>
       </div>
       <div class="p-4 border-t border-slate-800/60 backdrop-blur-xs bg-slate-900/50 text-xs text-slate-400 font-medium text-center flex items-center justify-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v29.0 Pro
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v30.0 Pro
       </div>
     </aside>
 
     <!-- Main Area -->
-    <div class="flex-1 flex flex-col overflow-y-auto">
+    <div class="flex-1 flex flex-col overflow-y-auto" onscroll="checkScroll()">
       <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-3 shadow-xs">
-        <div>
-          <h2 id="pageTitle" class="text-xl font-bold text-slate-800">HS ERP Portal</h2>
-          <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting...</p>
+        <div class="flex items-center gap-3">
+          <button onclick="toggleSidebar()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="Toggle Sidebar">☰</button>
+          <div>
+            <h2 id="pageTitle" class="text-xl font-bold text-slate-800">HS ERP Portal</h2>
+            <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting...</p>
+          </div>
         </div>
         <div class="flex items-center gap-3">
           <button onclick="openRequestModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-xs transition flex items-center gap-2">📑 Stock Request Form</button>
@@ -82,6 +100,18 @@
       </header>
 
       <main class="p-6 space-y-6">
+        <!-- THRESHOLD ALERT FLAG BANNER -->
+        <div id="thresholdAlertBanner" class="hidden bg-rose-50 border-2 border-rose-500 p-4 rounded-2xl shadow-md flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl animate-bounce">⚠️</span>
+            <div>
+              <h4 class="font-black text-rose-900 text-sm">Stock Threshold Alert!</h4>
+              <p class="text-xs text-rose-700">One or more riders have items below the minimum threshold or zero balance.</p>
+            </div>
+          </div>
+          <button onclick="openThresholdModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-xs transition">View Defaulters List</button>
+        </div>
+
         <!-- TAB 1: DASHBOARD -->
         <section id="tab-dashboard" class="admin-only space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
@@ -117,18 +147,18 @@
             </div>
           </div>
 
-          <!-- KPIs -->
+          <!-- CLICKABLE KPIS -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-sky-500">
-              <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL ISSUED</span>
+            <div onclick="filterKpi('issued')" class="cursor-pointer bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-sky-500 hover:shadow-md transition">
+              <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL ISSUED (Click to Filter)</span>
               <div id="kpiIssued" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-amber-500">
-              <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL CONSUMED</span>
+            <div onclick="filterKpi('used')" class="cursor-pointer bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-amber-500 hover:shadow-md transition">
+              <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL CONSUMED (Click to Filter)</span>
               <div id="kpiUsed" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-emerald-500">
-              <span class="text-xs font-bold text-slate-400 tracking-wider">REMAINING BALANCE</span>
+            <div onclick="filterKpi('balance')" class="cursor-pointer bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-emerald-500 hover:shadow-md transition">
+              <span class="text-xs font-bold text-slate-400 tracking-wider">REMAINING BALANCE (Click to Filter)</span>
               <div id="kpiBal" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
             </div>
           </div>
@@ -137,7 +167,7 @@
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
             <div class="p-5 border-b border-slate-200 bg-slate-900 text-white flex justify-between items-center">
               <div>
-                <h3 class="font-bold text-base">📦 Items Summary Report <span id="summaryReportTitle" class="text-sky-400 text-xs font-normal ml-2">(Overall Summary)</span></h3>
+                <h3 class="font-bold text-base">📦 Items Summary & Category-Wise Issuance <span id="summaryReportTitle" class="text-sky-400 text-xs font-normal ml-2">(Overall Summary)</span></h3>
                 <p class="text-xs text-slate-400 mt-0.5">Quantity breakdown per item</p>
               </div>
             </div>
@@ -149,36 +179,11 @@
                     <th class="p-3 border-b text-center">Total Issued</th>
                     <th class="p-3 border-b text-center">Total Used</th>
                     <th class="p-3 border-b text-center">Remaining Balance</th>
+                    <th class="p-3 border-b text-center">Min Threshold</th>
                   </tr>
                 </thead>
                 <tbody id="itemsSummaryTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Employee Reconciliation Table -->
-          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
-            <div class="p-5 border-b border-slate-200 flex justify-between items-center">
-              <h3 class="font-bold text-slate-800 text-base">Employee Stock Reconciliation</h3>
-              <span id="empCount" class="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full">0 Employees</span>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse">
-                <thead>
-                  <tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
-                    <th class="p-4">Region</th>
-                    <th class="p-4">Emp ID</th>
-                    <th class="p-4">Employee Name</th>
-                    <th class="p-4">Total Issued</th>
-                    <th class="p-4">Total Used</th>
-                    <th class="p-4">Balance</th>
-                    <th class="p-4">Status</th>
-                  </tr>
-                </thead>
-                <tbody id="erpTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="7" class="p-6 text-center text-slate-400">Loading data...</td></tr>
+                  <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -219,20 +224,88 @@
           </div>
         </section>
 
-        <!-- TAB 1.6: STOCK REQUESTS MANAGEMENT -->
+        <!-- TAB 1.6: RIDER MANAGEMENT (SEPARATE SCROLLABLE TABLE) -->
+        <section id="tab-riders" class="admin-only hidden space-y-6">
+          <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">🚴 Rider / Employee Management & History</h3>
+              <p class="text-xs text-slate-500 mt-1">Manage individual rider stocks, details and history.</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="openBulkRiderModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📁 Bulk Rider Upload</button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 text-base">Rider Stock Reconciliation</h3>
+              <span id="riderCountBadge" class="text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full">0 Riders</span>
+            </div>
+            <div class="overflow-x-auto max-h-[600px]">
+              <table class="w-full text-left border-collapse sticky top-0">
+                <thead class="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th class="p-4">Region</th>
+                    <th class="p-4">Emp ID</th>
+                    <th class="p-4">Rider Name</th>
+                    <th class="p-4">Total Issued</th>
+                    <th class="p-4">Total Used</th>
+                    <th class="p-4">Balance</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4 text-center">Action / History</th>
+                  </tr>
+                </thead>
+                <tbody id="riderTableBody" class="divide-y divide-slate-100 text-sm">
+                  <tr><td colspan="8" class="p-6 text-center text-slate-400">Loading riders...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 1.7: CATEGORIES & THRESHOLDS -->
+        <section id="tab-categories" class="admin-only hidden space-y-6">
+          <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-lg">⚙️ Category & Minimum Threshold Management</h3>
+              <p class="text-xs text-slate-500 mt-1">Add, edit, delete categories and set item-wise minimum thresholds.</p>
+            </div>
+            <button onclick="saveCategoriesAndThresholds()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition shadow-md">💾 Save All Changes</button>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 space-y-4">
+            <div class="flex gap-3">
+              <input type="text" id="newCatInput" placeholder="Enter new category/item name..." class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
+              <input type="number" id="newCatThreshold" placeholder="Min Threshold" value="5" class="w-36 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
+              <button onclick="addNewCategory()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition">➕ Add Category</button>
+            </div>
+            <div class="overflow-x-auto max-h-[500px]">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase border-b">
+                    <th class="p-3">Category / Item Name</th>
+                    <th class="p-3 text-center">Minimum Threshold Limit</th>
+                    <th class="p-3 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="categoryTableBody" class="divide-y divide-slate-100 text-sm">
+                  <tr><td colspan="3" class="p-4 text-center text-slate-400">Loading categories...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 1.8: STOCK REQUESTS -->
         <section id="tab-requests" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-5">
             <div>
               <h3 class="text-2xl font-black text-slate-900">Requests</h3>
               <p class="text-xs text-slate-500 mt-0.5">Manage stock requests submitted by employees.</p>
             </div>
-
-            <!-- Search Bar -->
             <div>
               <input type="text" id="reqSearchInput" onkeyup="renderRequests()" placeholder="Search name, Employee ID, item or text..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
             </div>
-
-            <!-- Status Pills -->
             <div class="flex flex-wrap items-center gap-2">
               <button onclick="setReqStatusFilter('ALL')" id="pill-ALL" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white transition shadow-xs">All <span id="count-ALL" class="ml-1 px-1.5 py-0.5 bg-slate-800 rounded-full">0</span></button>
               <button onclick="setReqStatusFilter('Open')" id="pill-Open" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Open <span id="count-Open" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
@@ -241,47 +314,16 @@
               <button onclick="setReqStatusFilter('Closed')" id="pill-Closed" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Closed <span id="count-Closed" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
               <button onclick="setReqStatusFilter('Cancelled')" id="pill-Cancelled" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Cancelled <span id="count-Cancelled" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
             </div>
-
-            <!-- Filters Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 mb-1">Item / category</label>
-                <select id="reqFilterItem" onchange="renderRequests()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none">
-                  <option value="ALL">All items</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 mb-1">Handler</label>
-                <select id="reqFilterHandler" onchange="renderRequests()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none">
-                  <option value="ALL">All Handlers</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 mb-1">From date</label>
-                <input type="date" id="reqFilterStartDate" onchange="renderRequests()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none">
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-500 mb-1">To date</label>
-                <input type="date" id="reqFilterEndDate" onchange="renderRequests()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:outline-none">
-              </div>
-              <div class="flex items-end">
-                <button onclick="clearReqFilters()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-3 rounded-xl text-xs transition">Clear filters</button>
-              </div>
-            </div>
-
             <div id="reqShowingCount" class="text-xs text-slate-500 font-medium pt-1">Showing 0 requests</div>
           </div>
-
-          <!-- Requests List Container -->
-          <div id="requestsListContainer" class="space-y-4">
-            <!-- Dynamic Cards inserted here -->
-          </div>
+          <div id="requestsListContainer" class="space-y-4"></div>
         </section>
 
         <!-- EMPLOYEE WELCOME -->
         <section id="employeeWelcome" class="hidden bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-4">
           <h2 id="welcomeEmpTitle" class="text-2xl font-black text-slate-900">خوش آمدید!</h2>
-          <p class="text-sm text-slate-600 max-w-lg mx-auto">اوپر دیے گئے بٹنوں سے اپنی ریکویسٹ یا ڈیلی کنزمپشن درج کریں۔</p>
+          <p class="text-sm text-slate-600 max-w-lg mx-auto">آپ یہاں اپنی اسٹاک ہسٹری اور ریکویسٹ کا اسٹیٹس دیکھ سکتے ہیں۔</p>
+          <div id="employeePortalHistory" class="text-left mt-6"></div>
         </section>
 
         <!-- TAB 2: INVENTORY ISSUED -->
@@ -347,63 +389,32 @@
     </div>
   </div>
 
-  <!-- ADD DEMAND ROOM STOCK MODAL -->
+  <!-- MODALS (Demand, Consumption, Request, Threshold Defaulters, Bulk Rider, Rider History) -->
   <div id="demandModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
-      <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
-        <h3 class="font-bold text-lg">🏢 Add New Stock to Demand Room</h3>
-        <button onclick="closeDemandModal()" class="text-white font-bold px-2 py-1">✕</button>
-      </div>
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">🏢 Add New Stock to Demand Room</h3><button onclick="closeDemandModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-        <div class="grid grid-cols-2 gap-4">
-          <div><label class="block text-xs font-bold text-slate-600 mb-1">Date Received</label><input type="date" id="demandDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
-          <div><label class="block text-xs font-bold text-slate-600 mb-1">Added By</label><input type="text" id="demandAddedBy" placeholder="Your Name/ID..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-2">Quantities for All Items</label>
-          <div id="demandItemsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
-        </div>
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Other Item Custom Name (if applicable)</label>
-          <input type="text" id="demandOtherName" placeholder="Type custom item name..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-900">
-        </div>
+        <div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-bold text-slate-600 mb-1">Date Received</label><input type="date" id="demandDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1">Added By</label><input type="text" id="demandAddedBy" placeholder="Your Name/ID..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div></div>
+        <div><label class="block text-xs font-bold text-slate-600 mb-2">Quantities for All Items</label><div id="demandItemsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div>
         <button onclick="submitDemandStock()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Save Stock Entry</button>
       </div>
     </div>
   </div>
 
-  <!-- ADMIN / OFFICE CONSUMPTION MODAL -->
   <div id="adminConsumptionModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
-      <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
-        <h3 class="font-bold text-lg">📤 Office / Admin Consumption Form</h3>
-        <button onclick="closeAdminConsumptionModal()" class="text-white font-bold px-2 py-1">✕</button>
-      </div>
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📤 Office / Admin Consumption Form</h3><button onclick="closeAdminConsumptionModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-        <div class="grid grid-cols-2 gap-4">
-          <div><label class="block text-xs font-bold text-slate-600 mb-1">Date</label><input type="date" id="adminConsDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
-          <div><label class="block text-xs font-bold text-slate-600 mb-1">Consumed / Used By</label><input type="text" id="adminConsBy" placeholder="Admin/Office Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-2">Quantities of Items Used (Bags, Toners, etc.)</label>
-          <div id="adminConsItemsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
-        </div>
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Other Item Name (if used)</label>
-          <input type="text" id="adminConsOtherName" placeholder="Type custom item name..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-900">
-        </div>
+        <div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-bold text-slate-600 mb-1">Date</label><input type="date" id="adminConsDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1">Consumed By</label><input type="text" id="adminConsBy" placeholder="Admin/Office Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div></div>
+        <div><label class="block text-xs font-bold text-slate-600 mb-2">Quantities of Items Used</label><div id="adminConsItemsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div>
         <button onclick="submitAdminConsumption()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Save Office Consumption</button>
       </div>
     </div>
   </div>
 
-  <!-- DAILY CONSUMPTION MODAL -->
   <div id="staffModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
-      <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
-        <h3 class="font-bold text-lg">📝 Daily Consumption Form</h3>
-        <button onclick="closeStaffModal()" class="text-white font-bold px-2 py-1">✕</button>
-      </div>
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📝 Daily Consumption Form</h3><button onclick="closeStaffModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="modalDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="modalEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
@@ -411,36 +422,76 @@
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="modalRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Case Number</label><input type="text" id="modalCaseNum" placeholder="e.g. 321001-01-01" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Used Items</label><div id="modalItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
-        <button onclick="submitConsumption()" id="modalSubBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Consumption</button>
+        <button onclick="submitConsumption()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Consumption</button>
       </div>
     </div>
   </div>
 
-  <!-- STOCK REQUEST MODAL -->
   <div id="requestModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
-      <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
-        <h3 class="font-bold text-lg">📑 Stock Request Form</h3>
-        <button onclick="closeRequestModal()" class="text-white font-bold px-2 py-1">✕</button>
-      </div>
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📑 Stock Request Form</h3><button onclick="closeRequestModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="reqDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="reqEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="reqEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
-        <button onclick="submitRequest()" id="reqSubBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Request</button>
+        <button onclick="submitRequest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Request</button>
       </div>
     </div>
   </div>
 
-  <!-- CHANGE PASSWORD MODAL -->
+  <!-- THRESHOLD DEFAULTERS MODAL -->
+  <div id="thresholdModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+      <div class="bg-rose-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">⚠️ Riders Below Threshold / Zero Balance</h3><button onclick="closeThresholdModal()" class="text-white font-bold px-2 py-1">✕</button></div>
+      <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Select Item to inspect status across riders:</label>
+          <select id="thresholdItemSelect" onchange="renderDefaultersList()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none"></select>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-xs font-bold text-slate-500 uppercase border-b">
+                <th class="p-3">Emp ID</th>
+                <th class="p-3">Rider Name</th>
+                <th class="p-3 text-center">Current Balance</th>
+                <th class="p-3 text-center">Threshold</th>
+                <th class="p-3 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="defaultersTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK RIDER UPLOAD MODAL -->
+  <div id="bulkRiderModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📁 Bulk Rider Upload</h3><button onclick="closeBulkRiderModal()" class="text-white font-bold px-2 py-1">✕</button></div>
+      <div class="p-6 space-y-4">
+        <p class="text-xs text-slate-500">Paste rider records in CSV format: <code class="bg-slate-100 px-1 py-0.5 rounded">Name, ID, Region</code> (one per line).</p>
+        <textarea id="bulkRiderText" rows="6" placeholder="Ali Raza, 1001, Center 1&#10;Usman Khan, 1002, South 1" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:outline-none"></textarea>
+        <button onclick="submitBulkRiders()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition">Upload Riders</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIDER HISTORY MODAL -->
+  <div id="riderHistoryModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 id="riderHistoryTitle" class="font-bold text-lg">🚴 Rider Stock & History</h3><button onclick="closeRiderHistoryModal()" class="text-white font-bold px-2 py-1">✕</button></div>
+      <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto" id="riderHistoryContent"></div>
+    </div>
+  </div>
+
+  <!-- PASSWORD MODAL -->
   <div id="passwordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-      <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
-        <h3 class="font-bold text-base">🔑 Change Password</h3>
-        <button onclick="closePasswordModal()" class="text-white font-bold px-2 py-1">✕</button>
-      </div>
+      <div class="bg-slate-900 text-white p-4 flex justify-between items-center"><h3 class="font-bold text-base">🔑 Change Password</h3><button onclick="closePasswordModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4">
         <div><label class="block text-xs font-bold text-slate-600 mb-1">New Password</label><input type="password" id="newPasswordInput" placeholder="Enter new password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
         <button onclick="saveNewPassword()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 rounded-xl text-sm">Save Password</button>
@@ -449,10 +500,10 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwamzCz255yqYVqBmbzUbakBU9DPTL65OjfZVYxXwhaa-UtLQwH6NmAkaFCjCSUBXF0vA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw1O-xu-IQnSxO0Q7PPRzChMHiuxlCGJ6-wOSkNZzlObwF0_ntr9GEzvaUfgjoVOzaXNg/exec";
     const ADMIN_PASSWORD = "admin123";
 
-    let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {};
+    let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], rawThresholds = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {}, itemThresholds = {};
     let lastMatchingEmployees = [];
     let currentReqStatusFilter = "ALL";
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
@@ -464,11 +515,57 @@
       document.getElementById('demandDate').valueAsDate = new Date();
       document.getElementById('adminConsDate').valueAsDate = new Date();
       
+      // Keyboard shortcuts (Enter to submit login, Esc to close modals)
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          if (!document.getElementById('loginScreen').classList.contains('hidden')) {
+            handleLogin();
+          }
+        }
+        if (e.key === 'Escape') {
+          closeDemandModal();
+          closeAdminConsumptionModal();
+          closeStaffModal();
+          closeRequestModal();
+          closeThresholdModal();
+          closeBulkRiderModal();
+          closeRiderHistoryModal();
+          closePasswordModal();
+        }
+      });
+
       let sessionRole = localStorage.getItem('erp_role');
       if (sessionRole) {
         loadDataAndInitSession();
+      } else {
+        hideLoader();
       }
     };
+
+    function showLoader(text = "Loading...") {
+      document.getElementById('loaderText').innerText = text;
+      document.getElementById('globalLoader').classList.remove('hidden');
+    }
+    function hideLoader() {
+      document.getElementById('globalLoader').classList.add('hidden');
+    }
+
+    function checkScroll() {
+      let btn = document.getElementById('scrollTopBtn');
+      if (window.scrollY > 300 || document.querySelector('.flex-1.flex.flex-col.overflow-y-auto').scrollTop > 300) {
+        btn.classList.remove('hidden');
+      } else {
+        btn.classList.add('hidden');
+      }
+    }
+    function scrollToTop() {
+      document.querySelector('.flex-1.flex.flex-col.overflow-y-auto').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleSidebar() {
+      let sb = document.getElementById('sidebar');
+      sb.classList.toggle('hidden');
+    }
 
     async function handleLogin() {
       let username = document.getElementById('loginUser').value.trim();
@@ -482,6 +579,7 @@
         return;
       }
 
+      showLoader("Verifying login...");
       try {
         const res = await fetch(SCRIPT_URL + "?v=" + new Date().getTime());
         const data = await res.json();
@@ -510,11 +608,14 @@
             localStorage.setItem('logged_name', foundName);
             localStorage.setItem('logged_reg', foundReg);
             loadDataAndInitSession();
+            hideLoader();
             return;
           }
         }
+        hideLoader();
         errBox.classList.remove('hidden');
       } catch (e) {
+        hideLoader();
         alert("لاگ ان میں خرابی پیش آگئی۔");
       }
     }
@@ -541,7 +642,7 @@
         let empName = localStorage.getItem('logged_name') || '';
         let empId = localStorage.getItem('logged_id') || '';
         document.getElementById('welcomeEmpTitle').innerText = `خوش آمدید! ${empName} (${empId})`;
-        document.getElementById('pageTitle').innerText = `HS ERP Portal - ${empName}`;
+        document.getElementById('pageTitle').innerText = `Rider Portal - ${empName}`;
         loadData();
       }
     }
@@ -562,7 +663,7 @@
     }
 
     function switchTab(tab) {
-      ['dashboard', 'demandroom', 'requests', 'issued', 'consumption'].forEach(t => {
+      ['dashboard', 'demandroom', 'requests', 'riders', 'categories', 'issued', 'consumption'].forEach(t => {
         let el = document.getElementById(`tab-${t}`);
         if(el) el.classList.add('hidden');
         let nav = document.getElementById(`nav-${t}`);
@@ -573,7 +674,15 @@
       let targetNav = document.getElementById(`nav-${tab}`);
       if(targetNav) targetNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-sky-600 text-white font-medium transition shadow-md shadow-sky-900/40";
       
-      const titles = { dashboard: "Admin Dashboard", demandroom: "Demand Room Management", requests: "Stock Requests Management", issued: "Office Inventory Issued Records", consumption: "Daily Consumption Records" };
+      const titles = { 
+        dashboard: "Admin Dashboard", 
+        demandroom: "Demand Room Management", 
+        requests: "Stock Requests Management", 
+        riders: "Rider Management & History",
+        categories: "Category & Threshold Settings",
+        issued: "Office Inventory Issued Records", 
+        consumption: "Daily Consumption Records" 
+      };
       document.getElementById('pageTitle').innerText = titles[tab] || "HS ERP Portal";
     }
 
@@ -602,8 +711,7 @@
     }
 
     async function loadData() {
-      const statusEl = document.getElementById('syncStatus');
-      statusEl.innerText = "Syncing...";
+      showLoader("Syncing records from Google Sheets...");
       try {
         const res = await fetch(SCRIPT_URL + "?v=" + new Date().getTime(), { method: "GET", redirect: "follow" });
         const data = await res.json();
@@ -614,7 +722,15 @@
         rawDemand = data.demand || [];
         rawAdminConsumed = data.adminConsumed || [];
         rawRequests = data.requests || [];
+        rawThresholds = data.thresholds || [];
         allCategories = data.allItems || [];
+
+        itemThresholds = {};
+        if (rawThresholds.length > 1) {
+          for (let i = 1; i < rawThresholds.length; i++) {
+            itemThresholds[rawThresholds[i][0]] = Number(rawThresholds[i][1]) || 5;
+          }
+        }
 
         fieldCategories = allCategories.filter(item => !EXCLUDED_FIELD_ITEMS.includes(item.toUpperCase().trim()));
 
@@ -630,6 +746,13 @@
           }
         }
 
+        // Check for new Open requests notification
+        let openReqs = rawRequests.slice(1).filter(r => r[7] && r[7].toString().trim() === "Open");
+        if (openReqs.length > 0) {
+          document.getElementById('reqBadge').classList.remove('hidden');
+          document.getElementById('reqBadge').innerText = openReqs.length + " New";
+        }
+
         const catSel = document.getElementById('catFilter');
         if(catSel) {
           catSel.innerHTML = '<option value="ALL">All Categories</option>';
@@ -642,16 +765,10 @@
           allCategories.forEach(c => reqCatSel.innerHTML += `<option value="${c}">${c}</option>`);
         }
 
-        const reqHandlerSel = document.getElementById('reqFilterHandler');
-        if(reqHandlerSel) {
-          reqHandlerSel.innerHTML = '<option value="ALL">All Handlers</option>';
-          let handlers = new Set();
-          if (rawRequests.length > 1) {
-            for(let i=1; i<rawRequests.length; i++) {
-              if(rawRequests[i][8]) handlers.add(rawRequests[i][8].toString().trim());
-            }
-          }
-          handlers.forEach(h => reqHandlerSel.innerHTML += `<option value="${h}">${h}</option>`);
+        const threshSel = document.getElementById('thresholdItemSelect');
+        if(threshSel) {
+          threshSel.innerHTML = "";
+          allCategories.forEach(c => threshSel.innerHTML += `<option value="${c}">${c}</option>`);
         }
 
         ['demandItemsContainer', 'adminConsItemsContainer'].forEach(containerId => {
@@ -684,15 +801,350 @@
           renderDashboard();
           renderDemandRoom();
           renderRequests();
-          renderRawTables();
+          renderRidersTable();
+          renderCategoriesTable();
+          checkThresholdAlerts();
+        } else if (localStorage.getItem('erp_role') === 'employee') {
+          renderEmployeePortalHistory();
         }
-        statusEl.innerText = "Connected • " + new Date().toLocaleTimeString();
+
+        hideLoader();
+        document.getElementById('syncStatus').innerText = "Connected • " + new Date().toLocaleTimeString();
       } catch (e) {
+        hideLoader();
         console.error(e);
-        statusEl.innerText = "Connection Failed!";
+        document.getElementById('syncStatus').innerText = "Connection Failed!";
       }
     }
 
+    // --- THRESHOLD ALERTS & DEFAULTERS ---
+    function checkThresholdAlerts() {
+      let banner = document.getElementById('thresholdAlertBanner');
+      let hasDefaulter = false;
+
+      // Compute summaries for riders
+      let summary = computeRiderSummary();
+      Object.values(summary).forEach(emp => {
+        fieldCategories.forEach(cat => {
+          let bal = emp.items[cat].issued - emp.items[cat].used;
+          let limit = itemThresholds[cat] || 5;
+          if (bal <= limit) { hasDefaulter = true; }
+        });
+      });
+
+      if (hasDefaulter) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function computeRiderSummary() {
+      let summary = {};
+      Object.keys(empMap).forEach(id => {
+        summary[id] = { region: empRegionMap[id] || "Center 1", id: id, name: empMap[id] || "", items: {} };
+        fieldCategories.forEach(cat => { summary[id].items[cat] = { issued: 0, used: 0 }; });
+      });
+
+      if (rawIssued.length > 1) {
+        let h = rawIssued[0];
+        for (let i = 1; i < rawIssued.length; i++) {
+          let r = rawIssued[i];
+          let id = "";
+          for (let col = 0; col < r.length; col++) {
+            let val = r[col] ? r[col].toString().trim() : "";
+            if (empMap[val]) { id = val; break; }
+          }
+          if (!id && r[2]) id = r[2].toString().trim();
+          for (let c = 0; c < h.length; c++) {
+            let colName = h[c] ? h[c].toString().trim() : "";
+            let valNum = Number(r[c]) || 0;
+            if (fieldCategories.includes(colName) && id && summary[id]) {
+              summary[id].items[colName].issued += valNum;
+            }
+          }
+        }
+      }
+
+      if (rawConsumed.length > 1) {
+        let h = rawConsumed[0];
+        for (let i = 1; i < rawConsumed.length; i++) {
+          let r = rawConsumed[i];
+          let id = "";
+          for (let col = 0; col < r.length; col++) {
+            let val = r[col] ? r[col].toString().trim() : "";
+            if (empMap[val]) { id = val; break; }
+          }
+          if (!id && r[2]) id = r[2].toString().trim();
+          for (let c = 0; c < h.length; c++) {
+            let colName = h[c] ? h[c].toString().trim() : "";
+            let valNum = Number(r[c]) || 0;
+            if (fieldCategories.includes(colName) && id && summary[id]) {
+              summary[id].items[colName].used += valNum;
+            }
+          }
+        }
+      }
+      return summary;
+    }
+
+    function openThresholdModal() {
+      document.getElementById('thresholdModal').classList.remove('hidden');
+      renderDefaultersList();
+    }
+    function closeThresholdModal() { document.getElementById('thresholdModal').classList.add('hidden'); }
+
+    function renderDefaultersList() {
+      let tbody = document.getElementById('defaultersTableBody');
+      let selectedItem = document.getElementById('thresholdItemSelect').value;
+      let limit = itemThresholds[selectedItem] || 5;
+      let summary = computeRiderSummary();
+
+      tbody.innerHTML = "";
+      let count = 0;
+
+      Object.values(summary).forEach(emp => {
+        let itemData = emp.items[selectedItem] || { issued: 0, used: 0 };
+        let bal = itemData.issued - itemData.used;
+        if (bal <= limit) {
+          count++;
+          let statusBadge = bal <= 0 
+            ? `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-xs font-bold">Zero / Negative</span>`
+            : `<span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs font-bold">Below Threshold</span>`;
+
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-3 font-semibold text-slate-700">${emp.id}</td>
+              <td class="p-3 font-medium text-slate-900">${emp.name}</td>
+              <td class="p-3 text-center font-black text-rose-600">${bal}</td>
+              <td class="p-3 text-center text-slate-600">${limit}</td>
+              <td class="p-3 text-center">${statusBadge}</td>
+            </tr>`;
+        }
+      });
+
+      if (count === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">All riders have sufficient balance for ${selectedItem}.</td></tr>`;
+      }
+    }
+
+    // --- CLICKABLE KPIS ---
+    let activeKpiFilter = null;
+    function filterKpi(type) {
+      activeKpiFilter = (activeKpiFilter === type) ? null : type;
+      renderDashboard();
+    }
+
+    // --- CATEGORIES & THRESHOLDS MANAGEMENT ---
+    function renderCategoriesTable() {
+      let tbody = document.getElementById('categoryTableBody');
+      if(!tbody) return;
+      tbody.innerHTML = "";
+      allCategories.forEach(cat => {
+        let limit = itemThresholds[cat] || 5;
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-bold text-slate-800">${cat}</td>
+            <td class="p-3 text-center"><input type="number" value="${limit}" data-cat="${cat}" class="cat-thresh-input w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-center font-bold text-sm"></td>
+            <td class="p-3 text-center"><button onclick="deleteCategory('${cat}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold px-3 py-1 rounded-lg text-xs transition">Delete</button></td>
+          </tr>`;
+      });
+    }
+
+    function addNewCategory() {
+      let name = document.getElementById('newCatInput').value.trim().toUpperCase();
+      let limit = Number(document.getElementById('newCatThreshold').value) || 5;
+      if (!name) { alert("Please enter category name."); return; }
+      if (allCategories.includes(name)) { alert("Category already exists."); return; }
+
+      allCategories.push(name);
+      itemThresholds[name] = limit;
+      document.getElementById('newCatInput').value = "";
+      renderCategoriesTable();
+      alert("✅ Added category successfully. Click 'Save All Changes' to persist.");
+    }
+
+    function deleteCategory(cat) {
+      if (confirm(`Are you sure you want to delete category '${cat}'?`)) {
+        allCategories = allCategories.filter(c => c !== cat);
+        delete itemThresholds[cat];
+        renderCategoriesTable();
+        alert("✅ Category removed. Click 'Save All Changes' to persist.");
+      }
+    }
+
+    async function saveCategoriesAndThresholds() {
+      document.querySelectorAll('.cat-thresh-input').forEach(inp => {
+        let cat = inp.dataset.cat;
+        itemThresholds[cat] = Number(inp.value) || 5;
+      });
+
+      showLoader("Saving categories and thresholds...");
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "update_thresholds", thresholds: itemThresholds })
+        });
+        hideLoader();
+        alert("✅ Thresholds and categories saved successfully!");
+        loadData();
+      } catch (e) {
+        hideLoader();
+        alert("Error: " + e);
+      }
+    }
+
+    // --- BULK RIDER UPLOAD ---
+    function openBulkRiderModal() { document.getElementById('bulkRiderModal').classList.remove('hidden'); }
+    function closeBulkRiderModal() { document.getElementById('bulkRiderModal').classList.add('hidden'); }
+
+    async function submitBulkRiders() {
+      let text = document.getElementById('bulkRiderText').value.trim();
+      if (!text) { alert("Please paste rider data."); return; }
+      let lines = text.split('\n');
+      let riders = [];
+      lines.forEach(l => {
+        let parts = l.split(',').map(p => p.trim());
+        if (parts.length >= 2) {
+          riders.push([parts[0], parts[1], parts[2] || "Center 1"]);
+        }
+      });
+
+      if (riders.length === 0) { alert("No valid rider records parsed."); return; }
+
+      showLoader("Uploading bulk riders...");
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "bulk_riders", riders })
+        });
+        hideLoader();
+        closeBulkRiderModal();
+        alert("✅ Bulk riders uploaded successfully!");
+        loadData();
+      } catch (e) {
+        hideLoader();
+        alert("Error: " + e);
+      }
+    }
+
+    // --- RIDER HISTORY MODAL ---
+    function openRiderHistory(empId) {
+      let empName = empMap[empId] || "Rider";
+      let reg = empRegionMap[empId] || "Center 1";
+      document.getElementById('riderHistoryTitle').innerText = `🚴 Rider History: ${empName} (${empId}) - ${reg}`;
+      
+      let content = document.getElementById('riderHistoryContent');
+      content.innerHTML = `<p class="text-slate-500">Loading history...</p>`;
+      document.getElementById('riderHistoryModal').classList.remove('hidden');
+
+      let issuedRows = rawIssued.slice(1).filter(r => r.join(" ").includes(empId));
+      let consumedRows = rawConsumed.slice(1).filter(r => r.join(" ").includes(empId));
+
+      let html = `<div class="space-y-4">
+        <h4 class="font-bold text-slate-800 text-base border-b pb-2">Issued Items History</h4>`;
+      if (issuedRows.length === 0) {
+        html += `<p class="text-xs text-slate-400">No issued records found.</p>`;
+      } else {
+        html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Details</th></tr></thead><tbody class="divide-y">`;
+        issuedRows.forEach(r => {
+          html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2">${r.join(" | ")}</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+      }
+
+      html += `<h4 class="font-bold text-slate-800 text-base border-b pb-2 pt-4">Daily Consumption History</h4>`;
+      if (consumedRows.length === 0) {
+        html += `<p class="text-xs text-slate-400">No consumption records found.</p>`;
+      } else {
+        html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Case Number</th><th class="p-2">Details</th></tr></thead><tbody class="divide-y">`;
+        consumedRows.forEach(r => {
+          html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2 font-bold">${r[4] || ''}</td><td class="p-2">${r.join(" | ")}</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+      }
+
+      html += `</div>`;
+      content.innerHTML = html;
+    }
+    function closeRiderHistoryModal() { document.getElementById('riderHistoryModal').classList.add('hidden'); }
+
+    // --- EMPLOYEE / RIDER PORTAL VIEW ---
+    function renderEmployeePortalHistory() {
+      let empId = localStorage.getItem('logged_id');
+      let content = document.getElementById('employeePortalHistory');
+      let issuedRows = rawIssued.slice(1).filter(r => r.join(" ").includes(empId));
+      let consumedRows = rawConsumed.slice(1).filter(r => r.join(" ").includes(empId));
+
+      let html = `<div class="space-y-6">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <h3 class="font-bold text-slate-800 text-lg mb-3">📦 Your Stock Issued History</h3>`;
+      if (issuedRows.length === 0) {
+        html += `<p class="text-xs text-slate-400">No stock issued records found.</p>`;
+      } else {
+        html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Record Details</th></tr></thead><tbody class="divide-y">`;
+        issuedRows.forEach(r => { html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2">${r.join(" | ")}</td></tr>`; });
+        html += `</tbody></table></div>`;
+      }
+      html += `</div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <h3 class="font-bold text-slate-800 text-lg mb-3">📥 Your Daily Consumption History</h3>`;
+      if (consumedRows.length === 0) {
+        html += `<p class="text-xs text-slate-400">No consumption records found.</p>`;
+      } else {
+        html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Case #</th><th class="p-2">Record Details</th></tr></thead><tbody class="divide-y">`;
+        consumedRows.forEach(r => { html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2 font-bold">${r[4]||''}</td><td class="p-2">${r.join(" | ")}</td></tr>`; });
+        html += `</tbody></table></div>`;
+      }
+      html += `</div></div>`;
+      content.innerHTML = html;
+    }
+
+    // --- RENDER RIDER TABLE (SEPARATE SCROLLABLE TABLE) ---
+    function renderRidersTable() {
+      let tbody = document.getElementById('riderTableBody');
+      if(!tbody) return;
+      let summary = computeRiderSummary();
+      let riders = Object.values(summary);
+
+      document.getElementById('riderCountBadge').innerText = `${riders.length} Riders`;
+      tbody.innerHTML = "";
+
+      if (riders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">No riders found.</td></tr>`;
+        return;
+      }
+
+      riders.forEach(item => {
+        let totIssued = 0, totUsed = 0;
+        fieldCategories.forEach(cat => {
+          totIssued += item.items[cat].issued;
+          totUsed += item.items[cat].used;
+        });
+        let bal = totIssued - totUsed;
+        let badge = bal < 0 
+          ? `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold">Shortage (${bal})</span>` 
+          : `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">In Hand</span>`;
+        
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 font-bold text-sky-700">${item.region}</td>
+            <td class="p-4 font-semibold text-slate-700">${item.id}</td>
+            <td class="p-4 font-medium text-slate-900">${item.name}</td>
+            <td class="p-4 text-slate-600">${totIssued}</td>
+            <td class="p-4 text-slate-600">${totUsed}</td>
+            <td class="p-4 font-bold text-slate-900">${bal}</td>
+            <td class="p-4">${badge}</td>
+            <td class="p-4 text-center"><button onclick="openRiderHistory('${item.id}')" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">View History</button></td>
+          </tr>`;
+      });
+    }
+
+    // Modal helpers
     function openStaffModal() {
       if (localStorage.getItem('erp_role') === 'employee') {
         document.getElementById('modalEmpId').value = localStorage.getItem('logged_id');
@@ -702,7 +1154,6 @@
       document.getElementById('staffModal').classList.remove('hidden');
     }
     function closeStaffModal() { document.getElementById('staffModal').classList.add('hidden'); }
-
     function openRequestModal() {
       if (localStorage.getItem('erp_role') === 'employee') {
         document.getElementById('reqEmpId').value = localStorage.getItem('logged_id');
@@ -712,13 +1163,11 @@
       document.getElementById('requestModal').classList.remove('hidden');
     }
     function closeRequestModal() { document.getElementById('requestModal').classList.add('hidden'); }
-
     function openDemandModal() {
-      document.getElementById('demandAddedBy').value = localStorage.getItem('logged_name') || localStorage.getItem('logged_id') || 'Admin';
+      document.getElementById('demandAddedBy').value = localStorage.getItem('logged_name') || 'Admin';
       document.getElementById('demandModal').classList.remove('hidden');
     }
     function closeDemandModal() { document.getElementById('demandModal').classList.add('hidden'); }
-
     function openAdminConsumptionModal() {
       document.getElementById('adminConsBy').value = localStorage.getItem('logged_name') || 'Admin';
       document.getElementById('adminConsumptionModal').classList.remove('hidden');
@@ -728,37 +1177,27 @@
     async function submitDemandStock() {
       const date = document.getElementById('demandDate').value;
       const addedBy = document.getElementById('demandAddedBy').value.trim();
-      const otherName = document.getElementById('demandOtherName').value.trim();
-
-      if (!date || !addedBy) { alert("تاریخ اور نام درج کرنا لازمی ہے۔"); return; }
-
+      if (!date || !addedBy) { alert("Date and Name required."); return; }
       let items = {};
       document.querySelectorAll('.demandItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
-
+      showLoader("Saving demand stock...");
       try {
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "demand", date, addedBy, otherName, items }) });
-        alert("✅ Demand Room میں اسٹاک کامیابی سے شامل ہو گیا!");
-        closeDemandModal();
-        loadData();
-      } catch (err) { alert("ایرر: " + err); }
+        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "demand", date, addedBy, items }) });
+        hideLoader(); alert("✅ Demand stock added!"); closeDemandModal(); loadData();
+      } catch (err) { hideLoader(); alert("Error: " + err); }
     }
 
     async function submitAdminConsumption() {
       const date = document.getElementById('adminConsDate').value;
       const addedBy = document.getElementById('adminConsBy').value.trim();
-      const otherName = document.getElementById('adminConsOtherName').value.trim();
-
-      if (!date || !addedBy) { alert("تاریخ اور نام درج کرنا لازمی ہے۔"); return; }
-
+      if (!date || !addedBy) { alert("Date and Name required."); return; }
       let items = {};
       document.querySelectorAll('.adminConsItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
-
+      showLoader("Saving office consumption...");
       try {
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "admin_consumption", date, addedBy, otherName, items }) });
-        alert("✅ آفس/ایڈمن کنزمپشن کامیابی سے درج ہو گئی!");
-        closeAdminConsumptionModal();
-        loadData();
-      } catch (err) { alert("ایرر: " + err); }
+        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "admin_consumption", date, addedBy, items }) });
+        hideLoader(); alert("✅ Office consumption saved!"); closeAdminConsumptionModal(); loadData();
+      } catch (err) { hideLoader(); alert("Error: " + err); }
     }
 
     async function submitConsumption() {
@@ -767,18 +1206,14 @@
       const empName = document.getElementById('modalEmpName').value;
       const region = document.getElementById('modalRegion').value;
       const caseNumber = document.getElementById('modalCaseNum').value.trim();
-
-      if (!date || !empId || !caseNumber) { alert("تاریخ، ایمپلائی آئی ڈی اور کیس نمبر لازمی ہیں۔"); return; }
-
+      if (!date || !empId || !caseNumber) { alert("Date, ID and Case Number required."); return; }
       let items = {};
       document.querySelectorAll('.modalItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
-
+      showLoader("Submitting consumption...");
       try {
         await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "consumption", date, region, empId, empName, caseNumber, items }) });
-        alert("✅ کامیابی سے درج ہو گیا!");
-        closeStaffModal();
-        loadData();
-      } catch (err) { alert("ایرر: " + err); }
+        hideLoader(); alert("✅ Consumption submitted!"); closeStaffModal(); loadData();
+      } catch (err) { hideLoader(); alert("Error: " + err); }
     }
 
     async function submitRequest() {
@@ -786,137 +1221,75 @@
       const empId = document.getElementById('reqEmpId').value;
       const empName = document.getElementById('reqEmpName').value;
       const region = document.getElementById('reqRegion').value;
-
-      if (!date || !empId) { alert("تاریخ اور ایمپلائی آئی ڈی لازمی ہیں۔"); return; }
-
-      let items = {};
-      let count = 0;
+      if (!date || !empId) { alert("Date and ID required."); return; }
+      let items = {}; let count = 0;
       document.querySelectorAll('.reqItemsContainer-input').forEach(inp => {
         let val = Number(inp.value) || 0;
         if (val > 0) { items[inp.dataset.item] = val; count++; }
       });
-
-      if (count === 0) { alert("براہ کرم کم از کم ایک آئٹم کی مقدار درج کریں۔"); return; }
-
+      if (count === 0) { alert("Please enter quantity for at least one item."); return; }
+      showLoader("Submitting request...");
       try {
         await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "request", date, region, empId, empName, items }) });
-        alert("✅ اسٹاک ریکویسٹ کامیابی سے بھیج دی گئی!");
-        closeRequestModal();
-        loadData();
-      } catch (err) { alert("ایرر: " + err); }
+        hideLoader(); alert("✅ Request submitted!"); closeRequestModal(); loadData();
+      } catch (err) { hideLoader(); alert("Error: " + err); }
     }
 
-    // --- REQUESTS MANAGEMENT LOGIC ---
     function setReqStatusFilter(status) {
       currentReqStatusFilter = status;
       ['ALL', 'Open', 'In progress', 'Resolved', 'Closed', 'Cancelled'].forEach(st => {
         let btn = document.getElementById('pill-' + st);
         if(!btn) return;
-        if(st === status) {
-          btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white transition shadow-xs";
-        } else {
-          btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
-        }
+        if(st === status) btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white transition shadow-xs";
+        else btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition";
       });
       renderRequests();
     }
 
-    function clearReqFilters() {
-      document.getElementById('reqSearchInput').value = "";
-      document.getElementById('reqFilterItem').value = "ALL";
-      document.getElementById('reqFilterHandler').value = "ALL";
-      document.getElementById('reqFilterStartDate').value = "";
-      document.getElementById('reqFilterEndDate').value = "";
-      setReqStatusFilter('ALL');
-    }
-
     async function updateRequestStatus(reqId, newStatus) {
-      let adminName = localStorage.getItem('logged_name') || localStorage.getItem('logged_id') || "Admin";
+      let adminName = localStorage.getItem('logged_name') || "Admin";
+      showLoader("Updating request status...");
       try {
         await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "update_request_status", reqId, status: newStatus, handler: adminName }) });
-        alert("✅ ریکویسٹ اسٹیٹس اپ ڈیٹ ہو گیا!");
-        loadData();
-      } catch (e) {
-        alert("ایرر: " + e);
-      }
+        hideLoader(); alert("✅ Request status updated!"); loadData();
+      } catch (e) { hideLoader(); alert("Error: " + e); }
     }
 
     function renderRequests() {
       const container = document.getElementById('requestsListContainer');
       if(!container) return;
-
       let counts = { ALL: 0, Open: 0, "In progress": 0, Resolved: 0, Closed: 0, Cancelled: 0 };
-      
-      let rows = rawRequests.slice(1); // skip header
+      let rows = rawRequests.slice(1);
       counts.ALL = rows.length;
-      rows.forEach(r => {
-        let st = r[7] ? r[7].toString().trim() : "Open";
-        if (counts.hasOwnProperty(st)) counts[st]++;
-      });
-
-      Object.keys(counts).forEach(st => {
-        let badge = document.getElementById('count-' + st);
-        if(badge) badge.innerText = counts[st];
-      });
+      rows.forEach(r => { let st = r[7] ? r[7].toString().trim() : "Open"; if (counts.hasOwnProperty(st)) counts[st]++; });
+      Object.keys(counts).forEach(st => { let badge = document.getElementById('count-' + st); if(badge) badge.innerText = counts[st]; });
 
       let search = document.getElementById('reqSearchInput').value.toLowerCase().trim();
-      let filterItem = document.getElementById('reqFilterItem').value;
-      let filterHandler = document.getElementById('reqFilterHandler').value;
-      let startDate = document.getElementById('reqFilterStartDate').value;
-      let endDate = document.getElementById('reqFilterEndDate').value;
-
       let filtered = rows.filter(r => {
         let reqId = r[0] ? r[0].toString() : "";
-        let date = getRowDate(r);
-        let region = r[2] ? r[2].toString() : "";
         let empId = r[3] ? r[3].toString() : "";
         let empName = r[4] ? r[4].toString() : "";
         let item = r[5] ? r[5].toString() : "";
-        let qty = r[6] ? r[6].toString() : "";
         let status = r[7] ? r[7].toString().trim() : "Open";
-        let handler = r[8] ? r[8].toString().trim() : "Unassigned";
-
         if (currentReqStatusFilter !== "ALL" && status.toLowerCase() !== currentReqStatusFilter.toLowerCase()) return false;
-        if (filterItem !== "ALL" && item !== filterItem) return false;
-        if (filterHandler !== "ALL" && handler !== filterHandler) return false;
-        if (startDate && date && date < startDate) return false;
-        if (endDate && date && date > endDate) return false;
-
-        if (search) {
-          let fullStr = `${reqId} ${empId} ${empName} ${item} ${region} ${handler}`.toLowerCase();
-          if (!fullStr.includes(search)) return false;
-        }
+        if (search && !`${reqId} ${empId} ${empName} ${item}`.toLowerCase().includes(search)) return false;
         return true;
       });
 
       document.getElementById('reqShowingCount').innerText = `Showing ${filtered.length} of ${rows.length} requests`;
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-400 font-medium">کوئی ریکویسٹ موجود نہیں ہے۔</div>`;
-        return;
-      }
+      if (filtered.length === 0) { container.innerHTML = `<div class="bg-white p-8 rounded-2xl border text-center text-slate-400">No requests found.</div>`; return; }
 
       container.innerHTML = "";
       filtered.forEach(r => {
-        let reqId = r[0];
-        let date = r[1];
-        let region = r[2];
-        let empId = r[3];
-        let empName = r[4];
-        let item = r[5];
-        let qty = r[6];
-        let status = r[7] || "Open";
-        let handler = r[8] || "Unassigned";
-
-        let statusBg = "bg-sky-100 text-sky-800 border-sky-200";
-        if(status === "Open") statusBg = "bg-amber-100 text-amber-800 border-amber-200";
+        let reqId = r[0], date = r[1], region = r[2], empId = r[3], empName = r[4], item = r[5], qty = r[6], status = r[7] || "Open", handler = r[8] || "Unassigned";
+        let statusBg = "bg-amber-100 text-amber-800 border-amber-200";
         if(status === "In progress") statusBg = "bg-indigo-100 text-indigo-800 border-indigo-200";
         if(status === "Resolved") statusBg = "bg-emerald-100 text-emerald-800 border-emerald-200";
         if(status === "Closed") statusBg = "bg-slate-200 text-slate-700 border-slate-300";
         if(status === "Cancelled") statusBg = "bg-rose-100 text-rose-800 border-rose-200";
 
         container.innerHTML += `
-          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 space-y-3 hover:border-slate-300 transition">
+          <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 space-y-3">
             <div class="flex justify-between items-start gap-4">
               <div>
                 <h4 class="font-black text-slate-900 text-base">${item} <span class="text-xs font-semibold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md ml-1">Qty: ${qty}</span></h4>
@@ -924,14 +1297,11 @@
               </div>
               <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusBg}">${status.toUpperCase()}</span>
             </div>
-            <div class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 flex items-center justify-between">
-              <span>Region: <strong class="text-slate-800">${region}</strong> | Req ID: <strong class="text-slate-800">${reqId}</strong></span>
-            </div>
             <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">
-              <button onclick="updateRequestStatus('${reqId}', 'In progress')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition shadow-2xs">Mark In Progress</button>
-              <button onclick="updateRequestStatus('${reqId}', 'Resolved')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition shadow-2xs">Mark Resolved</button>
-              <button onclick="updateRequestStatus('${reqId}', 'Cancelled')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition shadow-2xs">Cancel Request</button>
-              <button onclick="updateRequestStatus('${reqId}', 'Closed')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition shadow-2xs">Close</button>
+              <button onclick="updateRequestStatus('${reqId}', 'In progress')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Mark In Progress</button>
+              <button onclick="updateRequestStatus('${reqId}', 'Resolved')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Mark Resolved</button>
+              <button onclick="updateRequestStatus('${reqId}', 'Cancelled')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Cancel Request</button>
+              <button onclick="updateRequestStatus('${reqId}', 'Closed')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Close</button>
             </div>
           </div>`;
       });
@@ -940,11 +1310,8 @@
     function renderDemandRoom() {
       const tbody = document.getElementById('demandRoomTableBody');
       if (!tbody) return;
-
-      let itemReceivedTotals = {};
-      let itemOutTotals = {};
+      let itemReceivedTotals = {}, itemOutTotals = {};
       allCategories.forEach(cat => { itemReceivedTotals[cat] = 0; itemOutTotals[cat] = 0; });
-
       if (rawDemand.length > 1) {
         let h = rawDemand[0];
         for (let i = 1; i < rawDemand.length; i++) {
@@ -952,13 +1319,10 @@
           for (let c = 2; c < h.length - 1; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
             let valNum = Number(r[c]) || 0;
-            if (itemReceivedTotals.hasOwnProperty(colName)) {
-              itemReceivedTotals[colName] += valNum;
-            }
+            if (itemReceivedTotals.hasOwnProperty(colName)) itemReceivedTotals[colName] += valNum;
           }
         }
       }
-
       if (rawIssued.length > 1) {
         let h = rawIssued[0];
         for (let i = 1; i < rawIssued.length; i++) {
@@ -966,34 +1330,16 @@
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
             let valNum = Number(r[c]) || 0;
-            if (itemOutTotals.hasOwnProperty(colName)) {
-              itemOutTotals[colName] += valNum;
-            }
+            if (itemOutTotals.hasOwnProperty(colName)) itemOutTotals[colName] += valNum;
           }
         }
       }
-
-      if (rawAdminConsumed.length > 1) {
-        let h = rawAdminConsumed[0];
-        for (let i = 1; i < rawAdminConsumed.length; i++) {
-          let r = rawAdminConsumed[i];
-          for (let c = 2; c < h.length - 1; c++) {
-            let colName = h[c] ? h[c].toString().trim() : "";
-            let valNum = Number(r[c]) || 0;
-            if (itemOutTotals.hasOwnProperty(colName)) {
-              itemOutTotals[colName] += valNum;
-            }
-          }
-        }
-      }
-
       tbody.innerHTML = "";
       allCategories.forEach(cat => {
         let received = itemReceivedTotals[cat];
         let outTotal = itemOutTotals[cat];
         let balance = received - outTotal;
         let balColor = balance < 0 ? "text-rose-600 font-bold" : "text-emerald-700 font-extrabold";
-
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="p-4 font-bold text-slate-800">${cat}</td>
@@ -1005,33 +1351,10 @@
       });
     }
 
-    function exportDemandRoomCSV() {
-      let now = new Date();
-      let csv = [];
-      csv.push(`"HS ERP CLL - Demand Room Inventory Report"`);
-      csv.push(`"Export Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
-      csv.push("");
-      csv.push("Item Name,Total Received,Total Out (Issued/Consumed),Remaining Balance");
-
-      document.querySelectorAll("#demandRoomTableBody tr").forEach(row => {
-        let cols = row.querySelectorAll("td");
-        if (cols.length >= 4) {
-          csv.push(`"${cols[0].innerText}","${cols[1].innerText}","${cols[2].innerText}","${cols[3].innerText}"`);
-        }
-      });
-
-      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-      let a = document.createElement("a");
-      a.href = window.URL.createObjectURL(blob);
-      a.download = "demand_room_report.csv";
-      a.click();
-    }
-
     function renderDashboard() {
-      const tbody = document.getElementById('erpTableBody');
       const itemsSummaryBody = document.getElementById('itemsSummaryTableBody');
       const reportTitle = document.getElementById('summaryReportTitle');
-      if (!tbody || !itemsSummaryBody) return;
+      if (!itemsSummaryBody) return;
 
       const selectedRegion = document.getElementById('regionFilter').value;
       const search = document.getElementById('empSearch').value.toLowerCase().trim();
@@ -1042,12 +1365,6 @@
       let itemTotals = {};
       fieldCategories.forEach(cat => { itemTotals[cat] = { issued: 0, used: 0 }; });
 
-      let summary = {};
-      Object.keys(empMap).forEach(id => {
-        summary[id] = { region: empRegionMap[id] || "Center 1", id: id, name: empMap[id] || "", issued: 0, used: 0, items: {} };
-        fieldCategories.forEach(cat => { summary[id].items[cat] = { issued: 0, used: 0 }; });
-      });
-
       if (rawIssued.length > 1) {
         let h = rawIssued[0];
         for (let i = 1; i < rawIssued.length; i++) {
@@ -1055,31 +1372,14 @@
           let rowDate = getRowDate(r);
           if (startDate && rowDate && rowDate < startDate) continue;
           if (endDate && rowDate && rowDate > endDate) continue;
-
-          let id = "";
-          for (let col = 0; col < r.length; col++) {
-            let val = r[col] ? r[col].toString().trim() : "";
-            if (empMap[val]) { id = val; break; }
-          }
-          if (!id && r[2]) id = r[2].toString().trim();
-
           let rowReg = "Center 1";
-          for (let cell of r) {
-            let val = cell ? cell.toString().trim() : "";
-            let clean = cleanRegion(val);
-            if (clean) { rowReg = clean; break; }
-          }
-
+          for (let cell of r) { let clean = cleanRegion(cell); if (clean) { rowReg = clean; break; } }
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
             let valNum = Number(r[c]) || 0;
             if (fieldCategories.includes(colName)) {
               if (selectedRegion === "ALL" || rowReg.toUpperCase() === selectedRegion.toUpperCase()) {
                 itemTotals[colName].issued += valNum;
-              }
-              if (id && summary[id]) {
-                summary[id].issued += valNum;
-                summary[id].items[colName].issued += valNum;
               }
             }
           }
@@ -1093,21 +1393,8 @@
           let rowDate = getRowDate(r);
           if (startDate && rowDate && rowDate < startDate) continue;
           if (endDate && rowDate && rowDate > endDate) continue;
-
-          let id = "";
-          for (let col = 0; col < r.length; col++) {
-            let val = r[col] ? r[col].toString().trim() : "";
-            if (empMap[val]) { id = val; break; }
-          }
-          if (!id && r[2]) id = r[2].toString().trim();
-
           let rowReg = "Center 1";
-          for (let cell of r) {
-            let val = cell ? cell.toString().trim() : "";
-            let clean = cleanRegion(val);
-            if (clean) { rowReg = clean; break; }
-          }
-
+          for (let cell of r) { let clean = cleanRegion(cell); if (clean) { rowReg = clean; break; } }
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
             let valNum = Number(r[c]) || 0;
@@ -1115,83 +1402,37 @@
               if (selectedRegion === "ALL" || rowReg.toUpperCase() === selectedRegion.toUpperCase()) {
                 itemTotals[colName].used += valNum;
               }
-              if (id && summary[id]) {
-                summary[id].used += valNum;
-                summary[id].items[colName].used += valNum;
-              }
             }
           }
         }
       }
 
-      lastMatchingEmployees = Object.values(summary).filter(emp => {
-        if (selectedRegion !== "ALL" && emp.region.toUpperCase() !== selectedRegion.toUpperCase()) return false;
-        if (search && !emp.id.toLowerCase().includes(search) && !emp.name.toLowerCase().includes(search)) return false;
-        return true;
-      });
-
-      let displayItemTotals = {};
-      fieldCategories.forEach(cat => { displayItemTotals[cat] = { issued: 0, used: 0 }; });
-
-      if (search && lastMatchingEmployees.length > 0) {
-        reportTitle.innerText = `(Filtered Report for: ${lastMatchingEmployees.map(e => e.name + ' (' + e.id + ')').join(', ')})`;
-        lastMatchingEmployees.forEach(emp => {
-          fieldCategories.forEach(cat => {
-            displayItemTotals[cat].issued += emp.items[cat].issued;
-            displayItemTotals[cat].used += emp.items[cat].used;
-          });
-        });
-      } else {
-        reportTitle.innerText = "(Overall Summary)";
-        fieldCategories.forEach(cat => {
-          displayItemTotals[cat].issued = itemTotals[cat].issued;
-          displayItemTotals[cat].used = itemTotals[cat].used;
-        });
-      }
-
       itemsSummaryBody.innerHTML = "";
+      let totIssued = 0, totUsed = 0;
+
       fieldCategories.forEach(item => {
         if (catFilter !== "ALL" && item !== catFilter) return;
-        let itIssued = displayItemTotals[item].issued;
-        let itUsed = displayItemTotals[item].used;
+        let itIssued = itemTotals[item].issued;
+        let itUsed = itemTotals[item].used;
         let itBal = itIssued - itUsed;
-        let balColor = itBal < 0 ? "text-rose-600 font-bold" : "text-emerald-700 font-bold";
+        let limit = itemThresholds[item] || 5;
 
+        // Apply KPI click filter if active
+        if (activeKpiFilter === 'issued' && itIssued === 0) return;
+        if (activeKpiFilter === 'used' && itUsed === 0) return;
+        if (activeKpiFilter === 'balance' && itBal > limit) return;
+
+        totIssued += itIssued;
+        totUsed += itUsed;
+
+        let balColor = itBal < 0 ? "text-rose-600 font-bold" : "text-emerald-700 font-bold";
         itemsSummaryBody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="p-3 font-bold text-slate-700">${item}</td>
             <td class="p-3 text-center text-indigo-600 font-semibold">${itIssued}</td>
             <td class="p-3 text-center text-amber-600 font-semibold">${itUsed}</td>
             <td class="p-3 text-center ${balColor}">${itBal}</td>
-          </tr>`;
-      });
-
-      let totIssued = 0, totUsed = 0;
-      document.getElementById('empCount').innerText = `${lastMatchingEmployees.length} Employees`;
-      tbody.innerHTML = "";
-
-      if (lastMatchingEmployees.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No matching records found.</td></tr>`;
-        return;
-      }
-
-      lastMatchingEmployees.forEach(item => {
-        let bal = item.issued - item.used;
-        totIssued += item.issued;
-        totUsed += item.used;
-        let badge = bal < 0 
-          ? `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold">Shortage (${bal})</span>` 
-          : `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">In Hand</span>`;
-        
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="p-4 font-bold text-sky-700">${item.region}</td>
-            <td class="p-4 font-semibold text-slate-700">${item.id}</td>
-            <td class="p-4 font-medium text-slate-900">${item.name}</td>
-            <td class="p-4 text-slate-600">${item.issued}</td>
-            <td class="p-4 text-slate-600">${item.used}</td>
-            <td class="p-4 font-bold text-slate-900">${bal}</td>
-            <td class="p-4">${badge}</td>
+            <td class="p-3 text-center text-slate-600 font-medium">${limit}</td>
           </tr>`;
       });
 
@@ -1203,92 +1444,43 @@
     function renderRawTables() {
       const buildFilteredTable = (rows, regFilterId, startDateId, endDateId, searchId, tableId) => {
         if (!rows || rows.length === 0) return "<p class='text-slate-400'>No records found.</p>";
-        const regFilter = document.getElementById(regFilterId) ? document.getElementById(regFilterId).value : "ALL";
-        const startDate = document.getElementById(startDateId) ? document.getElementById(startDateId).value : "";
-        const endDate = document.getElementById(endDateId) ? document.getElementById(endDateId).value : "";
-        const search = document.getElementById(searchId) ? document.getElementById(searchId).value.toLowerCase().trim() : "";
-
         let h = rows[0];
         let html = `<table id="${tableId}" class="w-full text-left text-sm"><thead><tr class="bg-slate-50 text-xs font-bold uppercase">`;
         h.forEach(col => html += `<th class="p-3 border-b">${col}</th>`);
         html += `</tr></thead><tbody class="divide-y divide-slate-100">`;
-        
         for (let i = 1; i < rows.length; i++) {
           let r = rows[i];
-          let rowDate = getRowDate(r);
-          let rowText = r.join(" ").toLowerCase();
-          let rowReg = "Center 1";
-          for (let cell of r) {
-            let val = cell ? cell.toString().trim() : "";
-            let clean = cleanRegion(val);
-            if (clean) { rowReg = clean; break; }
-          }
-
-          if (regFilter !== "ALL" && rowReg.toUpperCase() !== regFilter.toUpperCase()) continue;
-          if (startDate && rowDate && rowDate < startDate) continue;
-          if (endDate && rowDate && rowDate > endDate) continue;
-          if (search && !rowText.includes(search)) continue;
-
           html += `<tr class="hover:bg-slate-50">`;
           r.forEach(c => html += `<td class="p-3">${c || ''}</td>`);
           html += `</tr>`;
         }
         return html + `</tbody></table>`;
       };
-
       document.getElementById('issuedRawBox').innerHTML = buildFilteredTable(rawIssued, 'issuedRegionFilter', 'issuedStartDate', 'issuedEndDate', null, 'issuedRawTable');
       document.getElementById('consumptionRawBox').innerHTML = buildFilteredTable(rawConsumed, 'consRegionFilter', 'consStartDate', 'consEndDate', null, 'consumptionRawTable');
     }
 
     function exportDashboardCSV() {
       let now = new Date();
-      let csv = [];
-      csv.push(`"HS ERP CLL - Inventory Report"`);
-      csv.push(`"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
-      csv.push("");
-      csv.push("Item Name,Total Issued,Total Used,Remaining Balance");
-
+      let csv = ["\"HS ERP CLL - Inventory Report\"", `"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`, "", "Item Name,Total Issued,Total Used,Remaining Balance,Min Threshold"];
       document.querySelectorAll("#itemsSummaryTableBody tr").forEach(row => {
         let cols = row.querySelectorAll("td");
-        if (cols.length === 4) {
-          csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
-        }
+        if (cols.length === 5) csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
       });
-
       let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-      let a = document.createElement("a");
-      a.href = window.URL.createObjectURL(blob);
-      a.download = "overall_inventory_report.csv";
-      a.click();
+      let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = "overall_inventory_report.csv"; a.click();
     }
 
     function exportRawTable(tableId, filename, startDateId, endDateId) {
-      let now = new Date();
       let table = document.getElementById(tableId);
-      if (!table) { alert("No data available!"); return; }
-      
-      const startDate = document.getElementById(startDateId) ? document.getElementById(startDateId).value : "";
-      const endDate = document.getElementById(endDateId) ? document.getElementById(endDateId).value : "";
-
+      if (!table) return;
       let csv = [];
-      csv.push(`"HS ERP CLL Report"`);
-      csv.push(`"Export Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`);
-      if (startDate || endDate) {
-        csv.push(`"Date Range","From: ${startDate || 'All'} To: ${endDate || 'All'}"`);
-      }
-      csv.push("");
-
-      let rows = table.querySelectorAll("tr");
-      rows.forEach((row) => {
+      table.querySelectorAll("tr").forEach(row => {
         let cols = row.querySelectorAll("th, td");
         csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/\n/g, ' ')}"`).join(","));
       });
-
-      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;"});
-      let a = document.createElement("a");
-      a.href = window.URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
+      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+      let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = filename; a.click();
     }
   </script>
 </body>
