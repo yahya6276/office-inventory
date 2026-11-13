@@ -77,7 +77,7 @@
         </nav>
       </div>
       <div class="p-4 border-t border-slate-800/60 backdrop-blur-xs bg-slate-900/50 text-xs text-slate-400 font-medium text-center flex items-center justify-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v32.0 Pro
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v33.0 Pro
       </div>
     </aside>
 
@@ -296,7 +296,7 @@
           </div>
         </section>
 
-        <!-- TAB 1.8: STOCK REQUESTS (GROUPED LIST WITH INDIVIDUAL APPROVE/CANCEL) -->
+        <!-- TAB 1.8: STOCK REQUESTS -->
         <section id="tab-requests" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-5">
             <div>
@@ -324,7 +324,6 @@
             <p class="text-sm text-slate-600 max-w-lg mx-auto">یہاں آپ اپنا موجودہ اسٹاک بیلنس اور ایڈمن نوٹیفیکیشنز دیکھ سکتے ہیں۔</p>
           </div>
 
-          <!-- Employee Notifications Banner -->
           <div id="empNotificationBox" class="hidden bg-amber-50 border-2 border-amber-400 p-5 rounded-2xl shadow-xs space-y-2">
             <h4 class="font-black text-amber-900 text-sm">🔔 Admin Request Updates & Notifications</h4>
             <div id="empNotificationList" class="space-y-1 text-xs text-amber-800"></div>
@@ -351,7 +350,7 @@
           <div id="employeePortalHistory" class="space-y-4"></div>
         </section>
 
-        <!-- TAB 2: INVENTORY ISSUED (CORRECTED TO SHOW ACTUAL ISSUED RECORDS) -->
+        <!-- TAB 2: INVENTORY ISSUED -->
         <section id="tab-issued" class="admin-only hidden space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div>
@@ -733,7 +732,10 @@
           }
         }
 
-        let openReqs = rawRequests.slice(1).filter(r => r[6] && r[6].toString().trim() === "Open");
+        let openReqs = rawRequests.slice(1).filter(r => {
+          let st = (r[6] !== undefined && r[6] !== null) ? r[6].toString().trim() : "Open";
+          return st === "Open";
+        });
         if (openReqs.length > 0) {
           document.getElementById('reqBadge').classList.remove('hidden');
           document.getElementById('reqBadge').innerText = openReqs.length + " New";
@@ -743,12 +745,6 @@
         if(catSel) {
           catSel.innerHTML = '<option value="ALL">All Categories</option>';
           allCategories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
-        }
-
-        const reqCatSel = document.getElementById('reqFilterItem');
-        if(reqCatSel) {
-          reqCatSel.innerHTML = '<option value="ALL">All items</option>';
-          allCategories.forEach(c => reqCatSel.innerHTML += `<option value="${c}">${c}</option>`);
         }
 
         const threshSel = document.getElementById('thresholdItemSelect');
@@ -1041,24 +1037,25 @@
     }
     function closeRiderHistoryModal() { document.getElementById('riderHistoryModal').classList.add('hidden'); }
 
-    // --- EMPLOYEE BALANCE & NOTIFICATIONS VIEW ---
     function renderEmployeePortalView() {
       let empId = localStorage.getItem('logged_id');
       let issuedRows = rawIssued.slice(1).filter(r => r.join(" ").includes(empId));
       let consumedRows = rawConsumed.slice(1).filter(r => r.join(" ").includes(empId));
       let requestRows = rawRequests.slice(1).filter(r => r[3] && r[3].toString().trim() === empId);
 
-      // Render Admin notifications / request remarks
       let notifBox = document.getElementById('empNotificationBox');
       let notifList = document.getElementById('empNotificationList');
-      let processedReqs = requestRows.filter(r => r[6] === "Resolved" || r[6] === "Cancelled");
+      let processedReqs = requestRows.filter(r => {
+        let st = (r[6] !== undefined && r[6] !== null) ? r[6].toString().trim() : "";
+        return st === "Resolved" || st === "Cancelled";
+      });
       
       if (processedReqs.length > 0) {
         notifBox.classList.remove('hidden');
         notifList.innerHTML = "";
         processedReqs.forEach(r => {
           let reqId = r[0];
-          let status = r[6];
+          let status = (r[6] !== undefined && r[6] !== null) ? r[6].toString().trim() : "";
           let remarks = r[8] || "Processed by admin";
           let badgeColor = status === "Resolved" ? "text-emerald-700 font-bold" : "text-rose-700 font-bold";
           notifList.innerHTML += `<div class="p-2 bg-white rounded-lg border border-amber-200">Request <strong>${reqId}</strong> status: <span class="${badgeColor}">${status}</span> — ${remarks}</div>`;
@@ -1150,7 +1147,6 @@
       });
     }
 
-    // Modal helpers
     function openStaffModal() {
       if (localStorage.getItem('erp_role') === 'employee') {
         document.getElementById('modalEmpId').value = localStorage.getItem('logged_id');
@@ -1280,7 +1276,6 @@
       renderRequests();
     }
 
-    // Process Individual, Approve All or Cancel Request
     async function processRequestAction(reqId, action, itemKey = null) {
       let adminName = localStorage.getItem('logged_name') || "Admin";
       let approvedItems = {};
@@ -1318,8 +1313,9 @@
       let rows = rawRequests.slice(1);
       counts.ALL = rows.length;
       rows.forEach(r => {
-        let st = r[6] ? r[6].toString().trim() : "Open";
+        let st = (r[6] !== undefined && r[6] !== null && r[6] !== "") ? r[6].toString().trim() : "Open";
         if (counts.hasOwnProperty(st)) counts[st]++;
+        else counts.Open++;
       });
       Object.keys(counts).forEach(st => {
         let badge = document.getElementById('count-' + st);
@@ -1331,7 +1327,7 @@
         let reqId = r[0] ? r[0].toString() : "";
         let empId = r[3] ? r[3].toString() : "";
         let empName = r[4] ? r[4].toString() : "";
-        let status = r[6] ? r[6].toString().trim() : "Open";
+        let status = (r[6] !== undefined && r[6] !== null && r[6] !== "") ? r[6].toString().trim() : "Open";
         if (currentReqStatusFilter !== "ALL" && status.toLowerCase() !== currentReqStatusFilter.toLowerCase()) return false;
         if (search && !`${reqId} ${empId} ${empName}`.toLowerCase().includes(search)) return false;
         return true;
@@ -1345,7 +1341,7 @@
 
       container.innerHTML = "";
       filtered.forEach(r => {
-        let reqId = r[0], date = r[1], region = r[2], empId = r[3], empName = r[4], itemsJson = r[5], status = r[6] || "Open", handler = r[7] || "Unassigned", remarks = r[8] || "";
+        let reqId = r[0], date = r[1], region = r[2], empId = r[3], empName = r[4], itemsJson = r[5], status = (r[6] !== undefined && r[6] !== null && r[6] !== "") ? r[6].toString().trim() : "Open", handler = r[7] || "Unassigned", remarks = r[8] || "";
         
         let statusBg = "bg-amber-100 text-amber-800 border-amber-200";
         if(status === "Resolved") statusBg = "bg-emerald-100 text-emerald-800 border-emerald-200";
@@ -1562,7 +1558,6 @@
       document.getElementById('kpiBal').innerText = totIssued - totUsed;
     }
 
-    // Corrected Inventory Issued View (Showing actual issued records instead of threshold table)
     function renderRawTables() {
       const buildFilteredTable = (rows, regFilterId, startDateId, endDateId, searchId, tableId) => {
         if (!rows || rows.length === 0) return "<p class='text-slate-400'>No records found.</p>";
