@@ -35,11 +35,11 @@
     <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-200 space-y-6">
       <div class="text-center">
         <h1 class="text-2xl font-black text-slate-900 tracking-wide">⚡ HS ERP CLL</h1>
-        <p class="text-xs text-slate-500 mt-1">Employee & Admin Secure Login</p>
+        <p class="text-xs text-slate-500 mt-1">Secure Server Login Portal</p>
       </div>
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID / Username</label>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID / Username / Admin</label>
           <input type="text" id="loginUser" placeholder="Enter ID or Admin..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
         </div>
         <div>
@@ -77,7 +77,7 @@
         </nav>
       </div>
       <div class="p-4 border-t border-slate-800/60 backdrop-blur-xs bg-slate-900/50 text-xs text-slate-400 font-medium text-center flex items-center justify-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v30.0 Pro
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v31.0 Pro
       </div>
     </aside>
 
@@ -125,7 +125,7 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-500 mb-1">Search Employee</label>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Search Employee / Rider</label>
               <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
             <div>
@@ -142,8 +142,8 @@
               <label class="block text-xs font-bold text-slate-500 mb-1">To Date</label>
               <input type="date" id="endDateFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
-            <div class="flex items-end">
-              <button onclick="exportDashboardCSV()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export CSV</button>
+            <div class="flex items-end gap-2">
+              <button onclick="exportDashboardCSV()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-3 rounded-xl text-xs transition shadow-xs">📥 Export CSV</button>
             </div>
           </div>
 
@@ -224,14 +224,15 @@
           </div>
         </section>
 
-        <!-- TAB 1.6: RIDER MANAGEMENT (SEPARATE SCROLLABLE TABLE) -->
+        <!-- TAB 1.6: RIDER MANAGEMENT (SEPARATE SCROLLABLE TABLE WITH SEARCH) -->
         <section id="tab-riders" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
             <div>
               <h3 class="font-bold text-slate-900 text-lg">🚴 Rider / Employee Management & History</h3>
               <p class="text-xs text-slate-500 mt-1">Manage individual rider stocks, details and history.</p>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-3 items-center">
+              <input type="text" id="riderTabSearch" onkeyup="renderRidersTable()" placeholder="Search rider name or ID..." class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
               <button onclick="openBulkRiderModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📁 Bulk Rider Upload</button>
             </div>
           </div>
@@ -251,12 +252,11 @@
                     <th class="p-4">Total Issued</th>
                     <th class="p-4">Total Used</th>
                     <th class="p-4">Balance</th>
-                    <th class="p-4">Status</th>
                     <th class="p-4 text-center">Action / History</th>
                   </tr>
                 </thead>
                 <tbody id="riderTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="8" class="p-6 text-center text-slate-400">Loading riders...</td></tr>
+                  <tr><td colspan="7" class="p-6 text-center text-slate-400">Loading riders...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -319,11 +319,34 @@
           <div id="requestsListContainer" class="space-y-4"></div>
         </section>
 
-        <!-- EMPLOYEE WELCOME -->
-        <section id="employeeWelcome" class="hidden bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-4">
-          <h2 id="welcomeEmpTitle" class="text-2xl font-black text-slate-900">خوش آمدید!</h2>
-          <p class="text-sm text-slate-600 max-w-lg mx-auto">آپ یہاں اپنی اسٹاک ہسٹری اور ریکویسٹ کا اسٹیٹس دیکھ سکتے ہیں۔</p>
-          <div id="employeePortalHistory" class="text-left mt-6"></div>
+        <!-- EMPLOYEE WELCOME & BALANCE VIEW -->
+        <section id="employeeWelcome" class="hidden space-y-6">
+          <div class="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-3">
+            <h2 id="welcomeEmpTitle" class="text-2xl font-black text-slate-900">خوش آمدید!</h2>
+            <p class="text-sm text-slate-600 max-w-lg mx-auto">یہاں آپ اپنا موجودہ اسٹاک بیلنس اور مکمل ہسٹری دیکھ سکتے ہیں۔</p>
+          </div>
+
+          <!-- Employee Stock Balances Grid -->
+          <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6 space-y-4">
+            <h3 class="font-bold text-slate-900 text-lg">📦 Your Current Stock Balances</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 text-xs font-bold text-slate-500 uppercase border-b">
+                    <th class="p-3">Item Name</th>
+                    <th class="p-3 text-center">Total Issued</th>
+                    <th class="p-3 text-center">Total Consumed</th>
+                    <th class="p-3 text-center">Remaining Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="empBalanceTableBody" class="divide-y divide-slate-100 text-sm">
+                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading balance...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="employeePortalHistory" class="space-y-4"></div>
         </section>
 
         <!-- TAB 2: INVENTORY ISSUED -->
@@ -389,7 +412,7 @@
     </div>
   </div>
 
-  <!-- MODALS (Demand, Consumption, Request, Threshold Defaulters, Bulk Rider, Rider History) -->
+  <!-- MODALS -->
   <div id="demandModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">🏢 Add New Stock to Demand Room</h3><button onclick="closeDemandModal()" class="text-white font-bold px-2 py-1">✕</button></div>
@@ -422,7 +445,7 @@
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="modalRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Case Number</label><input type="text" id="modalCaseNum" placeholder="e.g. 321001-01-01" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Used Items</label><div id="modalItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
-        <button onclick="submitConsumption()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Consumption</button>
+        <button id="modalSubBtn" onclick="submitConsumption()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition">Submit Consumption</button>
       </div>
     </div>
   </div>
@@ -436,12 +459,11 @@
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="reqEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
-        <button onclick="submitRequest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm">Submit Request</button>
+        <button id="reqSubBtn" onclick="submitRequest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition">Submit Request</button>
       </div>
     </div>
   </div>
 
-  <!-- THRESHOLD DEFAULTERS MODAL -->
   <div id="thresholdModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
       <div class="bg-rose-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">⚠️ Riders Below Threshold / Zero Balance</h3><button onclick="closeThresholdModal()" class="text-white font-bold px-2 py-1">✕</button></div>
@@ -468,7 +490,6 @@
     </div>
   </div>
 
-  <!-- BULK RIDER UPLOAD MODAL -->
   <div id="bulkRiderModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📁 Bulk Rider Upload</h3><button onclick="closeBulkRiderModal()" class="text-white font-bold px-2 py-1">✕</button></div>
@@ -480,7 +501,6 @@
     </div>
   </div>
 
-  <!-- RIDER HISTORY MODAL -->
   <div id="riderHistoryModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 id="riderHistoryTitle" class="font-bold text-lg">🚴 Rider Stock & History</h3><button onclick="closeRiderHistoryModal()" class="text-white font-bold px-2 py-1">✕</button></div>
@@ -488,7 +508,6 @@
     </div>
   </div>
 
-  <!-- PASSWORD MODAL -->
   <div id="passwordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
       <div class="bg-slate-900 text-white p-4 flex justify-between items-center"><h3 class="font-bold text-base">🔑 Change Password</h3><button onclick="closePasswordModal()" class="text-white font-bold px-2 py-1">✕</button></div>
@@ -500,11 +519,9 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw1O-xu-IQnSxO0Q7PPRzChMHiuxlCGJ6-wOSkNZzlObwF0_ntr9GEzvaUfgjoVOzaXNg/exec";
-    const ADMIN_PASSWORD = "admin123";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRAb3YYVwTKAtjx5v0sZIjpRZcm38nNUY0yAT9dgOGXgNG1cRBDOYHtJZ2ZTmylcOF7w/exec";
 
     let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], rawThresholds = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {}, itemThresholds = {};
-    let lastMatchingEmployees = [];
     let currentReqStatusFilter = "ALL";
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
     const EXCLUDED_FIELD_ITEMS = ["SMALL BAG", "LARGE BAG", "ICE POUCH", "ICE PACK", "TONER 05A", "TONER 79", "OTHERS"];
@@ -515,7 +532,6 @@
       document.getElementById('demandDate').valueAsDate = new Date();
       document.getElementById('adminConsDate').valueAsDate = new Date();
       
-      // Keyboard shortcuts (Enter to submit login, Esc to close modals)
       window.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
           if (!document.getElementById('loginScreen').classList.contains('hidden')) {
@@ -523,14 +539,9 @@
           }
         }
         if (e.key === 'Escape') {
-          closeDemandModal();
-          closeAdminConsumptionModal();
-          closeStaffModal();
-          closeRequestModal();
-          closeThresholdModal();
-          closeBulkRiderModal();
-          closeRiderHistoryModal();
-          closePasswordModal();
+          closeDemandModal(); closeAdminConsumptionModal(); closeStaffModal();
+          closeRequestModal(); closeThresholdModal(); closeBulkRiderModal();
+          closeRiderHistoryModal(); closePasswordModal();
         }
       });
 
@@ -563,8 +574,7 @@
     }
 
     function toggleSidebar() {
-      let sb = document.getElementById('sidebar');
-      sb.classList.toggle('hidden');
+      document.getElementById('sidebar').classList.toggle('hidden');
     }
 
     async function handleLogin() {
@@ -572,51 +582,35 @@
       let pass = document.getElementById('loginPassword').value.trim();
       let errBox = document.getElementById('loginError');
 
-      if (username.toLowerCase() === 'admin' && pass === ADMIN_PASSWORD) {
-        localStorage.setItem('erp_role', 'admin');
-        localStorage.setItem('logged_id', 'admin');
-        loadDataAndInitSession();
-        return;
-      }
+      if (!username || !pass) { alert("Please enter username and password."); return; }
 
-      showLoader("Verifying login...");
+      showLoader("Verifying credentials securely...");
       try {
-        const res = await fetch(SCRIPT_URL + "?v=" + new Date().getTime());
-        const data = await res.json();
-        rawEmployees = data.employees || [];
-
-        let foundId = "", foundName = "", foundReg = "Center 1";
-        if (rawEmployees.length > 1) {
-          for (let i = 1; i < rawEmployees.length; i++) {
-            let row = rawEmployees[i];
-            if (!row || row.length === 0) continue;
-            let name = row[0] ? row[0].toString().trim() : "";
-            let id = row[1] ? row[1].toString().trim() : "";
-            let reg = cleanRegion(row[2]);
-
-            if (id && (id.toLowerCase() === username.toLowerCase() || name.toLowerCase() === username.toLowerCase())) {
-              foundId = id; foundName = name; foundReg = reg; break;
-            }
-          }
-        }
-
-        if (foundId) {
-          let savedPass = localStorage.getItem('emp_pass_' + foundId) || foundId;
-          if (pass === savedPass) {
-            localStorage.setItem('erp_role', 'employee');
-            localStorage.setItem('logged_id', foundId);
-            localStorage.setItem('logged_name', foundName);
-            localStorage.setItem('logged_reg', foundReg);
-            loadDataAndInitSession();
-            hideLoader();
-            return;
-          }
-        }
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ type: "login", username, password: pass })
+        });
+        const result = await res.json();
         hideLoader();
-        errBox.classList.remove('hidden');
+
+        if (result.status === "success") {
+          localStorage.setItem('erp_role', result.role);
+          if (result.role === 'admin') {
+            localStorage.setItem('logged_id', 'admin');
+            localStorage.setItem('logged_name', 'Administrator');
+          } else {
+            localStorage.setItem('logged_id', result.id);
+            localStorage.setItem('logged_name', result.name);
+            localStorage.setItem('logged_reg', result.region);
+          }
+          loadDataAndInitSession();
+        } else {
+          errBox.classList.remove('hidden');
+        }
       } catch (e) {
         hideLoader();
-        alert("لاگ ان میں خرابی پیش آگئی۔");
+        alert("لاگ ان میں خرابی پیش آگئی: " + e.toString());
       }
     }
 
@@ -650,15 +644,31 @@
     function openPasswordModal() { document.getElementById('passwordModal').classList.remove('hidden'); }
     function closePasswordModal() { document.getElementById('passwordModal').classList.add('hidden'); }
 
-    function saveNewPassword() {
+    async function saveNewPassword() {
       let newPass = document.getElementById('newPasswordInput').value.trim();
       let role = localStorage.getItem('erp_role');
       if (!newPass) { alert("پاسورڈ خالی نہیں ہو سکتا!"); return; }
-      if (role === 'employee') {
-        let empId = localStorage.getItem('logged_id');
-        localStorage.setItem('emp_pass_' + empId, newPass);
-        alert("✅ پاسورڈ کامیابی سے تبدیل ہو گیا!");
+
+      if (role === 'admin') {
+        alert("Admin password can be configured in Apps Script.");
         closePasswordModal();
+        return;
+      }
+
+      let empId = localStorage.getItem('logged_id');
+      showLoader("Saving password on server...");
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ type: "update_password", empId, newPassword: newPass })
+        });
+        hideLoader();
+        alert("✅ پاسورڈ کامیابی سے سرور پر اپ ڈیٹ ہو گیا!");
+        closePasswordModal();
+      } catch (e) {
+        hideLoader();
+        alert("Error: " + e);
       }
     }
 
@@ -746,7 +756,6 @@
           }
         }
 
-        // Check for new Open requests notification
         let openReqs = rawRequests.slice(1).filter(r => r[7] && r[7].toString().trim() === "Open");
         if (openReqs.length > 0) {
           document.getElementById('reqBadge').classList.remove('hidden');
@@ -805,7 +814,7 @@
           renderCategoriesTable();
           checkThresholdAlerts();
         } else if (localStorage.getItem('erp_role') === 'employee') {
-          renderEmployeePortalHistory();
+          renderEmployeePortalView();
         }
 
         hideLoader();
@@ -817,12 +826,9 @@
       }
     }
 
-    // --- THRESHOLD ALERTS & DEFAULTERS ---
     function checkThresholdAlerts() {
       let banner = document.getElementById('thresholdAlertBanner');
       let hasDefaulter = false;
-
-      // Compute summaries for riders
       let summary = computeRiderSummary();
       Object.values(summary).forEach(emp => {
         fieldCategories.forEach(cat => {
@@ -831,12 +837,8 @@
           if (bal <= limit) { hasDefaulter = true; }
         });
       });
-
-      if (hasDefaulter) {
-        banner.classList.remove('hidden');
-      } else {
-        banner.classList.add('hidden');
-      }
+      if (hasDefaulter) banner.classList.remove('hidden');
+      else banner.classList.add('hidden');
     }
 
     function computeRiderSummary() {
@@ -899,7 +901,6 @@
       let selectedItem = document.getElementById('thresholdItemSelect').value;
       let limit = itemThresholds[selectedItem] || 5;
       let summary = computeRiderSummary();
-
       tbody.innerHTML = "";
       let count = 0;
 
@@ -911,7 +912,6 @@
           let statusBadge = bal <= 0 
             ? `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-xs font-bold">Zero / Negative</span>`
             : `<span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs font-bold">Below Threshold</span>`;
-
           tbody.innerHTML += `
             <tr class="hover:bg-slate-50">
               <td class="p-3 font-semibold text-slate-700">${emp.id}</td>
@@ -922,20 +922,15 @@
             </tr>`;
         }
       });
-
-      if (count === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">All riders have sufficient balance for ${selectedItem}.</td></tr>`;
-      }
+      if (count === 0) tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">All riders have sufficient balance for ${selectedItem}.</td></tr>`;
     }
 
-    // --- CLICKABLE KPIS ---
     let activeKpiFilter = null;
     function filterKpi(type) {
       activeKpiFilter = (activeKpiFilter === type) ? null : type;
       renderDashboard();
     }
 
-    // --- CATEGORIES & THRESHOLDS MANAGEMENT ---
     function renderCategoriesTable() {
       let tbody = document.getElementById('categoryTableBody');
       if(!tbody) return;
@@ -956,12 +951,11 @@
       let limit = Number(document.getElementById('newCatThreshold').value) || 5;
       if (!name) { alert("Please enter category name."); return; }
       if (allCategories.includes(name)) { alert("Category already exists."); return; }
-
       allCategories.push(name);
       itemThresholds[name] = limit;
       document.getElementById('newCatInput').value = "";
       renderCategoriesTable();
-      alert("✅ Added category successfully. Click 'Save All Changes' to persist.");
+      alert("✅ Category added. Click 'Save All Changes' to persist.");
     }
 
     function deleteCategory(cat) {
@@ -978,13 +972,11 @@
         let cat = inp.dataset.cat;
         itemThresholds[cat] = Number(inp.value) || 5;
       });
-
       showLoader("Saving categories and thresholds...");
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ type: "update_thresholds", thresholds: itemThresholds })
         });
         hideLoader();
@@ -996,7 +988,6 @@
       }
     }
 
-    // --- BULK RIDER UPLOAD ---
     function openBulkRiderModal() { document.getElementById('bulkRiderModal').classList.remove('hidden'); }
     function closeBulkRiderModal() { document.getElementById('bulkRiderModal').classList.add('hidden'); }
 
@@ -1007,19 +998,15 @@
       let riders = [];
       lines.forEach(l => {
         let parts = l.split(',').map(p => p.trim());
-        if (parts.length >= 2) {
-          riders.push([parts[0], parts[1], parts[2] || "Center 1"]);
-        }
+        if (parts.length >= 2) riders.push([parts[0], parts[1], parts[2] || "Center 1"]);
       });
-
       if (riders.length === 0) { alert("No valid rider records parsed."); return; }
 
       showLoader("Uploading bulk riders...");
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ type: "bulk_riders", riders })
         });
         hideLoader();
@@ -1032,12 +1019,10 @@
       }
     }
 
-    // --- RIDER HISTORY MODAL ---
     function openRiderHistory(empId) {
       let empName = empMap[empId] || "Rider";
       let reg = empRegionMap[empId] || "Center 1";
       document.getElementById('riderHistoryTitle').innerText = `🚴 Rider History: ${empName} (${empId}) - ${reg}`;
-      
       let content = document.getElementById('riderHistoryContent');
       content.innerHTML = `<p class="text-slate-500">Loading history...</p>`;
       document.getElementById('riderHistoryModal').classList.remove('hidden');
@@ -1045,47 +1030,73 @@
       let issuedRows = rawIssued.slice(1).filter(r => r.join(" ").includes(empId));
       let consumedRows = rawConsumed.slice(1).filter(r => r.join(" ").includes(empId));
 
-      let html = `<div class="space-y-4">
-        <h4 class="font-bold text-slate-800 text-base border-b pb-2">Issued Items History</h4>`;
-      if (issuedRows.length === 0) {
-        html += `<p class="text-xs text-slate-400">No issued records found.</p>`;
-      } else {
+      let html = `<div class="space-y-4"><h4 class="font-bold text-slate-800 text-base border-b pb-2">Issued Items History</h4>`;
+      if (issuedRows.length === 0) html += `<p class="text-xs text-slate-400">No issued records found.</p>`;
+      else {
         html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Details</th></tr></thead><tbody class="divide-y">`;
-        issuedRows.forEach(r => {
-          html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2">${r.join(" | ")}</td></tr>`;
-        });
+        issuedRows.forEach(r => { html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2">${r.join(" | ")}</td></tr>`; });
         html += `</tbody></table></div>`;
       }
 
       html += `<h4 class="font-bold text-slate-800 text-base border-b pb-2 pt-4">Daily Consumption History</h4>`;
-      if (consumedRows.length === 0) {
-        html += `<p class="text-xs text-slate-400">No consumption records found.</p>`;
-      } else {
+      if (consumedRows.length === 0) html += `<p class="text-xs text-slate-400">No consumption records found.</p>`;
+      else {
         html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Case Number</th><th class="p-2">Details</th></tr></thead><tbody class="divide-y">`;
-        consumedRows.forEach(r => {
-          html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2 font-bold">${r[4] || ''}</td><td class="p-2">${r.join(" | ")}</td></tr>`;
-        });
+        consumedRows.forEach(r => { html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2 font-bold">${r[4] || ''}</td><td class="p-2">${r.join(" | ")}</td></tr>`; });
         html += `</tbody></table></div>`;
       }
-
       html += `</div>`;
       content.innerHTML = html;
     }
     function closeRiderHistoryModal() { document.getElementById('riderHistoryModal').classList.add('hidden'); }
 
-    // --- EMPLOYEE / RIDER PORTAL VIEW ---
-    function renderEmployeePortalHistory() {
+    // --- EMPLOYEE BALANCE & HISTORY VIEW ---
+    function renderEmployeePortalView() {
       let empId = localStorage.getItem('logged_id');
-      let content = document.getElementById('employeePortalHistory');
       let issuedRows = rawIssued.slice(1).filter(r => r.join(" ").includes(empId));
       let consumedRows = rawConsumed.slice(1).filter(r => r.join(" ").includes(empId));
 
+      // Calculate balances for this employee
+      let itemTotals = {};
+      fieldCategories.forEach(cat => { itemTotals[cat] = { issued: 0, used: 0 }; });
+
+      issuedRows.forEach(r => {
+        let h = rawIssued[0];
+        for (let c = 0; c < h.length; c++) {
+          let col = h[c] ? h[c].toString().trim() : "";
+          if (fieldCategories.includes(col)) itemTotals[col].issued += Number(r[c]) || 0;
+        }
+      });
+
+      consumedRows.forEach(r => {
+        let h = rawConsumed[0];
+        for (let c = 0; c < h.length; c++) {
+          let col = h[c] ? h[c].toString().trim() : "";
+          if (fieldCategories.includes(col)) itemTotals[col].used += Number(r[c]) || 0;
+        }
+      });
+
+      let balTbody = document.getElementById('empBalanceTableBody');
+      balTbody.innerHTML = "";
+      fieldCategories.forEach(cat => {
+        let issued = itemTotals[cat].issued;
+        let used = itemTotals[cat].used;
+        let bal = issued - used;
+        balTbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-bold text-slate-700">${cat}</td>
+            <td class="p-3 text-center text-sky-600 font-semibold">${issued}</td>
+            <td class="p-3 text-center text-amber-600 font-semibold">${used}</td>
+            <td class="p-3 text-center font-bold text-slate-900">${bal}</td>
+          </tr>`;
+      });
+
+      let content = document.getElementById('employeePortalHistory');
       let html = `<div class="space-y-6">
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <h3 class="font-bold text-slate-800 text-lg mb-3">📦 Your Stock Issued History</h3>`;
-      if (issuedRows.length === 0) {
-        html += `<p class="text-xs text-slate-400">No stock issued records found.</p>`;
-      } else {
+      if (issuedRows.length === 0) html += `<p class="text-xs text-slate-400">No stock issued records found.</p>`;
+      else {
         html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Record Details</th></tr></thead><tbody class="divide-y">`;
         issuedRows.forEach(r => { html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2">${r.join(" | ")}</td></tr>`; });
         html += `</tbody></table></div>`;
@@ -1093,9 +1104,8 @@
       html += `</div>
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
           <h3 class="font-bold text-slate-800 text-lg mb-3">📥 Your Daily Consumption History</h3>`;
-      if (consumedRows.length === 0) {
-        html += `<p class="text-xs text-slate-400">No consumption records found.</p>`;
-      } else {
+      if (consumedRows.length === 0) html += `<p class="text-xs text-slate-400">No consumption records found.</p>`;
+      else {
         html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Case #</th><th class="p-2">Record Details</th></tr></thead><tbody class="divide-y">`;
         consumedRows.forEach(r => { html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2 font-bold">${r[4]||''}</td><td class="p-2">${r.join(" | ")}</td></tr>`; });
         html += `</tbody></table></div>`;
@@ -1104,18 +1114,22 @@
       content.innerHTML = html;
     }
 
-    // --- RENDER RIDER TABLE (SEPARATE SCROLLABLE TABLE) ---
+    // --- RENDER RIDER TABLE WITH SEARCH ---
     function renderRidersTable() {
       let tbody = document.getElementById('riderTableBody');
       if(!tbody) return;
+      let searchInput = document.getElementById('riderTabSearch').value.toLowerCase().trim();
       let summary = computeRiderSummary();
-      let riders = Object.values(summary);
+      let riders = Object.values(summary).filter(r => {
+        if (!searchInput) return true;
+        return r.id.toLowerCase().includes(searchInput) || r.name.toLowerCase().includes(searchInput);
+      });
 
       document.getElementById('riderCountBadge').innerText = `${riders.length} Riders`;
       tbody.innerHTML = "";
 
       if (riders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">No riders found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No matching riders found.</td></tr>`;
         return;
       }
 
@@ -1126,9 +1140,6 @@
           totUsed += item.items[cat].used;
         });
         let bal = totIssued - totUsed;
-        let badge = bal < 0 
-          ? `<span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg text-xs font-bold">Shortage (${bal})</span>` 
-          : `<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold">In Hand</span>`;
         
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
@@ -1138,7 +1149,6 @@
             <td class="p-4 text-slate-600">${totIssued}</td>
             <td class="p-4 text-slate-600">${totUsed}</td>
             <td class="p-4 font-bold text-slate-900">${bal}</td>
-            <td class="p-4">${badge}</td>
             <td class="p-4 text-center"><button onclick="openRiderHistory('${item.id}')" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">View History</button></td>
           </tr>`;
       });
@@ -1151,9 +1161,11 @@
         document.getElementById('modalEmpName').value = localStorage.getItem('logged_name');
         document.getElementById('modalRegion').value = localStorage.getItem('logged_reg');
       }
+      document.getElementById('modalCaseNum').value = ""; // Clear case number on open
       document.getElementById('staffModal').classList.remove('hidden');
     }
     function closeStaffModal() { document.getElementById('staffModal').classList.add('hidden'); }
+    
     function openRequestModal() {
       if (localStorage.getItem('erp_role') === 'employee') {
         document.getElementById('reqEmpId').value = localStorage.getItem('logged_id');
@@ -1163,11 +1175,13 @@
       document.getElementById('requestModal').classList.remove('hidden');
     }
     function closeRequestModal() { document.getElementById('requestModal').classList.add('hidden'); }
+    
     function openDemandModal() {
       document.getElementById('demandAddedBy').value = localStorage.getItem('logged_name') || 'Admin';
       document.getElementById('demandModal').classList.remove('hidden');
     }
     function closeDemandModal() { document.getElementById('demandModal').classList.add('hidden'); }
+    
     function openAdminConsumptionModal() {
       document.getElementById('adminConsBy').value = localStorage.getItem('logged_name') || 'Admin';
       document.getElementById('adminConsumptionModal').classList.remove('hidden');
@@ -1182,7 +1196,7 @@
       document.querySelectorAll('.demandItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
       showLoader("Saving demand stock...");
       try {
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "demand", date, addedBy, items }) });
+        await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "demand", date, addedBy, items }) });
         hideLoader(); alert("✅ Demand stock added!"); closeDemandModal(); loadData();
       } catch (err) { hideLoader(); alert("Error: " + err); }
     }
@@ -1195,44 +1209,50 @@
       document.querySelectorAll('.adminConsItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
       showLoader("Saving office consumption...");
       try {
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "admin_consumption", date, addedBy, items }) });
+        await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "admin_consumption", date, addedBy, items }) });
         hideLoader(); alert("✅ Office consumption saved!"); closeAdminConsumptionModal(); loadData();
       } catch (err) { hideLoader(); alert("Error: " + err); }
     }
 
     async function submitConsumption() {
+      const btn = document.getElementById('modalSubBtn');
+      btn.disabled = true; // Prevent double click
       const date = document.getElementById('modalDate').value;
       const empId = document.getElementById('modalEmpId').value;
       const empName = document.getElementById('modalEmpName').value;
       const region = document.getElementById('modalRegion').value;
       const caseNumber = document.getElementById('modalCaseNum').value.trim();
-      if (!date || !empId || !caseNumber) { alert("Date, ID and Case Number required."); return; }
+      if (!date || !empId || !caseNumber) { alert("Date, ID and Case Number required."); btn.disabled = false; return; }
       let items = {};
       document.querySelectorAll('.modalItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
       showLoader("Submitting consumption...");
       try {
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "consumption", date, region, empId, empName, caseNumber, items }) });
-        hideLoader(); alert("✅ Consumption submitted!"); closeStaffModal(); loadData();
+        await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "consumption", date, region, empId, empName, caseNumber, items }) });
+        hideLoader(); alert("✅ Consumption submitted!"); closeStaffModal(); document.getElementById('modalCaseNum').value = ""; loadData();
       } catch (err) { hideLoader(); alert("Error: " + err); }
+      btn.disabled = false;
     }
 
     async function submitRequest() {
+      const btn = document.getElementById('reqSubBtn');
+      btn.disabled = true; // Prevent double click
       const date = document.getElementById('reqDate').value;
       const empId = document.getElementById('reqEmpId').value;
       const empName = document.getElementById('reqEmpName').value;
       const region = document.getElementById('reqRegion').value;
-      if (!date || !empId) { alert("Date and ID required."); return; }
+      if (!date || !empId) { alert("Date and ID required."); btn.disabled = false; return; }
       let items = {}; let count = 0;
       document.querySelectorAll('.reqItemsContainer-input').forEach(inp => {
         let val = Number(inp.value) || 0;
         if (val > 0) { items[inp.dataset.item] = val; count++; }
       });
-      if (count === 0) { alert("Please enter quantity for at least one item."); return; }
+      if (count === 0) { alert("Please enter quantity for at least one item."); btn.disabled = false; return; }
       showLoader("Submitting request...");
       try {
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "request", date, region, empId, empName, items }) });
+        await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "request", date, region, empId, empName, items }) });
         hideLoader(); alert("✅ Request submitted!"); closeRequestModal(); loadData();
       } catch (err) { hideLoader(); alert("Error: " + err); }
+      btn.disabled = false;
     }
 
     function setReqStatusFilter(status) {
@@ -1250,9 +1270,24 @@
       let adminName = localStorage.getItem('logged_name') || "Admin";
       showLoader("Updating request status...");
       try {
-        await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "update_request_status", reqId, status: newStatus, handler: adminName }) });
-        hideLoader(); alert("✅ Request status updated!"); loadData();
-      } catch (e) { hideLoader(); alert("Error: " + e); }
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ type: "update_request_status", reqId, status: newStatus, handler: adminName })
+        });
+        hideLoader();
+        // Instantly update local array to reflect UI change without waiting full reload
+        rawRequests.forEach(r => {
+          if (r[0] && r[0].toString() === reqId.toString()) {
+            r[7] = newStatus;
+            r[8] = adminName;
+          }
+        });
+        renderRequests();
+      } catch (e) {
+        hideLoader();
+        alert("Error: " + e);
+      }
     }
 
     function renderRequests() {
@@ -1288,6 +1323,14 @@
         if(status === "Closed") statusBg = "bg-slate-200 text-slate-700 border-slate-300";
         if(status === "Cancelled") statusBg = "bg-rose-100 text-rose-800 border-rose-200";
 
+        // Action buttons (hide buttons depending on status or remove pressed ones)
+        let actionButtonsHtml = `<div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">`;
+        if (status !== "In progress") actionButtonsHtml += `<button onclick="updateRequestStatus('${reqId}', 'In progress')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Mark In Progress</button>`;
+        if (status !== "Resolved") actionButtonsHtml += `<button onclick="updateRequestStatus('${reqId}', 'Resolved')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Mark Resolved</button>`;
+        if (status !== "Cancelled") actionButtonsHtml += `<button onclick="updateRequestStatus('${reqId}', 'Cancelled')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Cancel</button>`;
+        if (status !== "Closed") actionButtonsHtml += `<button onclick="updateRequestStatus('${reqId}', 'Closed')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Close</button>`;
+        actionButtonsHtml += `</div>`;
+
         container.innerHTML += `
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 space-y-3">
             <div class="flex justify-between items-start gap-4">
@@ -1297,12 +1340,7 @@
               </div>
               <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusBg}">${status.toUpperCase()}</span>
             </div>
-            <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">
-              <button onclick="updateRequestStatus('${reqId}', 'In progress')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Mark In Progress</button>
-              <button onclick="updateRequestStatus('${reqId}', 'Resolved')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Mark Resolved</button>
-              <button onclick="updateRequestStatus('${reqId}', 'Cancelled')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Cancel Request</button>
-              <button onclick="updateRequestStatus('${reqId}', 'Closed')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Close</button>
-            </div>
+            ${actionButtonsHtml}
           </div>`;
       });
     }
@@ -1365,6 +1403,20 @@
       let itemTotals = {};
       fieldCategories.forEach(cat => { itemTotals[cat] = { issued: 0, used: 0 }; });
 
+      // If search is active, find specific employee records
+      let matchedEmpIds = [];
+      if (search) {
+        Object.keys(empMap).forEach(id => {
+          let name = empMap[id].toLowerCase();
+          if (id.toLowerCase().includes(search) || name.includes(search)) {
+            matchedEmpIds.push(id);
+          }
+        });
+        reportTitle.innerText = `(Filtered for Employee(s): ${matchedEmpIds.join(', ') || search})`;
+      } else {
+        reportTitle.innerText = "(Overall Summary)";
+      }
+
       if (rawIssued.length > 1) {
         let h = rawIssued[0];
         for (let i = 1; i < rawIssued.length; i++) {
@@ -1372,8 +1424,19 @@
           let rowDate = getRowDate(r);
           if (startDate && rowDate && rowDate < startDate) continue;
           if (endDate && rowDate && rowDate > endDate) continue;
+
+          let id = "";
+          for (let col = 0; col < r.length; col++) {
+            let val = r[col] ? r[col].toString().trim() : "";
+            if (empMap[val]) { id = val; break; }
+          }
+          if (!id && r[2]) id = r[2].toString().trim();
+
+          if (search && !matchedEmpIds.includes(id)) continue;
+
           let rowReg = "Center 1";
           for (let cell of r) { let clean = cleanRegion(cell); if (clean) { rowReg = clean; break; } }
+
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
             let valNum = Number(r[c]) || 0;
@@ -1393,8 +1456,19 @@
           let rowDate = getRowDate(r);
           if (startDate && rowDate && rowDate < startDate) continue;
           if (endDate && rowDate && rowDate > endDate) continue;
+
+          let id = "";
+          for (let col = 0; col < r.length; col++) {
+            let val = r[col] ? r[col].toString().trim() : "";
+            if (empMap[val]) { id = val; break; }
+          }
+          if (!id && r[2]) id = r[2].toString().trim();
+
+          if (search && !matchedEmpIds.includes(id)) continue;
+
           let rowReg = "Center 1";
           for (let cell of r) { let clean = cleanRegion(cell); if (clean) { rowReg = clean; break; } }
+
           for (let c = 0; c < h.length; c++) {
             let colName = h[c] ? h[c].toString().trim() : "";
             let valNum = Number(r[c]) || 0;
@@ -1417,7 +1491,6 @@
         let itBal = itIssued - itUsed;
         let limit = itemThresholds[item] || 5;
 
-        // Apply KPI click filter if active
         if (activeKpiFilter === 'issued' && itIssued === 0) return;
         if (activeKpiFilter === 'used' && itUsed === 0) return;
         if (activeKpiFilter === 'balance' && itBal > limit) return;
@@ -1468,7 +1541,7 @@
         if (cols.length === 5) csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
       });
       let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-      let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = "overall_inventory_report.csv"; a.click();
+      let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = "employee_filtered_inventory_report.csv"; a.click();
     }
 
     function exportRawTable(tableId, filename, startDateId, endDateId) {
