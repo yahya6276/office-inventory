@@ -19,7 +19,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
-  <!-- GLOBAL LOADING SPINNER OVERLAY -->
+  <!-- GLOBAL LOADING SPINNER -->
   <div id="globalLoader" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 flex flex-col items-center justify-center space-y-3 transition-opacity duration-300">
     <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full spinner"></div>
     <p id="loaderText" class="text-white text-sm font-semibold tracking-wide">Connecting & Loading Data...</p>
@@ -77,7 +77,7 @@
         </nav>
       </div>
       <div class="p-4 border-t border-slate-800/60 backdrop-blur-xs bg-slate-900/50 text-xs text-slate-400 font-medium text-center flex items-center justify-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v31.0 Pro
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v32.0 Pro
       </div>
     </aside>
 
@@ -100,7 +100,7 @@
       </header>
 
       <main class="p-6 space-y-6">
-        <!-- THRESHOLD ALERT FLAG BANNER -->
+        <!-- THRESHOLD ALERT BANNER -->
         <div id="thresholdAlertBanner" class="hidden bg-rose-50 border-2 border-rose-500 p-4 rounded-2xl shadow-md flex justify-between items-center">
           <div class="flex items-center gap-3">
             <span class="text-2xl animate-bounce">⚠️</span>
@@ -147,7 +147,7 @@
             </div>
           </div>
 
-          <!-- CLICKABLE KPIS -->
+          <!-- KPIS -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div onclick="filterKpi('issued')" class="cursor-pointer bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-sky-500 hover:shadow-md transition">
               <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL ISSUED (Click to Filter)</span>
@@ -180,10 +180,11 @@
                     <th class="p-3 border-b text-center">Total Used</th>
                     <th class="p-3 border-b text-center">Remaining Balance</th>
                     <th class="p-3 border-b text-center">Min Threshold</th>
+                    <th class="p-3 border-b text-center">Max Limit</th>
                   </tr>
                 </thead>
                 <tbody id="itemsSummaryTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading...</td></tr>
+                  <tr><td colspan="6" class="p-4 text-center text-slate-400">Loading...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -203,7 +204,6 @@
               <button onclick="exportDemandRoomCSV()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export CSV</button>
             </div>
           </div>
-
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
@@ -224,7 +224,7 @@
           </div>
         </section>
 
-        <!-- TAB 1.6: RIDER MANAGEMENT (SEPARATE SCROLLABLE TABLE WITH SEARCH) -->
+        <!-- TAB 1.6: RIDER MANAGEMENT -->
         <section id="tab-riders" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
             <div>
@@ -236,7 +236,6 @@
               <button onclick="openBulkRiderModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📁 Bulk Rider Upload</button>
             </div>
           </div>
-
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
             <div class="p-5 border-b border-slate-200 flex justify-between items-center">
               <h3 class="font-bold text-slate-800 text-base">Rider Stock Reconciliation</h3>
@@ -263,55 +262,54 @@
           </div>
         </section>
 
-        <!-- TAB 1.7: CATEGORIES & THRESHOLDS -->
+        <!-- TAB 1.7: CATEGORIES & THRESHOLDS / MAXIMUM LIMITS -->
         <section id="tab-categories" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
             <div>
-              <h3 class="font-bold text-slate-900 text-lg">⚙️ Category & Minimum Threshold Management</h3>
-              <p class="text-xs text-slate-500 mt-1">Add, edit, delete categories and set item-wise minimum thresholds.</p>
+              <h3 class="font-bold text-slate-900 text-lg">⚙️ Category, Minimum Threshold & Maximum Issue Limits</h3>
+              <p class="text-xs text-slate-500 mt-1">Manage categories, minimum alert thresholds, and maximum issuance limits.</p>
             </div>
             <button onclick="saveCategoriesAndThresholds()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition shadow-md">💾 Save All Changes</button>
           </div>
-
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 space-y-4">
-            <div class="flex gap-3">
-              <input type="text" id="newCatInput" placeholder="Enter new category/item name..." class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
+            <div class="flex gap-3 flex-wrap">
+              <input type="text" id="newCatInput" placeholder="Category name..." class="flex-1 min-w-[200px] bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
               <input type="number" id="newCatThreshold" placeholder="Min Threshold" value="5" class="w-36 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
-              <button onclick="addNewCategory()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition">➕ Add Category</button>
+              <input type="number" id="newCatMaxLimit" placeholder="Max Limit" value="50" class="w-36 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
+              <button onclick="addNewCategory()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition">➕ Add Item</button>
             </div>
             <div class="overflow-x-auto max-h-[500px]">
               <table class="w-full text-left border-collapse">
                 <thead>
                   <tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase border-b">
-                    <th class="p-3">Category / Item Name</th>
-                    <th class="p-3 text-center">Minimum Threshold Limit</th>
+                    <th class="p-3">Item / Category Name</th>
+                    <th class="p-3 text-center">Minimum Threshold (Alert)</th>
+                    <th class="p-3 text-center">Maximum Issue Limit</th>
                     <th class="p-3 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="categoryTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="3" class="p-4 text-center text-slate-400">Loading categories...</td></tr>
+                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading categories...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
         </section>
 
-        <!-- TAB 1.8: STOCK REQUESTS -->
+        <!-- TAB 1.8: STOCK REQUESTS (GROUPED LIST WITH INDIVIDUAL APPROVE/CANCEL) -->
         <section id="tab-requests" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-5">
             <div>
-              <h3 class="text-2xl font-black text-slate-900">Requests</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Manage stock requests submitted by employees.</p>
+              <h3 class="text-2xl font-black text-slate-900">Stock Requests</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Manage employee stock requests grouped as single submissions.</p>
             </div>
             <div>
-              <input type="text" id="reqSearchInput" onkeyup="renderRequests()" placeholder="Search name, Employee ID, item or text..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <input type="text" id="reqSearchInput" onkeyup="renderRequests()" placeholder="Search name, Employee ID, or request ID..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <button onclick="setReqStatusFilter('ALL')" id="pill-ALL" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white transition shadow-xs">All <span id="count-ALL" class="ml-1 px-1.5 py-0.5 bg-slate-800 rounded-full">0</span></button>
               <button onclick="setReqStatusFilter('Open')" id="pill-Open" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Open <span id="count-Open" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
-              <button onclick="setReqStatusFilter('In progress')" id="pill-In progress" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">In progress <span id="count-In progress" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
               <button onclick="setReqStatusFilter('Resolved')" id="pill-Resolved" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Resolved <span id="count-Resolved" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
-              <button onclick="setReqStatusFilter('Closed')" id="pill-Closed" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Closed <span id="count-Closed" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
               <button onclick="setReqStatusFilter('Cancelled')" id="pill-Cancelled" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Cancelled <span id="count-Cancelled" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
             </div>
             <div id="reqShowingCount" class="text-xs text-slate-500 font-medium pt-1">Showing 0 requests</div>
@@ -319,14 +317,19 @@
           <div id="requestsListContainer" class="space-y-4"></div>
         </section>
 
-        <!-- EMPLOYEE WELCOME & BALANCE VIEW -->
+        <!-- EMPLOYEE WELCOME & BALANCE / NOTIFICATIONS -->
         <section id="employeeWelcome" class="hidden space-y-6">
           <div class="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-3">
             <h2 id="welcomeEmpTitle" class="text-2xl font-black text-slate-900">خوش آمدید!</h2>
-            <p class="text-sm text-slate-600 max-w-lg mx-auto">یہاں آپ اپنا موجودہ اسٹاک بیلنس اور مکمل ہسٹری دیکھ سکتے ہیں۔</p>
+            <p class="text-sm text-slate-600 max-w-lg mx-auto">یہاں آپ اپنا موجودہ اسٹاک بیلنس اور ایڈمن نوٹیفیکیشنز دیکھ سکتے ہیں۔</p>
           </div>
 
-          <!-- Employee Stock Balances Grid -->
+          <!-- Employee Notifications Banner -->
+          <div id="empNotificationBox" class="hidden bg-amber-50 border-2 border-amber-400 p-5 rounded-2xl shadow-xs space-y-2">
+            <h4 class="font-black text-amber-900 text-sm">🔔 Admin Request Updates & Notifications</h4>
+            <div id="empNotificationList" class="space-y-1 text-xs text-amber-800"></div>
+          </div>
+
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6 space-y-4">
             <h3 class="font-bold text-slate-900 text-lg">📦 Your Current Stock Balances</h3>
             <div class="overflow-x-auto">
@@ -345,11 +348,10 @@
               </table>
             </div>
           </div>
-
           <div id="employeePortalHistory" class="space-y-4"></div>
         </section>
 
-        <!-- TAB 2: INVENTORY ISSUED -->
+        <!-- TAB 2: INVENTORY ISSUED (CORRECTED TO SHOW ACTUAL ISSUED RECORDS) -->
         <section id="tab-issued" class="admin-only hidden space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div>
@@ -458,7 +460,7 @@
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="reqEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="reqEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
-        <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items (Max Limit Checked)</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
         <button id="reqSubBtn" onclick="submitRequest()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition">Submit Request</button>
       </div>
     </div>
@@ -519,9 +521,9 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzRAb3YYVwTKAtjx5v0sZIjpRZcm38nNUY0yAT9dgOGXgNG1cRBDOYHtJZ2ZTmylcOF7w/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyeg8HdYe0xdXOI9m3futsdZfcZcfyjoQO7EZXPoTYpDsz0dPGXA7CYFww6kjwImcII-w/exec";
 
-    let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], rawThresholds = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {}, itemThresholds = {};
+    let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], rawThresholds = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {}, itemThresholds = {}, itemMaxLimits = {};
     let currentReqStatusFilter = "ALL";
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
     const EXCLUDED_FIELD_ITEMS = ["SMALL BAG", "LARGE BAG", "ICE POUCH", "ICE PACK", "TONER 05A", "TONER 79", "OTHERS"];
@@ -534,9 +536,7 @@
       
       window.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
-          if (!document.getElementById('loginScreen').classList.contains('hidden')) {
-            handleLogin();
-          }
+          if (!document.getElementById('loginScreen').classList.contains('hidden')) handleLogin();
         }
         if (e.key === 'Escape') {
           closeDemandModal(); closeAdminConsumptionModal(); closeStaffModal();
@@ -546,42 +546,28 @@
       });
 
       let sessionRole = localStorage.getItem('erp_role');
-      if (sessionRole) {
-        loadDataAndInitSession();
-      } else {
-        hideLoader();
-      }
+      if (sessionRole) loadDataAndInitSession();
+      else hideLoader();
     };
 
     function showLoader(text = "Loading...") {
       document.getElementById('loaderText').innerText = text;
       document.getElementById('globalLoader').classList.remove('hidden');
     }
-    function hideLoader() {
-      document.getElementById('globalLoader').classList.add('hidden');
-    }
+    function hideLoader() { document.getElementById('globalLoader').classList.add('hidden'); }
 
     function checkScroll() {
       let btn = document.getElementById('scrollTopBtn');
-      if (window.scrollY > 300 || document.querySelector('.flex-1.flex.flex-col.overflow-y-auto').scrollTop > 300) {
-        btn.classList.remove('hidden');
-      } else {
-        btn.classList.add('hidden');
-      }
+      if (window.scrollY > 300 || document.querySelector('.flex-1.flex.flex-col.overflow-y-auto').scrollTop > 300) btn.classList.remove('hidden');
+      else btn.classList.add('hidden');
     }
-    function scrollToTop() {
-      document.querySelector('.flex-1.flex.flex-col.overflow-y-auto').scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('hidden');
-    }
+    function scrollToTop() { document.querySelector('.flex-1.flex.flex-col.overflow-y-auto').scrollTo({ top: 0, behavior: 'smooth' }); }
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
 
     async function handleLogin() {
       let username = document.getElementById('loginUser').value.trim();
       let pass = document.getElementById('loginPassword').value.trim();
       let errBox = document.getElementById('loginError');
-
       if (!username || !pass) { alert("Please enter username and password."); return; }
 
       showLoader("Verifying credentials securely...");
@@ -614,10 +600,7 @@
       }
     }
 
-    function logout() {
-      localStorage.clear();
-      location.reload();
-    }
+    function logout() { localStorage.clear(); location.reload(); }
 
     async function loadDataAndInitSession() {
       let role = localStorage.getItem('erp_role');
@@ -648,12 +631,7 @@
       let newPass = document.getElementById('newPasswordInput').value.trim();
       let role = localStorage.getItem('erp_role');
       if (!newPass) { alert("پاسورڈ خالی نہیں ہو سکتا!"); return; }
-
-      if (role === 'admin') {
-        alert("Admin password can be configured in Apps Script.");
-        closePasswordModal();
-        return;
-      }
+      if (role === 'admin') { alert("Admin password can be configured in Apps Script."); closePasswordModal(); return; }
 
       let empId = localStorage.getItem('logged_id');
       showLoader("Saving password on server...");
@@ -666,10 +644,7 @@
         hideLoader();
         alert("✅ پاسورڈ کامیابی سے سرور پر اپ ڈیٹ ہو گیا!");
         closePasswordModal();
-      } catch (e) {
-        hideLoader();
-        alert("Error: " + e);
-      }
+      } catch (e) { hideLoader(); alert("Error: " + e); }
     }
 
     function switchTab(tab) {
@@ -689,7 +664,7 @@
         demandroom: "Demand Room Management", 
         requests: "Stock Requests Management", 
         riders: "Rider Management & History",
-        categories: "Category & Threshold Settings",
+        categories: "Category, Threshold & Max Limits",
         issued: "Office Inventory Issued Records", 
         consumption: "Daily Consumption Records" 
       };
@@ -736,9 +711,11 @@
         allCategories = data.allItems || [];
 
         itemThresholds = {};
+        itemMaxLimits = {};
         if (rawThresholds.length > 1) {
           for (let i = 1; i < rawThresholds.length; i++) {
             itemThresholds[rawThresholds[i][0]] = Number(rawThresholds[i][1]) || 5;
+            itemMaxLimits[rawThresholds[i][0]] = Number(rawThresholds[i][2]) || 50;
           }
         }
 
@@ -756,7 +733,7 @@
           }
         }
 
-        let openReqs = rawRequests.slice(1).filter(r => r[7] && r[7].toString().trim() === "Open");
+        let openReqs = rawRequests.slice(1).filter(r => r[6] && r[6].toString().trim() === "Open");
         if (openReqs.length > 0) {
           document.getElementById('reqBadge').classList.remove('hidden');
           document.getElementById('reqBadge').innerText = openReqs.length + " New";
@@ -798,10 +775,11 @@
           if(!container) return;
           container.innerHTML = "";
           fieldCategories.forEach(item => {
+            let maxLim = itemMaxLimits[item] || 50;
             container.innerHTML += `
               <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
-                <label class="block text-xs font-bold text-slate-700 mb-1">${item}</label>
-                <input type="number" min="0" value="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';" class="${containerId}-input w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-sm font-bold text-slate-900 focus:outline-none" data-item="${item}">
+                <label class="block text-xs font-bold text-slate-700 mb-1">${item} <span class="text-[10px] text-sky-600">(Max: ${maxLim})</span></label>
+                <input type="number" min="0" max="${maxLim}" value="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';" class="${containerId}-input w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-sm font-bold text-slate-900 focus:outline-none" data-item="${item}" data-max="${maxLim}">
               </div>`;
           });
         });
@@ -812,6 +790,7 @@
           renderRequests();
           renderRidersTable();
           renderCategoriesTable();
+          renderRawTables();
           checkThresholdAlerts();
         } else if (localStorage.getItem('erp_role') === 'employee') {
           renderEmployeePortalView();
@@ -937,10 +916,12 @@
       tbody.innerHTML = "";
       allCategories.forEach(cat => {
         let limit = itemThresholds[cat] || 5;
+        let maxLim = itemMaxLimits[cat] || 50;
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50">
             <td class="p-3 font-bold text-slate-800">${cat}</td>
             <td class="p-3 text-center"><input type="number" value="${limit}" data-cat="${cat}" class="cat-thresh-input w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-center font-bold text-sm"></td>
+            <td class="p-3 text-center"><input type="number" value="${maxLim}" data-cat="${cat}" class="cat-max-input w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-center font-bold text-sm text-sky-600"></td>
             <td class="p-3 text-center"><button onclick="deleteCategory('${cat}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold px-3 py-1 rounded-lg text-xs transition">Delete</button></td>
           </tr>`;
       });
@@ -949,38 +930,48 @@
     function addNewCategory() {
       let name = document.getElementById('newCatInput').value.trim().toUpperCase();
       let limit = Number(document.getElementById('newCatThreshold').value) || 5;
+      let maxLim = Number(document.getElementById('newCatMaxLimit').value) || 50;
       if (!name) { alert("Please enter category name."); return; }
       if (allCategories.includes(name)) { alert("Category already exists."); return; }
       allCategories.push(name);
       itemThresholds[name] = limit;
+      itemMaxLimits[name] = maxLim;
       document.getElementById('newCatInput').value = "";
       renderCategoriesTable();
-      alert("✅ Category added. Click 'Save All Changes' to persist.");
+      alert("✅ Item added. Click 'Save All Changes' to persist.");
     }
 
     function deleteCategory(cat) {
       if (confirm(`Are you sure you want to delete category '${cat}'?`)) {
         allCategories = allCategories.filter(c => c !== cat);
         delete itemThresholds[cat];
+        delete itemMaxLimits[cat];
         renderCategoriesTable();
         alert("✅ Category removed. Click 'Save All Changes' to persist.");
       }
     }
 
     async function saveCategoriesAndThresholds() {
+      let thresholdsPayload = {};
       document.querySelectorAll('.cat-thresh-input').forEach(inp => {
         let cat = inp.dataset.cat;
-        itemThresholds[cat] = Number(inp.value) || 5;
+        let minVal = Number(inp.value) || 5;
+        let maxVal = 50;
+        document.querySelectorAll('.cat-max-input').forEach(maxInp => {
+          if (maxInp.dataset.cat === cat) maxVal = Number(maxInp.value) || 50;
+        });
+        thresholdsPayload[cat] = { min: minVal, max: maxVal };
       });
-      showLoader("Saving categories and thresholds...");
+
+      showLoader("Saving categories and limits...");
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ type: "update_thresholds", thresholds: itemThresholds })
+          body: JSON.stringify({ type: "update_thresholds", thresholds: thresholdsPayload })
         });
         hideLoader();
-        alert("✅ Thresholds and categories saved successfully!");
+        alert("✅ Thresholds and max issue limits saved successfully!");
         loadData();
       } catch (e) {
         hideLoader();
@@ -1050,13 +1041,30 @@
     }
     function closeRiderHistoryModal() { document.getElementById('riderHistoryModal').classList.add('hidden'); }
 
-    // --- EMPLOYEE BALANCE & HISTORY VIEW ---
+    // --- EMPLOYEE BALANCE & NOTIFICATIONS VIEW ---
     function renderEmployeePortalView() {
       let empId = localStorage.getItem('logged_id');
       let issuedRows = rawIssued.slice(1).filter(r => r.join(" ").includes(empId));
       let consumedRows = rawConsumed.slice(1).filter(r => r.join(" ").includes(empId));
+      let requestRows = rawRequests.slice(1).filter(r => r[3] && r[3].toString().trim() === empId);
 
-      // Calculate balances for this employee
+      // Render Admin notifications / request remarks
+      let notifBox = document.getElementById('empNotificationBox');
+      let notifList = document.getElementById('empNotificationList');
+      let processedReqs = requestRows.filter(r => r[6] === "Resolved" || r[6] === "Cancelled");
+      
+      if (processedReqs.length > 0) {
+        notifBox.classList.remove('hidden');
+        notifList.innerHTML = "";
+        processedReqs.forEach(r => {
+          let reqId = r[0];
+          let status = r[6];
+          let remarks = r[8] || "Processed by admin";
+          let badgeColor = status === "Resolved" ? "text-emerald-700 font-bold" : "text-rose-700 font-bold";
+          notifList.innerHTML += `<div class="p-2 bg-white rounded-lg border border-amber-200">Request <strong>${reqId}</strong> status: <span class="${badgeColor}">${status}</span> — ${remarks}</div>`;
+        });
+      }
+
       let itemTotals = {};
       fieldCategories.forEach(cat => { itemTotals[cat] = { issued: 0, used: 0 }; });
 
@@ -1101,20 +1109,10 @@
         issuedRows.forEach(r => { html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2">${r.join(" | ")}</td></tr>`; });
         html += `</tbody></table></div>`;
       }
-      html += `</div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-          <h3 class="font-bold text-slate-800 text-lg mb-3">📥 Your Daily Consumption History</h3>`;
-      if (consumedRows.length === 0) html += `<p class="text-xs text-slate-400">No consumption records found.</p>`;
-      else {
-        html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Case #</th><th class="p-2">Record Details</th></tr></thead><tbody class="divide-y">`;
-        consumedRows.forEach(r => { html += `<tr><td class="p-2">${getRowDate(r)}</td><td class="p-2 font-bold">${r[4]||''}</td><td class="p-2">${r.join(" | ")}</td></tr>`; });
-        html += `</tbody></table></div>`;
-      }
       html += `</div></div>`;
       content.innerHTML = html;
     }
 
-    // --- RENDER RIDER TABLE WITH SEARCH ---
     function renderRidersTable() {
       let tbody = document.getElementById('riderTableBody');
       if(!tbody) return;
@@ -1127,7 +1125,6 @@
 
       document.getElementById('riderCountBadge').innerText = `${riders.length} Riders`;
       tbody.innerHTML = "";
-
       if (riders.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No matching riders found.</td></tr>`;
         return;
@@ -1140,7 +1137,6 @@
           totUsed += item.items[cat].used;
         });
         let bal = totIssued - totUsed;
-        
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="p-4 font-bold text-sky-700">${item.region}</td>
@@ -1161,7 +1157,7 @@
         document.getElementById('modalEmpName').value = localStorage.getItem('logged_name');
         document.getElementById('modalRegion').value = localStorage.getItem('logged_reg');
       }
-      document.getElementById('modalCaseNum').value = ""; // Clear case number on open
+      document.getElementById('modalCaseNum').value = "";
       document.getElementById('staffModal').classList.remove('hidden');
     }
     function closeStaffModal() { document.getElementById('staffModal').classList.add('hidden'); }
@@ -1216,7 +1212,7 @@
 
     async function submitConsumption() {
       const btn = document.getElementById('modalSubBtn');
-      btn.disabled = true; // Prevent double click
+      btn.disabled = true;
       const date = document.getElementById('modalDate').value;
       const empId = document.getElementById('modalEmpId').value;
       const empName = document.getElementById('modalEmpName').value;
@@ -1235,29 +1231,47 @@
 
     async function submitRequest() {
       const btn = document.getElementById('reqSubBtn');
-      btn.disabled = true; // Prevent double click
+      btn.disabled = true;
       const date = document.getElementById('reqDate').value;
       const empId = document.getElementById('reqEmpId').value;
       const empName = document.getElementById('reqEmpName').value;
       const region = document.getElementById('reqRegion').value;
       if (!date || !empId) { alert("Date and ID required."); btn.disabled = false; return; }
-      let items = {}; let count = 0;
+
+      let items = {};
+      let count = 0;
+      let limitExceeded = false;
       document.querySelectorAll('.reqItemsContainer-input').forEach(inp => {
         let val = Number(inp.value) || 0;
+        let maxLim = Number(inp.dataset.max) || 50;
+        if (val > maxLim) {
+          alert(`Quantity for ${inp.dataset.item} exceeds maximum allowed limit (${maxLim}).`);
+          limitExceeded = true;
+        }
         if (val > 0) { items[inp.dataset.item] = val; count++; }
       });
+
+      if (limitExceeded) { btn.disabled = false; return; }
       if (count === 0) { alert("Please enter quantity for at least one item."); btn.disabled = false; return; }
-      showLoader("Submitting request...");
+
+      showLoader("Submitting grouped stock request...");
       try {
-        await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "request", date, region, empId, empName, items }) });
-        hideLoader(); alert("✅ Request submitted!"); closeRequestModal(); loadData();
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ type: "request", date, region, empId, empName, items })
+        });
+        hideLoader();
+        alert("✅ Grouped stock request submitted successfully!");
+        closeRequestModal();
+        loadData();
       } catch (err) { hideLoader(); alert("Error: " + err); }
       btn.disabled = false;
     }
 
     function setReqStatusFilter(status) {
       currentReqStatusFilter = status;
-      ['ALL', 'Open', 'In progress', 'Resolved', 'Closed', 'Cancelled'].forEach(st => {
+      ['ALL', 'Open', 'Resolved', 'Cancelled'].forEach(st => {
         let btn = document.getElementById('pill-' + st);
         if(!btn) return;
         if(st === status) btn.className = "px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white transition shadow-xs";
@@ -1266,24 +1280,31 @@
       renderRequests();
     }
 
-    async function updateRequestStatus(reqId, newStatus) {
+    // Process Individual, Approve All or Cancel Request
+    async function processRequestAction(reqId, action, itemKey = null) {
       let adminName = localStorage.getItem('logged_name') || "Admin";
-      showLoader("Updating request status...");
+      let approvedItems = {};
+      let remarks = "";
+
+      if (action === "partial_approve") {
+        let qty = Number(document.getElementById(`qty_${reqId}_${itemKey}`).value) || 0;
+        approvedItems[itemKey] = qty;
+      } else if (action === "partial_cancel") {
+        remarks = `Item ${itemKey} cancelled by admin.`;
+      } else if (action === "cancel_all") {
+        remarks = prompt("Enter cancellation reason / notes for rider:") || "Cancelled by Admin";
+      }
+
+      showLoader("Processing request action...");
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ type: "update_request_status", reqId, status: newStatus, handler: adminName })
+          body: JSON.stringify({ type: "process_request", reqId, action, approvedItems, cancelledRemarks: remarks, handler: adminName })
         });
         hideLoader();
-        // Instantly update local array to reflect UI change without waiting full reload
-        rawRequests.forEach(r => {
-          if (r[0] && r[0].toString() === reqId.toString()) {
-            r[7] = newStatus;
-            r[8] = adminName;
-          }
-        });
-        renderRequests();
+        alert("✅ Request processed successfully!");
+        loadData();
       } catch (e) {
         hideLoader();
         alert("Error: " + e);
@@ -1293,54 +1314,84 @@
     function renderRequests() {
       const container = document.getElementById('requestsListContainer');
       if(!container) return;
-      let counts = { ALL: 0, Open: 0, "In progress": 0, Resolved: 0, Closed: 0, Cancelled: 0 };
+      let counts = { ALL: 0, Open: 0, Resolved: 0, Cancelled: 0 };
       let rows = rawRequests.slice(1);
       counts.ALL = rows.length;
-      rows.forEach(r => { let st = r[7] ? r[7].toString().trim() : "Open"; if (counts.hasOwnProperty(st)) counts[st]++; });
-      Object.keys(counts).forEach(st => { let badge = document.getElementById('count-' + st); if(badge) badge.innerText = counts[st]; });
+      rows.forEach(r => {
+        let st = r[6] ? r[6].toString().trim() : "Open";
+        if (counts.hasOwnProperty(st)) counts[st]++;
+      });
+      Object.keys(counts).forEach(st => {
+        let badge = document.getElementById('count-' + st);
+        if(badge) badge.innerText = counts[st];
+      });
 
       let search = document.getElementById('reqSearchInput').value.toLowerCase().trim();
       let filtered = rows.filter(r => {
         let reqId = r[0] ? r[0].toString() : "";
         let empId = r[3] ? r[3].toString() : "";
         let empName = r[4] ? r[4].toString() : "";
-        let item = r[5] ? r[5].toString() : "";
-        let status = r[7] ? r[7].toString().trim() : "Open";
+        let status = r[6] ? r[6].toString().trim() : "Open";
         if (currentReqStatusFilter !== "ALL" && status.toLowerCase() !== currentReqStatusFilter.toLowerCase()) return false;
-        if (search && !`${reqId} ${empId} ${empName} ${item}`.toLowerCase().includes(search)) return false;
+        if (search && !`${reqId} ${empId} ${empName}`.toLowerCase().includes(search)) return false;
         return true;
       });
 
       document.getElementById('reqShowingCount').innerText = `Showing ${filtered.length} of ${rows.length} requests`;
-      if (filtered.length === 0) { container.innerHTML = `<div class="bg-white p-8 rounded-2xl border text-center text-slate-400">No requests found.</div>`; return; }
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="bg-white p-8 rounded-2xl border text-center text-slate-400">No requests found.</div>`;
+        return;
+      }
 
       container.innerHTML = "";
       filtered.forEach(r => {
-        let reqId = r[0], date = r[1], region = r[2], empId = r[3], empName = r[4], item = r[5], qty = r[6], status = r[7] || "Open", handler = r[8] || "Unassigned";
+        let reqId = r[0], date = r[1], region = r[2], empId = r[3], empName = r[4], itemsJson = r[5], status = r[6] || "Open", handler = r[7] || "Unassigned", remarks = r[8] || "";
+        
         let statusBg = "bg-amber-100 text-amber-800 border-amber-200";
-        if(status === "In progress") statusBg = "bg-indigo-100 text-indigo-800 border-indigo-200";
         if(status === "Resolved") statusBg = "bg-emerald-100 text-emerald-800 border-emerald-200";
-        if(status === "Closed") statusBg = "bg-slate-200 text-slate-700 border-slate-300";
         if(status === "Cancelled") statusBg = "bg-rose-100 text-rose-800 border-rose-200";
 
-        // Action buttons (hide buttons depending on status or remove pressed ones)
-        let actionButtonsHtml = `<div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100">`;
-        if (status !== "In progress") actionButtonsHtml += `<button onclick="updateRequestStatus('${reqId}', 'In progress')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Mark In Progress</button>`;
-        if (status !== "Resolved") actionButtonsHtml += `<button onclick="updateRequestStatus('${reqId}', 'Resolved')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Mark Resolved</button>`;
-        if (status !== "Cancelled") actionButtonsHtml += `<button onclick="updateRequestStatus('${reqId}', 'Cancelled')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Cancel</button>`;
-        if (status !== "Closed") actionButtonsHtml += `<button onclick="updateRequestStatus('${reqId}', 'Closed')" class="bg-slate-700 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">Close</button>`;
-        actionButtonsHtml += `</div>`;
+        let itemsObj = {};
+        try { itemsObj = JSON.parse(itemsJson); } catch(e) {}
+
+        let itemsHtml = `<div class="space-y-2 my-3">`;
+        for (let itemKey in itemsObj) {
+          let qty = itemsObj[itemKey];
+          itemsHtml += `
+            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
+              <div><strong class="text-slate-800">${itemKey}</strong> : Qty requested = <span class="text-sky-600 font-bold">${qty}</span></div>
+              <div class="flex items-center gap-2">
+                <input type="number" id="qty_${reqId}_${itemKey}" value="${qty}" class="w-16 bg-white border rounded px-2 py-1 text-center font-bold">
+                ${status === 'Open' ? `
+                  <button onclick="processRequestAction('${reqId}', 'partial_approve', '${itemKey}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded font-bold">Approve</button>
+                  <button onclick="processRequestAction('${reqId}', 'partial_cancel', '${itemKey}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded font-bold">Cancel</button>
+                ` : ``}
+              </div>
+            </div>`;
+        }
+        itemsHtml += `</div>`;
+
+        let globalActions = "";
+        if (status === 'Open') {
+          globalActions = `
+            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+              <button onclick="processRequestAction('${reqId}', 'approve_all')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Approve All</button>
+              <button onclick="processRequestAction('${reqId}', 'cancel_all')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Cancel All</button>
+            </div>`;
+        }
 
         container.innerHTML += `
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 space-y-3">
             <div class="flex justify-between items-start gap-4">
               <div>
-                <h4 class="font-black text-slate-900 text-base">${item} <span class="text-xs font-semibold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md ml-1">Qty: ${qty}</span></h4>
-                <p class="text-xs text-slate-500 mt-0.5"><strong class="text-slate-700">${empName}</strong> • ${empId} • ${date} • <span class="text-indigo-600 font-semibold">Handler: ${handler}</span></p>
+                <h4 class="font-black text-slate-900 text-base">Request ID: ${reqId}</h4>
+                <p class="text-xs text-slate-500 mt-0.5"><strong class="text-slate-700">${empName}</strong> • ID: ${empId} • Region: ${region} • Date: ${date} • <span class="text-indigo-600 font-semibold">Handler: ${handler}</span></p>
+                ${remarks ? `<p class="text-xs text-rose-600 mt-1">Note: ${remarks}</p>` : ``}
               </div>
               <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusBg}">${status.toUpperCase()}</span>
             </div>
-            ${actionButtonsHtml}
+            ${itemsHtml}
+            ${globalActions}
           </div>`;
       });
     }
@@ -1403,14 +1454,11 @@
       let itemTotals = {};
       fieldCategories.forEach(cat => { itemTotals[cat] = { issued: 0, used: 0 }; });
 
-      // If search is active, find specific employee records
       let matchedEmpIds = [];
       if (search) {
         Object.keys(empMap).forEach(id => {
           let name = empMap[id].toLowerCase();
-          if (id.toLowerCase().includes(search) || name.includes(search)) {
-            matchedEmpIds.push(id);
-          }
+          if (id.toLowerCase().includes(search) || name.includes(search)) matchedEmpIds.push(id);
         });
         reportTitle.innerText = `(Filtered for Employee(s): ${matchedEmpIds.join(', ') || search})`;
       } else {
@@ -1431,7 +1479,6 @@
             if (empMap[val]) { id = val; break; }
           }
           if (!id && r[2]) id = r[2].toString().trim();
-
           if (search && !matchedEmpIds.includes(id)) continue;
 
           let rowReg = "Center 1";
@@ -1463,7 +1510,6 @@
             if (empMap[val]) { id = val; break; }
           }
           if (!id && r[2]) id = r[2].toString().trim();
-
           if (search && !matchedEmpIds.includes(id)) continue;
 
           let rowReg = "Center 1";
@@ -1490,6 +1536,7 @@
         let itUsed = itemTotals[item].used;
         let itBal = itIssued - itUsed;
         let limit = itemThresholds[item] || 5;
+        let maxLimit = itemMaxLimits[item] || 50;
 
         if (activeKpiFilter === 'issued' && itIssued === 0) return;
         if (activeKpiFilter === 'used' && itUsed === 0) return;
@@ -1506,6 +1553,7 @@
             <td class="p-3 text-center text-amber-600 font-semibold">${itUsed}</td>
             <td class="p-3 text-center ${balColor}">${itBal}</td>
             <td class="p-3 text-center text-slate-600 font-medium">${limit}</td>
+            <td class="p-3 text-center text-sky-600 font-bold">${maxLimit}</td>
           </tr>`;
       });
 
@@ -1514,6 +1562,7 @@
       document.getElementById('kpiBal').innerText = totIssued - totUsed;
     }
 
+    // Corrected Inventory Issued View (Showing actual issued records instead of threshold table)
     function renderRawTables() {
       const buildFilteredTable = (rows, regFilterId, startDateId, endDateId, searchId, tableId) => {
         if (!rows || rows.length === 0) return "<p class='text-slate-400'>No records found.</p>";
@@ -1535,10 +1584,10 @@
 
     function exportDashboardCSV() {
       let now = new Date();
-      let csv = ["\"HS ERP CLL - Inventory Report\"", `"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`, "", "Item Name,Total Issued,Total Used,Remaining Balance,Min Threshold"];
+      let csv = ["\"HS ERP CLL - Inventory Report\"", `"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`, "", "Item Name,Total Issued,Total Used,Remaining Balance,Min Threshold,Max Limit"];
       document.querySelectorAll("#itemsSummaryTableBody tr").forEach(row => {
         let cols = row.querySelectorAll("td");
-        if (cols.length === 5) csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
+        if (cols.length === 6) csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
       });
       let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
       let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = "employee_filtered_inventory_report.csv"; a.click();
