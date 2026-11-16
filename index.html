@@ -77,7 +77,7 @@
         </nav>
       </div>
       <div class="p-4 border-t border-slate-800/60 backdrop-blur-xs bg-slate-900/50 text-xs text-slate-400 font-medium text-center flex items-center justify-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v35.0 Pro
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v36.0 Pro
       </div>
     </aside>
 
@@ -361,7 +361,7 @@
           <div id="employeePortalHistory" class="space-y-4"></div>
         </section>
 
-        <!-- TAB 2: INVENTORY ISSUED (CORRECTED) -->
+        <!-- TAB 2: INVENTORY ISSUED -->
         <section id="tab-issued" class="admin-only hidden space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div>
@@ -537,6 +537,43 @@
     let currentReqStatusFilter = "ALL";
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
     const EXCLUDED_FIELD_ITEMS = ["SMALL BAG", "LARGE BAG", "ICE POUCH", "ICE PACK", "TONER 05A", "TONER 79", "OTHERS"];
+
+    // Helper: Parse a row from the Requests sheet (columns A-E metadata, F-AN items, trailing Status/Handler/Remarks)
+    function parseRequestRow(row) {
+      let headers = rawRequests[0] || [];
+      let upperHeaders = headers.map(h => h ? h.toString().trim().toUpperCase() : "");
+      let statusIdx = upperHeaders.indexOf("STATUS");
+      let handlerIdx = upperHeaders.indexOf("HANDLER");
+      let remarksIdx = upperHeaders.indexOf("REMARKS");
+
+      let status = (statusIdx !== -1 && row[statusIdx] !== undefined && row[statusIdx] !== null && row[statusIdx] !== "")
+        ? row[statusIdx].toString().trim()
+        : "Open";
+      let handler = (handlerIdx !== -1 && row[handlerIdx]) ? row[handlerIdx].toString().trim() : "Unassigned";
+      let remarks = (remarksIdx !== -1 && row[remarksIdx]) ? row[remarksIdx].toString().trim() : "";
+
+      let itemsObj = {};
+      let endCol = statusIdx !== -1 ? statusIdx : headers.length;
+      for (let c = 5; c < endCol; c++) {
+        let colName = headers[c] ? headers[c].toString().trim() : "";
+        let qty = Number(row[c]) || 0;
+        if (colName && qty > 0) {
+          itemsObj[colName] = qty;
+        }
+      }
+
+      return {
+        reqId: row[0] ? row[0].toString().trim() : "",
+        date: getRowDate(row) || (row[1] ? row[1].toString().trim() : ""),
+        region: row[2] ? row[2].toString().trim() : "",
+        empId: row[3] ? row[3].toString().trim() : "",
+        empName: row[4] ? row[4].toString().trim() : "",
+        itemsObj,
+        status,
+        handler,
+        remarks
+      };
+    }
 
     window.onload = function() {
       document.getElementById('modalDate').valueAsDate = new Date();
@@ -744,10 +781,7 @@
         }
 
         // Admin Notification Badge: Hide immediately when Open requests = 0
-        let openReqs = rawRequests.slice(1).filter(r => {
-          let st = (r[6] !== undefined && r[6] !== null && r[6] !== "") ? r[6].toString().trim() : "Open";
-          return st === "Open";
-        });
+        let openReqs = rawRequests.slice(1).map(parseRequestRow).filter(r => r.status === "Open");
         let reqBadge = document.getElementById('reqBadge');
         if (openReqs.length > 0) {
           reqBadge.classList.remove('hidden');
@@ -1069,12 +1103,11 @@
 
     function dismissEmpNotifications() {
       let empId = localStorage.getItem('logged_id');
-      let requestRows = rawRequests.slice(1).filter(r => r[3] && r[3].toString().trim() === empId);
+      let parsedReqs = rawRequests.slice(1).map(parseRequestRow).filter(r => r.empId === empId);
       let seenIds = JSON.parse(localStorage.getItem('seen_req_notifs_' + empId) || '[]');
-      requestRows.forEach(r => {
-        let st = (r[6] !== undefined && r[6] !== null) ? r[6].toString().trim() : "";
-        if ((st === "Resolved" || st === "Cancelled") && !seenIds.includes(r[0])) {
-          seenIds.push(r[0]);
+      parsedReqs.forEach(r => {
+        if ((r.status === "Resolved" || r.status === "Cancelled") && !seenIds.includes(r.reqId)) {
+          seenIds.push(r.reqId);
         }
       });
       localStorage.setItem('seen_req_notifs_' + empId, JSON.stringify(seenIds));
@@ -1085,26 +1118,20 @@
       let empId = localStorage.getItem('logged_id');
       let issuedRows = rawIssued.slice(1).filter(r => r[2] && r[2].toString().trim() === empId);
       let consumedRows = rawConsumed.slice(1).filter(r => r[2] && r[2].toString().trim() === empId);
-      let requestRows = rawRequests.slice(1).filter(r => r[3] && r[3].toString().trim() === empId);
+      let parsedReqs = rawRequests.slice(1).map(parseRequestRow).filter(r => r.empId === empId);
 
       // 1. Unseen Notifications Banner
       let seenIds = JSON.parse(localStorage.getItem('seen_req_notifs_' + empId) || '[]');
       let notifBox = document.getElementById('empNotificationBox');
       let notifList = document.getElementById('empNotificationList');
-      let unseenProcessedReqs = requestRows.filter(r => {
-        let st = (r[6] !== undefined && r[6] !== null) ? r[6].toString().trim() : "";
-        return (st === "Resolved" || st === "Cancelled") && !seenIds.includes(r[0]);
-      });
+      let unseenProcessedReqs = parsedReqs.filter(r => (r.status === "Resolved" || r.status === "Cancelled") && !seenIds.includes(r.reqId));
       
       if (unseenProcessedReqs.length > 0) {
         notifBox.classList.remove('hidden');
         notifList.innerHTML = "";
         unseenProcessedReqs.forEach(r => {
-          let reqId = r[0];
-          let status = r[6].toString().trim();
-          let remarks = r[8] || "Processed by admin";
-          let badgeColor = status === "Resolved" ? "text-emerald-700 font-bold" : "text-rose-700 font-bold";
-          notifList.innerHTML += `<div class="p-2.5 bg-white rounded-xl border border-amber-200 flex justify-between items-center"><span>Request <strong>${reqId}</strong>: <span class="${badgeColor}">${status}</span> — ${remarks}</span></div>`;
+          let badgeColor = r.status === "Resolved" ? "text-emerald-700 font-bold" : "text-rose-700 font-bold";
+          notifList.innerHTML += `<div class="p-2.5 bg-white rounded-xl border border-amber-200 flex justify-between items-center"><span>Request <strong>${r.reqId}</strong>: <span class="${badgeColor}">${r.status}</span> — ${r.remarks || "Processed by admin"}</span></div>`;
         });
       } else {
         notifBox.classList.add('hidden');
@@ -1112,27 +1139,24 @@
 
       // 2. Employee Stock Requests History & Live Status
       let empReqBox = document.getElementById('empRequestsHistoryBox');
-      if (requestRows.length === 0) {
+      if (parsedReqs.length === 0) {
         empReqBox.innerHTML = `<p class="text-xs text-slate-400">You have not submitted any stock requests yet.</p>`;
       } else {
         empReqBox.innerHTML = "";
-        requestRows.slice().reverse().forEach(r => {
-          let reqId = r[0], date = r[1], itemsJson = r[5], status = (r[6] || "Open").toString().trim(), remarks = r[8] || "";
-          let itemsObj = {};
-          try { itemsObj = JSON.parse(itemsJson); } catch(e) {}
-          let itemBadges = Object.keys(itemsObj).map(k => `<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-semibold">${k}: ${itemsObj[k]}</span>`).join(" ");
+        parsedReqs.slice().reverse().forEach(r => {
+          let itemBadges = Object.keys(r.itemsObj).map(k => `<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-semibold">${k}: ${r.itemsObj[k]}</span>`).join(" ");
           let statusBadge = "bg-amber-100 text-amber-800";
-          if (status === "Resolved") statusBadge = "bg-emerald-100 text-emerald-800";
-          if (status === "Cancelled") statusBadge = "bg-rose-100 text-rose-800";
+          if (r.status === "Resolved") statusBadge = "bg-emerald-100 text-emerald-800";
+          if (r.status === "Cancelled") statusBadge = "bg-rose-100 text-rose-800";
 
           empReqBox.innerHTML += `
             <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60 flex flex-wrap justify-between items-center gap-3">
               <div class="space-y-1">
-                <div class="text-xs font-bold text-slate-800">${reqId} <span class="text-slate-400 font-normal">• ${date}</span></div>
+                <div class="text-xs font-bold text-slate-800">${r.reqId} <span class="text-slate-400 font-normal">• ${r.date}</span></div>
                 <div class="flex flex-wrap gap-1.5 text-xs">${itemBadges}</div>
-                ${remarks ? `<div class="text-xs text-slate-600 italic">Admin Note: ${remarks}</div>` : ``}
+                ${r.remarks ? `<div class="text-xs text-slate-600 italic">Admin Note: ${r.remarks}</div>` : ``}
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBadge}">${status.toUpperCase()}</span>
+              <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBadge}">${r.status.toUpperCase()}</span>
             </div>`;
         });
       }
@@ -1373,7 +1397,7 @@
         remarks = `Item ${itemKey} cancelled by admin.`;
       } else if (action === "cancel_all") {
         let promptRes = prompt("Enter cancellation reason / notes for rider:");
-        if (promptRes === null) return; // User clicked cancel on prompt
+        if (promptRes === null) return;
         remarks = promptRes || "Cancelled by Admin";
       }
 
@@ -1397,11 +1421,10 @@
       const container = document.getElementById('requestsListContainer');
       if(!container) return;
       let counts = { ALL: 0, Open: 0, Resolved: 0, Cancelled: 0 };
-      let rows = rawRequests.slice(1);
-      counts.ALL = rows.length;
-      rows.forEach(r => {
-        let st = (r[6] !== undefined && r[6] !== null && r[6] !== "") ? r[6].toString().trim() : "Open";
-        if (counts.hasOwnProperty(st)) counts[st]++;
+      let parsedRows = rawRequests.slice(1).map(parseRequestRow);
+      counts.ALL = parsedRows.length;
+      parsedRows.forEach(r => {
+        if (counts.hasOwnProperty(r.status)) counts[r.status]++;
         else counts.Open++;
       });
       Object.keys(counts).forEach(st => {
@@ -1410,17 +1433,13 @@
       });
 
       let search = document.getElementById('reqSearchInput').value.toLowerCase().trim();
-      let filtered = rows.filter(r => {
-        let reqId = r[0] ? r[0].toString() : "";
-        let empId = r[3] ? r[3].toString() : "";
-        let empName = r[4] ? r[4].toString() : "";
-        let status = (r[6] !== undefined && r[6] !== null && r[6] !== "") ? r[6].toString().trim() : "Open";
-        if (currentReqStatusFilter !== "ALL" && status.toLowerCase() !== currentReqStatusFilter.toLowerCase()) return false;
-        if (search && !`${reqId} ${empId} ${empName}`.toLowerCase().includes(search)) return false;
+      let filtered = parsedRows.filter(r => {
+        if (currentReqStatusFilter !== "ALL" && r.status.toLowerCase() !== currentReqStatusFilter.toLowerCase()) return false;
+        if (search && !`${r.reqId} ${r.empId} ${r.empName}`.toLowerCase().includes(search)) return false;
         return true;
       });
 
-      document.getElementById('reqShowingCount').innerText = `Showing ${filtered.length} of ${rows.length} requests`;
+      document.getElementById('reqShowingCount').innerText = `Showing ${filtered.length} of ${parsedRows.length} requests`;
       if (filtered.length === 0) {
         container.innerHTML = `<div class="bg-white p-8 rounded-2xl border text-center text-slate-400">No requests found.</div>`;
         return;
@@ -1428,19 +1447,15 @@
 
       container.innerHTML = "";
       filtered.slice().reverse().forEach(r => {
-        let reqId = r[0], date = r[1], region = r[2], empId = r[3], empName = r[4], itemsJson = r[5], status = (r[6] !== undefined && r[6] !== null && r[6] !== "") ? r[6].toString().trim() : "Open", handler = r[7] || "Unassigned", remarks = r[8] || "";
-        let isOpen = (status === "Open");
+        let isOpen = (r.status === "Open");
         
         let statusBg = "bg-amber-100 text-amber-800 border-amber-200";
-        if(status === "Resolved") statusBg = "bg-emerald-100 text-emerald-800 border-emerald-200";
-        if(status === "Cancelled") statusBg = "bg-rose-100 text-rose-800 border-rose-200";
-
-        let itemsObj = {};
-        try { itemsObj = JSON.parse(itemsJson); } catch(e) {}
+        if(r.status === "Resolved") statusBg = "bg-emerald-100 text-emerald-800 border-emerald-200";
+        if(r.status === "Cancelled") statusBg = "bg-rose-100 text-rose-800 border-rose-200";
 
         let itemsHtml = `<div class="space-y-2 my-3">`;
-        for (let itemKey in itemsObj) {
-          let qty = itemsObj[itemKey];
+        for (let itemKey in r.itemsObj) {
+          let qty = r.itemsObj[itemKey];
           itemsHtml += `
             <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs">
               <div>
@@ -1451,11 +1466,11 @@
               </div>
               <div class="flex items-center gap-2">
                 ${isOpen ? `
-                  <input type="number" id="qty_${reqId}_${itemKey}" value="${qty}" min="0" class="w-16 bg-white border border-slate-300 rounded px-2 py-1 text-center font-bold">
-                  <button onclick="processRequestAction('${reqId}', 'partial_approve', '${itemKey}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded font-bold transition">Approve</button>
-                  <button onclick="processRequestAction('${reqId}', 'partial_cancel', '${itemKey}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded font-bold transition">Cancel</button>
+                  <input type="number" id="qty_${r.reqId}_${itemKey}" value="${qty}" min="0" class="w-16 bg-white border border-slate-300 rounded px-2 py-1 text-center font-bold">
+                  <button onclick="processRequestAction('${r.reqId}', 'partial_approve', '${itemKey}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded font-bold transition">Approve</button>
+                  <button onclick="processRequestAction('${r.reqId}', 'partial_cancel', '${itemKey}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded font-bold transition">Cancel</button>
                 ` : `
-                  <span class="px-2.5 py-1 bg-slate-200 text-slate-600 rounded font-bold">Locked (${status})</span>
+                  <span class="px-2.5 py-1 bg-slate-200 text-slate-600 rounded font-bold">Locked (${r.status})</span>
                 `}
               </div>
             </div>`;
@@ -1466,8 +1481,8 @@
         if (isOpen) {
           globalActions = `
             <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
-              <button onclick="processRequestAction('${reqId}', 'approve_all')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Approve All & Issue Stock</button>
-              <button onclick="processRequestAction('${reqId}', 'cancel_all')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Cancel All</button>
+              <button onclick="processRequestAction('${r.reqId}', 'approve_all')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Approve All & Issue Stock</button>
+              <button onclick="processRequestAction('${r.reqId}', 'cancel_all')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">Cancel All</button>
             </div>`;
         }
 
@@ -1475,11 +1490,11 @@
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 space-y-3">
             <div class="flex justify-between items-start gap-4">
               <div>
-                <h4 class="font-black text-slate-900 text-base">Request ID: ${reqId}</h4>
-                <p class="text-xs text-slate-500 mt-0.5"><strong class="text-slate-700">${empName}</strong> • ID: ${empId} • Region: ${region} • Date: ${date} • <span class="text-indigo-600 font-semibold">Handler: ${handler}</span></p>
-                ${remarks ? `<p class="text-xs text-slate-600 font-medium mt-1">Note: ${remarks}</p>` : ``}
+                <h4 class="font-black text-slate-900 text-base">Request ID: ${r.reqId}</h4>
+                <p class="text-xs text-slate-500 mt-0.5"><strong class="text-slate-700">${r.empName}</strong> • ID: ${r.empId} • Region: ${r.region} • Date: ${r.date} • <span class="text-indigo-600 font-semibold">Handler: ${r.handler}</span></p>
+                ${r.remarks ? `<p class="text-xs text-slate-600 font-medium mt-1">Note: ${r.remarks}</p>` : ``}
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusBg}">${status.toUpperCase()}</span>
+              <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusBg}">${r.status.toUpperCase()}</span>
             </div>
             ${itemsHtml}
             ${globalActions}
@@ -1651,7 +1666,6 @@
       document.getElementById('kpiBal').innerText = totIssued - totUsed;
     }
 
-    // Fixed renderRawTables with proper Region & Date filtering and clean columns
     function renderRawTables() {
       const buildFilteredTable = (rows, tableId, regFilterId, startFilterId, endFilterId) => {
         if (!rows || rows.length === 0) return "<p class='text-slate-400'>No records found.</p>";
@@ -1660,7 +1674,6 @@
         let endFilter = document.getElementById(endFilterId) ? document.getElementById(endFilterId).value : "";
 
         let h = rows[0];
-        // Filter out any accidental threshold/empty header columns
         let validColIndices = [];
         h.forEach((col, idx) => {
           let cName = col ? col.toString().trim() : "";
