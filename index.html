@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HS ERP CLL - Portal</title>
+  <title>Hs Erp Cll - Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style> 
@@ -19,40 +19,40 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
 
-  <!-- GLOBAL LOADING SPINNER -->
+  <!-- Global Loading Spinner -->
   <div id="globalLoader" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 flex flex-col items-center justify-center space-y-3 transition-opacity duration-300">
     <div class="w-12 h-12 border-4 border-sky-500 border-t-transparent rounded-full spinner"></div>
     <p id="loaderText" class="text-white text-sm font-semibold tracking-wide">Connecting & Loading Data...</p>
   </div>
 
-  <!-- SCROLL TO TOP BUTTON -->
+  <!-- Scroll To Top Button -->
   <button onclick="scrollToTop()" id="scrollTopBtn" class="hidden fixed bottom-6 right-6 z-40 bg-sky-600 hover:bg-sky-700 text-white p-3 rounded-full shadow-2xl transition transform hover:scale-110 flex items-center justify-center">
     ⬆️
   </button>
 
-  <!-- LOGIN SCREEN -->
+  <!-- Login Screen -->
   <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8 border border-slate-200 space-y-6">
       <div class="text-center">
-        <h1 class="text-2xl font-black text-slate-900 tracking-wide">⚡ HS ERP CLL</h1>
+        <h1 class="text-2xl font-black text-slate-900 tracking-wide">⚡ Hs Erp Cll</h1>
         <p class="text-xs text-slate-500 mt-1">Secure Server Login Portal</p>
       </div>
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID / Username / Admin</label>
-          <input type="text" id="loginUser" placeholder="Enter ID or Admin..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <label class="block text-xs font-bold text-slate-600 mb-1">Employee Id / Username / Admin</label>
+          <input type="text" id="loginUser" placeholder="Enter Id Or Admin..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
-          <input type="password" id="loginPassword" placeholder="Enter password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <input type="password" id="loginPassword" placeholder="Enter Password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
         </div>
-        <button onclick="handleLogin()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Login to Portal</button>
+        <button onclick="handleLogin()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Login To Portal</button>
         <div id="loginError" class="hidden text-rose-600 text-xs text-center font-bold">غلط آئی ڈی یا پاسورڈ! دوبارہ کوشش کریں۔</div>
       </div>
     </div>
   </div>
 
-  <!-- MAIN APP -->
+  <!-- Main App -->
   <div id="mainApp" class="hidden flex h-screen overflow-hidden">
     <!-- Sidebar -->
     <aside id="sidebar" class="w-64 sidebar-bg text-slate-300 hidden md:flex flex-col justify-between border-r border-slate-800/80 shadow-xl transition-all duration-300">
@@ -61,8 +61,8 @@
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-sky-600/30 border border-sky-400/30 flex items-center justify-center text-sky-400 font-black text-lg shadow-inner">⚡</div>
             <div>
-              <h1 class="text-lg font-black text-white tracking-wider">HS ERP CLL</h1>
-              <p class="text-[10px] text-sky-400 font-semibold uppercase tracking-widest mt-0.5">Enterprise Portal</p>
+              <h1 class="text-lg font-black text-white tracking-wider">Hs Erp Cll</h1>
+              <p class="text-[10px] text-sky-400 font-semibold tracking-widest mt-0.5">Enterprise Portal</p>
             </div>
           </div>
         </div>
@@ -77,7 +77,7 @@
         </nav>
       </div>
       <div class="p-4 border-t border-slate-800/60 backdrop-blur-xs bg-slate-900/50 text-xs text-slate-400 font-medium text-center flex items-center justify-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System v36.0 Pro
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> System V37.0 Pro
       </div>
     </aside>
 
@@ -87,7 +87,7 @@
         <div class="flex items-center gap-3">
           <button onclick="toggleSidebar()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="Toggle Sidebar">☰</button>
           <div>
-            <h2 id="pageTitle" class="text-xl font-bold text-slate-800">HS ERP Portal</h2>
+            <h2 id="pageTitle" class="text-xl font-bold text-slate-800">Hs Erp Portal</h2>
             <p id="syncStatus" class="text-xs text-slate-500 mt-0.5">Connecting...</p>
           </div>
         </div>
@@ -100,19 +100,19 @@
       </header>
 
       <main class="p-6 space-y-6">
-        <!-- THRESHOLD ALERT BANNER -->
+        <!-- Threshold Alert Banner -->
         <div id="thresholdAlertBanner" class="hidden bg-rose-50 border-2 border-rose-500 p-4 rounded-2xl shadow-md flex justify-between items-center">
           <div class="flex items-center gap-3">
             <span class="text-2xl animate-bounce">⚠️</span>
             <div>
               <h4 class="font-black text-rose-900 text-sm">Stock Threshold Alert!</h4>
-              <p class="text-xs text-rose-700">One or more riders have items below the minimum threshold or zero balance.</p>
+              <p class="text-xs text-rose-700">One Or More Riders Have Items Below The Minimum Threshold Or Zero Balance.</p>
             </div>
           </div>
           <button onclick="openThresholdModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-xs transition">View Defaulters List</button>
         </div>
 
-        <!-- TAB 1: DASHBOARD -->
+        <!-- Tab 1: Dashboard -->
         <section id="tab-dashboard" class="admin-only space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
             <div>
@@ -126,7 +126,7 @@
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Search Employee / Rider</label>
-              <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="Type ID or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+              <input type="text" id="empSearch" onkeyup="renderDashboard()" placeholder="Type Id Or Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-500 mb-1">Item Category</label>
@@ -143,37 +143,37 @@
               <input type="date" id="endDateFilter" onchange="renderDashboard()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
             <div class="flex items-end gap-2">
-              <button onclick="exportDashboardCSV()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-3 rounded-xl text-xs transition shadow-xs">📥 Export CSV</button>
+              <button onclick="exportDashboardCSV()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-3 rounded-xl text-xs transition shadow-xs">📥 Export Csv</button>
             </div>
           </div>
 
-          <!-- KPIS -->
+          <!-- Kpis -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div onclick="filterKpi('issued')" class="cursor-pointer bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-sky-500 hover:shadow-md transition">
-              <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL ISSUED (Click to Filter)</span>
+              <span class="text-xs font-bold text-slate-400 tracking-wider">Total Issued (Click To Filter)</span>
               <div id="kpiIssued" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
             </div>
             <div onclick="filterKpi('used')" class="cursor-pointer bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-amber-500 hover:shadow-md transition">
-              <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL CONSUMED (Click to Filter)</span>
+              <span class="text-xs font-bold text-slate-400 tracking-wider">Total Consumed (Click To Filter)</span>
               <div id="kpiUsed" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
             </div>
             <div onclick="filterKpi('balance')" class="cursor-pointer bg-white p-6 rounded-2xl shadow-xs border border-slate-200 border-l-4 border-l-emerald-500 hover:shadow-md transition">
-              <span class="text-xs font-bold text-slate-400 tracking-wider">REMAINING BALANCE (Click to Filter)</span>
+              <span class="text-xs font-bold text-slate-400 tracking-wider">Remaining Balance (Click To Filter)</span>
               <div id="kpiBal" class="text-3xl font-extrabold text-slate-900 mt-2">0</div>
             </div>
           </div>
 
-          <!-- ITEMS SUMMARY TABLE -->
+          <!-- Items Summary Table -->
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
             <div class="p-5 border-b border-slate-200 bg-slate-900 text-white flex justify-between items-center">
               <div>
                 <h3 class="font-bold text-base">📦 Items Summary & Category-Wise Issuance <span id="summaryReportTitle" class="text-sky-400 text-xs font-normal ml-2">(Overall Summary)</span></h3>
-                <p class="text-xs text-slate-400 mt-0.5">Quantity breakdown per item</p>
+                <p class="text-xs text-slate-400 mt-0.5">Quantity Breakdown Per Item</p>
               </div>
             </div>
             <div class="overflow-x-auto max-h-96">
               <table class="w-full text-left border-collapse">
-                <thead class="sticky top-0 bg-slate-100 text-slate-600 text-xs font-bold uppercase">
+                <thead class="sticky top-0 bg-slate-100 text-slate-600 text-xs font-bold">
                   <tr>
                     <th class="p-3 border-b">Item Name / Category</th>
                     <th class="p-3 border-b text-center">Total Issued</th>
@@ -191,7 +191,7 @@
           </div>
         </section>
 
-        <!-- TAB 1.5: DEMAND ROOM -->
+        <!-- Tab 1.5: Demand Room -->
         <section id="tab-demandroom" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
             <div>
@@ -201,14 +201,14 @@
             <div class="flex flex-wrap items-center gap-3">
               <button onclick="openDemandModal()" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs flex items-center gap-2">➕ Add New Stock</button>
               <button onclick="openAdminConsumptionModal()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs flex items-center gap-2">📤 Office/Admin Consumption</button>
-              <button onclick="exportDemandRoomCSV()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export CSV</button>
+              <button onclick="exportDemandRoomCSV()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export Csv</button>
             </div>
           </div>
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
-                  <tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                  <tr class="bg-slate-50 text-slate-500 text-xs font-bold tracking-wider border-b border-slate-200">
                     <th class="p-4">Item Category / Name</th>
                     <th class="p-4 text-center">Total Received (Demand Room)</th>
                     <th class="p-4 text-center">Total Issued / Consumed</th>
@@ -224,15 +224,15 @@
           </div>
         </section>
 
-        <!-- TAB 1.6: RIDER MANAGEMENT -->
+        <!-- Tab 1.6: Rider Management -->
         <section id="tab-riders" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
             <div>
               <h3 class="font-bold text-slate-900 text-lg">🚴 Rider / Employee Management & History</h3>
-              <p class="text-xs text-slate-500 mt-1">Manage individual rider stocks, details and history.</p>
+              <p class="text-xs text-slate-500 mt-1">Manage Individual Rider Stocks, Details And History.</p>
             </div>
             <div class="flex gap-3 items-center">
-              <input type="text" id="riderTabSearch" onkeyup="renderRidersTable()" placeholder="Search rider name or ID..." class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+              <input type="text" id="riderTabSearch" onkeyup="renderRidersTable()" placeholder="Search Rider Name Or Id..." class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
               <button onclick="openBulkRiderModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📁 Bulk Rider Upload</button>
             </div>
           </div>
@@ -243,10 +243,10 @@
             </div>
             <div class="overflow-x-auto max-h-[600px]">
               <table class="w-full text-left border-collapse sticky top-0">
-                <thead class="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                <thead class="bg-slate-50 text-slate-500 text-xs font-bold tracking-wider border-b border-slate-200">
                   <tr>
                     <th class="p-4">Region</th>
-                    <th class="p-4">Emp ID</th>
+                    <th class="p-4">Emp Id</th>
                     <th class="p-4">Rider Name</th>
                     <th class="p-4">Total Issued</th>
                     <th class="p-4">Total Used</th>
@@ -255,25 +255,25 @@
                   </tr>
                 </thead>
                 <tbody id="riderTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="7" class="p-6 text-center text-slate-400">Loading riders...</td></tr>
+                  <tr><td colspan="7" class="p-6 text-center text-slate-400">Loading Riders...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
         </section>
 
-        <!-- TAB 1.7: CATEGORIES & THRESHOLDS / MAXIMUM LIMITS -->
+        <!-- Tab 1.7: Categories & Thresholds / Maximum Limits -->
         <section id="tab-categories" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap justify-between items-center gap-4">
             <div>
               <h3 class="font-bold text-slate-900 text-lg">⚙️ Category, Minimum Threshold & Maximum Issue Limits</h3>
-              <p class="text-xs text-slate-500 mt-1">Manage categories, minimum alert thresholds, and maximum issuance limits.</p>
+              <p class="text-xs text-slate-500 mt-1">Manage Categories, Minimum Alert Thresholds, And Maximum Issuance Limits.</p>
             </div>
             <button onclick="saveCategoriesAndThresholds()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition shadow-md">💾 Save All Changes</button>
           </div>
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 space-y-4">
             <div class="flex gap-3 flex-wrap">
-              <input type="text" id="newCatInput" placeholder="Category name..." class="flex-1 min-w-[200px] bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
+              <input type="text" id="newCatInput" placeholder="Category Name..." class="flex-1 min-w-[200px] bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
               <input type="number" id="newCatThreshold" placeholder="Min Threshold" value="5" class="w-36 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
               <input type="number" id="newCatMaxLimit" placeholder="Max Limit" value="50" class="w-36 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
               <button onclick="addNewCategory()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition">➕ Add Item</button>
@@ -281,7 +281,7 @@
             <div class="overflow-x-auto max-h-[500px]">
               <table class="w-full text-left border-collapse">
                 <thead>
-                  <tr class="bg-slate-50 text-slate-500 text-xs font-bold uppercase border-b">
+                  <tr class="bg-slate-50 text-slate-500 text-xs font-bold border-b">
                     <th class="p-3">Item / Category Name</th>
                     <th class="p-3 text-center">Minimum Threshold (Alert)</th>
                     <th class="p-3 text-center">Maximum Issue Limit</th>
@@ -289,22 +289,22 @@
                   </tr>
                 </thead>
                 <tbody id="categoryTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading categories...</td></tr>
+                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading Categories...</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
         </section>
 
-        <!-- TAB 1.8: STOCK REQUESTS -->
+        <!-- Tab 1.8: Stock Requests -->
         <section id="tab-requests" class="admin-only hidden space-y-6">
           <div class="bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-5">
             <div>
               <h3 class="text-2xl font-black text-slate-900">Stock Requests</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Manage employee stock requests grouped as single submissions.</p>
+              <p class="text-xs text-slate-500 mt-0.5">Manage Employee Stock Requests Grouped As Single Submissions.</p>
             </div>
             <div>
-              <input type="text" id="reqSearchInput" onkeyup="renderRequests()" placeholder="Search name, Employee ID, or request ID..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+              <input type="text" id="reqSearchInput" onkeyup="renderRequests()" placeholder="Search Name, Employee Id, Or Request Id..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <button onclick="setReqStatusFilter('ALL')" id="pill-ALL" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white transition shadow-xs">All <span id="count-ALL" class="ml-1 px-1.5 py-0.5 bg-slate-800 rounded-full">0</span></button>
@@ -312,12 +312,12 @@
               <button onclick="setReqStatusFilter('Resolved')" id="pill-Resolved" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Resolved <span id="count-Resolved" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
               <button onclick="setReqStatusFilter('Cancelled')" id="pill-Cancelled" class="px-4 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 hover:bg-slate-200 transition">Cancelled <span id="count-Cancelled" class="ml-1 px-1.5 py-0.5 bg-slate-200 rounded-full">0</span></button>
             </div>
-            <div id="reqShowingCount" class="text-xs text-slate-500 font-medium pt-1">Showing 0 requests</div>
+            <div id="reqShowingCount" class="text-xs text-slate-500 font-medium pt-1">Showing 0 Requests</div>
           </div>
           <div id="requestsListContainer" class="space-y-4"></div>
         </section>
 
-        <!-- EMPLOYEE WELCOME & BALANCE / NOTIFICATIONS -->
+        <!-- Employee Welcome & Balance / Notifications -->
         <section id="employeeWelcome" class="hidden space-y-6">
           <div class="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-3">
             <h2 id="welcomeEmpTitle" class="text-2xl font-black text-slate-900">خوش آمدید!</h2>
@@ -336,7 +336,7 @@
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6 space-y-4">
             <h3 class="font-bold text-slate-900 text-lg">📋 Your Stock Requests Status</h3>
             <div id="empRequestsHistoryBox" class="space-y-3">
-              <p class="text-xs text-slate-400">Loading your requests...</p>
+              <p class="text-xs text-slate-400">Loading Your Requests...</p>
             </div>
           </div>
 
@@ -345,7 +345,7 @@
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse">
                 <thead>
-                  <tr class="bg-slate-50 text-xs font-bold text-slate-500 uppercase border-b">
+                  <tr class="bg-slate-50 text-xs font-bold text-slate-500 border-b">
                     <th class="p-3">Item Name</th>
                     <th class="p-3 text-center">Total Issued</th>
                     <th class="p-3 text-center">Total Consumed</th>
@@ -353,7 +353,7 @@
                   </tr>
                 </thead>
                 <tbody id="empBalanceTableBody" class="divide-y divide-slate-100 text-sm">
-                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading balance...</td></tr>
+                  <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading Balance...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -361,7 +361,7 @@
           <div id="employeePortalHistory" class="space-y-4"></div>
         </section>
 
-        <!-- TAB 2: INVENTORY ISSUED -->
+        <!-- Tab 2: Inventory Issued -->
         <section id="tab-issued" class="admin-only hidden space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div>
@@ -382,7 +382,7 @@
               <input type="date" id="issuedEndDate" onchange="renderRawTables()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
             <div class="flex items-end">
-              <button onclick="exportRawTable('issuedRawTable', 'inventory_issued_report.csv')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export Issued CSV</button>
+              <button onclick="exportRawTable('issuedRawTable', 'Inventory_Issued_Report.csv')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export Issued Csv</button>
             </div>
           </div>
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
@@ -391,7 +391,7 @@
           </div>
         </section>
 
-        <!-- TAB 3: DAILY CONSUMPTION -->
+        <!-- Tab 3: Daily Consumption -->
         <section id="tab-consumption" class="admin-only hidden space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div>
@@ -412,7 +412,7 @@
               <input type="date" id="consEndDate" onchange="renderRawTables()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
             </div>
             <div class="flex items-end">
-              <button onclick="exportRawTable('consumptionRawTable', 'daily_consumption_report.csv')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export Consumption CSV</button>
+              <button onclick="exportRawTable('consumptionRawTable', 'Daily_Consumption_Report.csv')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-xl text-sm transition shadow-xs">📥 Export Consumption Csv</button>
             </div>
           </div>
           <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden p-6">
@@ -424,13 +424,13 @@
     </div>
   </div>
 
-  <!-- MODALS -->
+  <!-- Modals -->
   <div id="demandModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-8">
-      <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">🏢 Add New Stock to Demand Room</h3><button onclick="closeDemandModal()" class="text-white font-bold px-2 py-1">✕</button></div>
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">🏢 Add New Stock To Demand Room</h3><button onclick="closeDemandModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-        <div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-bold text-slate-600 mb-1">Date Received</label><input type="date" id="demandDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1">Added By</label><input type="text" id="demandAddedBy" placeholder="Your Name/ID..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div></div>
-        <div><label class="block text-xs font-bold text-slate-600 mb-2">Quantities for All Items</label><div id="demandItemsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div>
+        <div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-bold text-slate-600 mb-1">Date Received</label><input type="date" id="demandDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1">Added By</label><input type="text" id="demandAddedBy" placeholder="Your Name/Id..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div></div>
+        <div><label class="block text-xs font-bold text-slate-600 mb-2">Quantities For All Items</label><div id="demandItemsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div>
         <button onclick="submitDemandStock()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Save Stock Entry</button>
       </div>
     </div>
@@ -441,7 +441,7 @@
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📤 Office / Admin Consumption Form</h3><button onclick="closeAdminConsumptionModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div class="grid grid-cols-2 gap-4"><div><label class="block text-xs font-bold text-slate-600 mb-1">Date</label><input type="date" id="adminConsDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div><div><label class="block text-xs font-bold text-slate-600 mb-1">Consumed By</label><input type="text" id="adminConsBy" placeholder="Admin/Office Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div></div>
-        <div><label class="block text-xs font-bold text-slate-600 mb-2">Quantities of Items Used</label><div id="adminConsItemsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div>
+        <div><label class="block text-xs font-bold text-slate-600 mb-2">Quantities Of Items Used</label><div id="adminConsItemsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div>
         <button onclick="submitAdminConsumption()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">Save Office Consumption</button>
       </div>
     </div>
@@ -452,10 +452,10 @@
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📝 Daily Consumption Form</h3><button onclick="closeStaffModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="modalDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
-        <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="modalEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Id</label><input type="text" id="modalEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="modalEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="modalRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
-        <div><label class="block text-xs font-bold text-slate-500 mb-1">Case Number</label><input type="text" id="modalCaseNum" placeholder="e.g. 321001-01-01" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-1">Case Number</label><input type="text" id="modalCaseNum" placeholder="E.g. 321001-01-01" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Used Items</label><div id="modalItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
         <button id="modalSubBtn" onclick="submitConsumption()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition">Submit Consumption</button>
       </div>
@@ -467,7 +467,7 @@
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📑 Stock Request Form</h3><button onclick="closeRequestModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Date</label><input type="date" id="reqDate" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
-        <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee ID</label><input type="text" id="reqEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
+        <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Id</label><input type="text" id="reqEmpId" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Employee Name</label><input type="text" id="reqEmpName" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-1">Region</label><input type="text" id="reqRegion" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-sm"></div>
         <div><label class="block text-xs font-bold text-slate-500 mb-2">Requested Items (Max Limit Checked)</label><div id="reqItemsContainer" class="grid grid-cols-2 gap-3"></div></div>
@@ -481,14 +481,14 @@
       <div class="bg-rose-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">⚠️ Riders Below Threshold / Zero Balance</h3><button onclick="closeThresholdModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Select Item to inspect status across riders:</label>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Select Item To Inspect Status Across Riders:</label>
           <select id="thresholdItemSelect" onchange="renderDefaultersList()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none"></select>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-50 text-xs font-bold text-slate-500 uppercase border-b">
-                <th class="p-3">Emp ID</th>
+              <tr class="bg-slate-50 text-xs font-bold text-slate-500 border-b">
+                <th class="p-3">Emp Id</th>
                 <th class="p-3">Rider Name</th>
                 <th class="p-3 text-center">Current Balance</th>
                 <th class="p-3 text-center">Threshold</th>
@@ -506,7 +506,7 @@
     <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📁 Bulk Rider Upload</h3><button onclick="closeBulkRiderModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4">
-        <p class="text-xs text-slate-500">Paste rider records in CSV format: <code class="bg-slate-100 px-1 py-0.5 rounded">Name, ID, Region</code> (one per line).</p>
+        <p class="text-xs text-slate-500">Paste Rider Records In Csv Format: <code class="bg-slate-100 px-1 py-0.5 rounded">Name, Id, Region</code> (One Per Line).</p>
         <textarea id="bulkRiderText" rows="6" placeholder="Ali Raza, 1001, Center 1&#10;Usman Khan, 1002, South 1" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:outline-none"></textarea>
         <button onclick="submitBulkRiders()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition">Upload Riders</button>
       </div>
@@ -524,21 +524,29 @@
     <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
       <div class="bg-slate-900 text-white p-4 flex justify-between items-center"><h3 class="font-bold text-base">🔑 Change Password</h3><button onclick="closePasswordModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4">
-        <div><label class="block text-xs font-bold text-slate-600 mb-1">New Password</label><input type="password" id="newPasswordInput" placeholder="Enter new password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
+        <div><label class="block text-xs font-bold text-slate-600 mb-1">New Password</label><input type="password" id="newPasswordInput" placeholder="Enter New Password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
         <button onclick="saveNewPassword()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 rounded-xl text-sm">Save Password</button>
       </div>
     </div>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyB5I3DjUeSLCWBGEigfxxeoP8x_qeFcX4OMIDR1-Jk3PG4VGFStdYFxgk2w3oRhBDgEA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw55wJKwOSPS5x2h4wA68jiYvYUo-HqyGApISsU2GVxHP7r4dVysJ_xU4KVNbOcH23oWQ/exec";
 
     let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], rawThresholds = [], allCategories = [], fieldCategories = [], empMap = {}, empRegionMap = {}, itemThresholds = {}, itemMaxLimits = {};
     let currentReqStatusFilter = "ALL";
     const VALID_REGIONS = ["Center 1", "Center 2", "South 1", "South 2", "North 1", "North 2"];
     const EXCLUDED_FIELD_ITEMS = ["SMALL BAG", "LARGE BAG", "ICE POUCH", "ICE PACK", "TONER 05A", "TONER 79", "OTHERS"];
 
-    // Helper: Parse a row from the Requests sheet (columns A-E metadata, F-AN items, trailing Status/Handler/Remarks)
+    // Title Case Formatter: Har word ka pehla alphabet capital aur baqi normal
+    function toTitleCase(str) {
+      if (str === null || str === undefined) return "";
+      return str.toString().trim().toLowerCase().replace(/(?:^|[\s\-\/\.])([a-z])/g, function(match) {
+        return match.toUpperCase();
+      });
+    }
+
+    // Parse a row from the Requests sheet (columns A-E metadata, F-AN items, trailing Status/Handler/Remarks)
     function parseRequestRow(row) {
       let headers = rawRequests[0] || [];
       let upperHeaders = headers.map(h => h ? h.toString().trim().toUpperCase() : "");
@@ -547,10 +555,10 @@
       let remarksIdx = upperHeaders.indexOf("REMARKS");
 
       let status = (statusIdx !== -1 && row[statusIdx] !== undefined && row[statusIdx] !== null && row[statusIdx] !== "")
-        ? row[statusIdx].toString().trim()
+        ? toTitleCase(row[statusIdx])
         : "Open";
-      let handler = (handlerIdx !== -1 && row[handlerIdx]) ? row[handlerIdx].toString().trim() : "Unassigned";
-      let remarks = (remarksIdx !== -1 && row[remarksIdx]) ? row[remarksIdx].toString().trim() : "";
+      let handler = (handlerIdx !== -1 && row[handlerIdx]) ? toTitleCase(row[handlerIdx]) : "Unassigned";
+      let remarks = (remarksIdx !== -1 && row[remarksIdx]) ? toTitleCase(row[remarksIdx]) : "";
 
       let itemsObj = {};
       let endCol = statusIdx !== -1 ? statusIdx : headers.length;
@@ -565,9 +573,9 @@
       return {
         reqId: row[0] ? row[0].toString().trim() : "",
         date: getRowDate(row) || (row[1] ? row[1].toString().trim() : ""),
-        region: row[2] ? row[2].toString().trim() : "",
+        region: cleanRegion(row[2]),
         empId: row[3] ? row[3].toString().trim() : "",
-        empName: row[4] ? row[4].toString().trim() : "",
+        empName: row[4] ? toTitleCase(row[4]) : "",
         itemsObj,
         status,
         handler,
@@ -598,7 +606,7 @@
     };
 
     function showLoader(text = "Loading...") {
-      document.getElementById('loaderText').innerText = text;
+      document.getElementById('loaderText').innerText = toTitleCase(text);
       document.getElementById('globalLoader').classList.remove('hidden');
     }
     function hideLoader() { document.getElementById('globalLoader').classList.add('hidden'); }
@@ -615,9 +623,9 @@
       let username = document.getElementById('loginUser').value.trim();
       let pass = document.getElementById('loginPassword').value.trim();
       let errBox = document.getElementById('loginError');
-      if (!username || !pass) { alert("Please enter username and password."); return; }
+      if (!username || !pass) { alert("Please Enter Username And Password."); return; }
 
-      showLoader("Verifying credentials securely...");
+      showLoader("Verifying Credentials Securely...");
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
@@ -630,12 +638,12 @@
         if (result.status === "success") {
           localStorage.setItem('erp_role', result.role);
           if (result.role === 'admin') {
-            localStorage.setItem('logged_id', 'admin');
+            localStorage.setItem('logged_id', 'Admin');
             localStorage.setItem('logged_name', 'Administrator');
           } else {
             localStorage.setItem('logged_id', result.id);
-            localStorage.setItem('logged_name', result.name);
-            localStorage.setItem('logged_reg', result.region);
+            localStorage.setItem('logged_name', toTitleCase(result.name));
+            localStorage.setItem('logged_reg', cleanRegion(result.region));
           }
           loadDataAndInitSession();
         } else {
@@ -663,7 +671,7 @@
         document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
         document.getElementById('employeeWelcome').classList.remove('hidden');
         
-        let empName = localStorage.getItem('logged_name') || '';
+        let empName = toTitleCase(localStorage.getItem('logged_name') || '');
         let empId = localStorage.getItem('logged_id') || '';
         document.getElementById('welcomeEmpTitle').innerText = `خوش آمدید! ${empName} (${empId})`;
         document.getElementById('pageTitle').innerText = `Rider Portal - ${empName}`;
@@ -678,10 +686,10 @@
       let newPass = document.getElementById('newPasswordInput').value.trim();
       let role = localStorage.getItem('erp_role');
       if (!newPass) { alert("پاسورڈ خالی نہیں ہو سکتا!"); return; }
-      if (role === 'admin') { alert("Admin password can be configured in Apps Script."); closePasswordModal(); return; }
+      if (role === 'admin') { alert("Admin Password Can Be Configured In Apps Script."); closePasswordModal(); return; }
 
       let empId = localStorage.getItem('logged_id');
-      showLoader("Saving password on server...");
+      showLoader("Saving Password On Server...");
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
@@ -715,7 +723,7 @@
         issued: "Office Inventory Issued Records", 
         consumption: "Daily Consumption Records" 
       };
-      document.getElementById('pageTitle').innerText = titles[tab] || "HS ERP Portal";
+      document.getElementById('pageTitle').innerText = titles[tab] || "Hs Erp Portal";
     }
 
     function cleanRegion(r) {
@@ -724,7 +732,7 @@
       for (let vr of VALID_REGIONS) {
         if (val.toUpperCase() === vr.toUpperCase() || val.toUpperCase().includes(vr.toUpperCase())) return vr;
       }
-      return "Center 1";
+      return toTitleCase(val) || "Center 1";
     }
 
     function getRowDate(row) {
@@ -743,7 +751,7 @@
     }
 
     async function loadData() {
-      showLoader("Syncing records from Google Sheets...");
+      showLoader("Syncing Records From Google Sheets...");
       try {
         const res = await fetch(SCRIPT_URL + "?v=" + new Date().getTime(), { method: "GET", redirect: "follow" });
         const data = await res.json();
@@ -773,14 +781,14 @@
           for (let i = 1; i < rawEmployees.length; i++) {
             let row = rawEmployees[i];
             if (!row || row.length === 0) continue;
-            let name = row[0] ? row[0].toString().trim() : "";
+            let name = row[0] ? toTitleCase(row[0]) : "";
             let id = row[1] ? row[1].toString().trim() : "";
             let reg = cleanRegion(row[2]);
             if (id) { empMap[id] = name || "Employee " + id; empRegionMap[id] = reg; }
           }
         }
 
-        // Admin Notification Badge: Hide immediately when Open requests = 0
+        // Admin Notification Badge
         let openReqs = rawRequests.slice(1).map(parseRequestRow).filter(r => r.status === "Open");
         let reqBadge = document.getElementById('reqBadge');
         if (openReqs.length > 0) {
@@ -794,13 +802,13 @@
         const catSel = document.getElementById('catFilter');
         if(catSel) {
           catSel.innerHTML = '<option value="ALL">All Categories</option>';
-          allCategories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+          allCategories.forEach(c => catSel.innerHTML += `<option value="${c}">${toTitleCase(c)}</option>`);
         }
 
         const threshSel = document.getElementById('thresholdItemSelect');
         if(threshSel) {
           threshSel.innerHTML = "";
-          allCategories.forEach(c => threshSel.innerHTML += `<option value="${c}">${c}</option>`);
+          allCategories.forEach(c => threshSel.innerHTML += `<option value="${c}">${toTitleCase(c)}</option>`);
         }
 
         ['demandItemsContainer', 'adminConsItemsContainer'].forEach(containerId => {
@@ -810,7 +818,7 @@
           allCategories.forEach(item => {
             container.innerHTML += `
               <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
-                <label class="block text-xs font-bold text-slate-700 mb-1">${item}</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">${toTitleCase(item)}</label>
                 <input type="number" min="0" value="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';" class="${containerId}-input w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-sm font-bold text-slate-900 focus:outline-none" data-item="${item}">
               </div>`;
           });
@@ -824,7 +832,7 @@
             let maxLim = itemMaxLimits[item] || 50;
             container.innerHTML += `
               <div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
-                <label class="block text-xs font-bold text-slate-700 mb-1">${item} <span class="text-[10px] text-sky-600">(Max: ${maxLim})</span></label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">${toTitleCase(item)} <span class="text-[10px] text-sky-600">(Max: ${maxLim})</span></label>
                 <input type="number" min="0" max="${maxLim}" value="0" onfocus="if(this.value=='0')this.value='';" onblur="if(this.value=='')this.value='0';" class="${containerId}-input w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-sm font-bold text-slate-900 focus:outline-none" data-item="${item}" data-max="${maxLim}">
               </div>`;
           });
@@ -940,14 +948,14 @@
           tbody.innerHTML += `
             <tr class="hover:bg-slate-50">
               <td class="p-3 font-semibold text-slate-700">${emp.id}</td>
-              <td class="p-3 font-medium text-slate-900">${emp.name}</td>
+              <td class="p-3 font-medium text-slate-900">${toTitleCase(emp.name)}</td>
               <td class="p-3 text-center font-black text-rose-600">${bal}</td>
               <td class="p-3 text-center text-slate-600">${limit}</td>
               <td class="p-3 text-center">${statusBadge}</td>
             </tr>`;
         }
       });
-      if (count === 0) tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">All riders have sufficient balance for ${selectedItem}.</td></tr>`;
+      if (count === 0) tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">All Riders Have Sufficient Balance For ${toTitleCase(selectedItem)}.</td></tr>`;
     }
 
     let activeKpiFilter = null;
@@ -965,7 +973,7 @@
         let maxLim = itemMaxLimits[cat] || 50;
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50">
-            <td class="p-3 font-bold text-slate-800">${cat}</td>
+            <td class="p-3 font-bold text-slate-800">${toTitleCase(cat)}</td>
             <td class="p-3 text-center"><input type="number" value="${limit}" data-cat="${cat}" class="cat-thresh-input w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-center font-bold text-sm"></td>
             <td class="p-3 text-center"><input type="number" value="${maxLim}" data-cat="${cat}" class="cat-max-input w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-center font-bold text-sm text-sky-600"></td>
             <td class="p-3 text-center"><button onclick="deleteCategory('${cat}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold px-3 py-1 rounded-lg text-xs transition">Delete</button></td>
@@ -974,26 +982,26 @@
     }
 
     function addNewCategory() {
-      let name = document.getElementById('newCatInput').value.trim().toUpperCase();
+      let name = toTitleCase(document.getElementById('newCatInput').value.trim());
       let limit = Number(document.getElementById('newCatThreshold').value) || 5;
       let maxLim = Number(document.getElementById('newCatMaxLimit').value) || 50;
-      if (!name) { alert("Please enter category name."); return; }
-      if (allCategories.includes(name)) { alert("Category already exists."); return; }
+      if (!name) { alert("Please Enter Category Name."); return; }
+      if (allCategories.some(c => c.toUpperCase() === name.toUpperCase())) { alert("Category Already Exists."); return; }
       allCategories.push(name);
       itemThresholds[name] = limit;
       itemMaxLimits[name] = maxLim;
       document.getElementById('newCatInput').value = "";
       renderCategoriesTable();
-      alert("✅ Item added. Click 'Save All Changes' to persist.");
+      alert("✅ Item Added. Click 'Save All Changes' To Persist.");
     }
 
     function deleteCategory(cat) {
-      if (confirm(`Are you sure you want to delete category '${cat}'?`)) {
+      if (confirm(`Are You Sure You Want To Delete Category '${toTitleCase(cat)}'?`)) {
         allCategories = allCategories.filter(c => c !== cat);
         delete itemThresholds[cat];
         delete itemMaxLimits[cat];
         renderCategoriesTable();
-        alert("✅ Category removed. Click 'Save All Changes' to persist.");
+        alert("✅ Category Removed. Click 'Save All Changes' To Persist.");
       }
     }
 
@@ -1009,7 +1017,7 @@
         thresholdsPayload[cat] = { min: minVal, max: maxVal };
       });
 
-      showLoader("Saving categories and limits...");
+      showLoader("Saving Categories And Limits...");
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
@@ -1017,7 +1025,7 @@
           body: JSON.stringify({ type: "update_thresholds", thresholds: thresholdsPayload })
         });
         hideLoader();
-        alert("✅ Thresholds and max issue limits saved successfully!");
+        alert("✅ Thresholds And Max Issue Limits Saved Successfully!");
         loadData();
       } catch (e) {
         hideLoader();
@@ -1030,16 +1038,16 @@
 
     async function submitBulkRiders() {
       let text = document.getElementById('bulkRiderText').value.trim();
-      if (!text) { alert("Please paste rider data."); return; }
+      if (!text) { alert("Please Paste Rider Data."); return; }
       let lines = text.split('\n');
       let riders = [];
       lines.forEach(l => {
         let parts = l.split(',').map(p => p.trim());
-        if (parts.length >= 2) riders.push([parts[0], parts[1], parts[2] || "Center 1"]);
+        if (parts.length >= 2) riders.push([toTitleCase(parts[0]), parts[1], cleanRegion(parts[2] || "Center 1")]);
       });
-      if (riders.length === 0) { alert("No valid rider records parsed."); return; }
+      if (riders.length === 0) { alert("No Valid Rider Records Parsed."); return; }
 
-      showLoader("Uploading bulk riders...");
+      showLoader("Uploading Bulk Riders...");
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
@@ -1048,7 +1056,7 @@
         });
         hideLoader();
         closeBulkRiderModal();
-        alert("✅ Bulk riders uploaded successfully!");
+        alert("✅ Bulk Riders Uploaded Successfully!");
         loadData();
       } catch (e) {
         hideLoader();
@@ -1057,42 +1065,42 @@
     }
 
     function openRiderHistory(empId) {
-      let empName = empMap[empId] || "Rider";
+      let empName = toTitleCase(empMap[empId] || "Rider");
       let reg = empRegionMap[empId] || "Center 1";
       document.getElementById('riderHistoryTitle').innerText = `🚴 Rider History: ${empName} (${empId}) - ${reg}`;
       let content = document.getElementById('riderHistoryContent');
-      content.innerHTML = `<p class="text-slate-500">Loading history...</p>`;
+      content.innerHTML = `<p class="text-slate-500">Loading History...</p>`;
       document.getElementById('riderHistoryModal').classList.remove('hidden');
 
       let issuedRows = rawIssued.slice(1).filter(r => r[2] && r[2].toString().trim() === empId);
       let consumedRows = rawConsumed.slice(1).filter(r => r[2] && r[2].toString().trim() === empId);
 
       let html = `<div class="space-y-4"><h4 class="font-bold text-slate-800 text-base border-b pb-2">Issued Items History</h4>`;
-      if (issuedRows.length === 0) html += `<p class="text-xs text-slate-400">No issued records found.</p>`;
+      if (issuedRows.length === 0) html += `<p class="text-xs text-slate-400">No Issued Records Found.</p>`;
       else {
         let h = rawIssued[0];
         html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Issued Items Breakdown</th></tr></thead><tbody class="divide-y">`;
         issuedRows.forEach(r => {
           let breakdown = [];
           for (let c = 4; c < h.length; c++) {
-            if (Number(r[c]) > 0) breakdown.push(`${h[c]}: <strong>${r[c]}</strong>`);
+            if (Number(r[c]) > 0) breakdown.push(`${toTitleCase(h[c])}: <strong>${r[c]}</strong>`);
           }
-          html += `<tr><td class="p-2 whitespace-nowrap">${getRowDate(r)}</td><td class="p-2">${breakdown.join(", ") || "0 items"}</td></tr>`;
+          html += `<tr><td class="p-2 whitespace-nowrap">${getRowDate(r)}</td><td class="p-2">${breakdown.join(", ") || "0 Items"}</td></tr>`;
         });
         html += `</tbody></table></div>`;
       }
 
       html += `<h4 class="font-bold text-slate-800 text-base border-b pb-2 pt-4">Daily Consumption History</h4>`;
-      if (consumedRows.length === 0) html += `<p class="text-xs text-slate-400">No consumption records found.</p>`;
+      if (consumedRows.length === 0) html += `<p class="text-xs text-slate-400">No Consumption Records Found.</p>`;
       else {
         let h = rawConsumed[0];
         html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold"><tr><th class="p-2">Date</th><th class="p-2">Case Number</th><th class="p-2">Used Items Breakdown</th></tr></thead><tbody class="divide-y">`;
         consumedRows.forEach(r => {
           let breakdown = [];
           for (let c = 5; c < h.length; c++) {
-            if (Number(r[c]) > 0) breakdown.push(`${h[c]}: <strong>${r[c]}</strong>`);
+            if (Number(r[c]) > 0) breakdown.push(`${toTitleCase(h[c])}: <strong>${r[c]}</strong>`);
           }
-          html += `<tr><td class="p-2 whitespace-nowrap">${getRowDate(r)}</td><td class="p-2 font-bold">${r[4] || ''}</td><td class="p-2">${breakdown.join(", ") || "0 items"}</td></tr>`;
+          html += `<tr><td class="p-2 whitespace-nowrap">${getRowDate(r)}</td><td class="p-2 font-bold">${r[4] || ''}</td><td class="p-2">${breakdown.join(", ") || "0 Items"}</td></tr>`;
         });
         html += `</tbody></table></div>`;
       }
@@ -1131,7 +1139,7 @@
         notifList.innerHTML = "";
         unseenProcessedReqs.forEach(r => {
           let badgeColor = r.status === "Resolved" ? "text-emerald-700 font-bold" : "text-rose-700 font-bold";
-          notifList.innerHTML += `<div class="p-2.5 bg-white rounded-xl border border-amber-200 flex justify-between items-center"><span>Request <strong>${r.reqId}</strong>: <span class="${badgeColor}">${r.status}</span> — ${r.remarks || "Processed by admin"}</span></div>`;
+          notifList.innerHTML += `<div class="p-2.5 bg-white rounded-xl border border-amber-200 flex justify-between items-center"><span>Request <strong>${r.reqId}</strong>: <span class="${badgeColor}">${toTitleCase(r.status)}</span> — ${toTitleCase(r.remarks || "Processed By Admin")}</span></div>`;
         });
       } else {
         notifBox.classList.add('hidden');
@@ -1140,11 +1148,11 @@
       // 2. Employee Stock Requests History & Live Status
       let empReqBox = document.getElementById('empRequestsHistoryBox');
       if (parsedReqs.length === 0) {
-        empReqBox.innerHTML = `<p class="text-xs text-slate-400">You have not submitted any stock requests yet.</p>`;
+        empReqBox.innerHTML = `<p class="text-xs text-slate-400">You Have Not Submitted Any Stock Requests Yet.</p>`;
       } else {
         empReqBox.innerHTML = "";
         parsedReqs.slice().reverse().forEach(r => {
-          let itemBadges = Object.keys(r.itemsObj).map(k => `<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-semibold">${k}: ${r.itemsObj[k]}</span>`).join(" ");
+          let itemBadges = Object.keys(r.itemsObj).map(k => `<span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-semibold">${toTitleCase(k)}: ${r.itemsObj[k]}</span>`).join(" ");
           let statusBadge = "bg-amber-100 text-amber-800";
           if (r.status === "Resolved") statusBadge = "bg-emerald-100 text-emerald-800";
           if (r.status === "Cancelled") statusBadge = "bg-rose-100 text-rose-800";
@@ -1154,9 +1162,9 @@
               <div class="space-y-1">
                 <div class="text-xs font-bold text-slate-800">${r.reqId} <span class="text-slate-400 font-normal">• ${r.date}</span></div>
                 <div class="flex flex-wrap gap-1.5 text-xs">${itemBadges}</div>
-                ${r.remarks ? `<div class="text-xs text-slate-600 italic">Admin Note: ${r.remarks}</div>` : ``}
+                ${r.remarks ? `<div class="text-xs text-slate-600 italic">Admin Note: ${toTitleCase(r.remarks)}</div>` : ``}
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBadge}">${r.status.toUpperCase()}</span>
+              <span class="px-3 py-1 rounded-full text-xs font-bold ${statusBadge}">${toTitleCase(r.status)}</span>
             </div>`;
         });
       }
@@ -1189,28 +1197,28 @@
         let bal = issued - used;
         balTbody.innerHTML += `
           <tr class="hover:bg-slate-50">
-            <td class="p-3 font-bold text-slate-700">${cat}</td>
+            <td class="p-3 font-bold text-slate-700">${toTitleCase(cat)}</td>
             <td class="p-3 text-center text-sky-600 font-semibold">${issued}</td>
             <td class="p-3 text-center text-amber-600 font-semibold">${used}</td>
             <td class="p-3 text-center font-bold text-slate-900">${bal}</td>
           </tr>`;
       });
 
-      // 4. Employee Stock Issued History (Clean Item Breakdown)
+      // 4. Employee Stock Issued History
       let content = document.getElementById('employeePortalHistory');
       let html = `<div class="space-y-6">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
           <h3 class="font-bold text-slate-800 text-lg mb-3">📦 Your Stock Issued History</h3>`;
-      if (issuedRows.length === 0) html += `<p class="text-xs text-slate-400">No stock issued records found.</p>`;
+      if (issuedRows.length === 0) html += `<p class="text-xs text-slate-400">No Stock Issued Records Found.</p>`;
       else {
         let h = rawIssued[0];
         html += `<div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead class="bg-slate-50 font-bold border-b"><tr><th class="p-3">Date</th><th class="p-3">Issued Items & Quantities</th></tr></thead><tbody class="divide-y">`;
         issuedRows.slice().reverse().forEach(r => {
           let breakdown = [];
           for (let c = 4; c < h.length; c++) {
-            if (Number(r[c]) > 0) breakdown.push(`<span class="inline-block bg-sky-50 text-sky-800 border border-sky-200 px-2 py-0.5 rounded mr-1 mb-1">${h[c]}: <strong>${r[c]}</strong></span>`);
+            if (Number(r[c]) > 0) breakdown.push(`<span class="inline-block bg-sky-50 text-sky-800 border border-sky-200 px-2 py-0.5 rounded mr-1 mb-1">${toTitleCase(h[c])}: <strong>${r[c]}</strong></span>`);
           }
-          html += `<tr><td class="p-3 whitespace-nowrap font-semibold">${getRowDate(r)}</td><td class="p-3">${breakdown.join("") || "0 items"}</td></tr>`;
+          html += `<tr><td class="p-3 whitespace-nowrap font-semibold">${getRowDate(r)}</td><td class="p-3">${breakdown.join("") || "0 Items"}</td></tr>`;
         });
         html += `</tbody></table></div>`;
       }
@@ -1231,7 +1239,7 @@
       document.getElementById('riderCountBadge').innerText = `${riders.length} Riders`;
       tbody.innerHTML = "";
       if (riders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No matching riders found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No Matching Riders Found.</td></tr>`;
         return;
       }
 
@@ -1244,9 +1252,9 @@
         let bal = totIssued - totUsed;
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
-            <td class="p-4 font-bold text-sky-700">${item.region}</td>
+            <td class="p-4 font-bold text-sky-700">${cleanRegion(item.region)}</td>
             <td class="p-4 font-semibold text-slate-700">${item.id}</td>
-            <td class="p-4 font-medium text-slate-900">${item.name}</td>
+            <td class="p-4 font-medium text-slate-900">${toTitleCase(item.name)}</td>
             <td class="p-4 text-slate-600">${totIssued}</td>
             <td class="p-4 text-slate-600">${totUsed}</td>
             <td class="p-4 font-bold text-slate-900">${bal}</td>
@@ -1258,8 +1266,8 @@
     function openStaffModal() {
       if (localStorage.getItem('erp_role') === 'employee') {
         document.getElementById('modalEmpId').value = localStorage.getItem('logged_id');
-        document.getElementById('modalEmpName').value = localStorage.getItem('logged_name');
-        document.getElementById('modalRegion').value = localStorage.getItem('logged_reg');
+        document.getElementById('modalEmpName').value = toTitleCase(localStorage.getItem('logged_name'));
+        document.getElementById('modalRegion').value = cleanRegion(localStorage.getItem('logged_reg'));
       }
       document.getElementById('modalCaseNum').value = "";
       document.getElementById('staffModal').classList.remove('hidden');
@@ -1269,48 +1277,48 @@
     function openRequestModal() {
       if (localStorage.getItem('erp_role') === 'employee') {
         document.getElementById('reqEmpId').value = localStorage.getItem('logged_id');
-        document.getElementById('reqEmpName').value = localStorage.getItem('logged_name');
-        document.getElementById('reqRegion').value = localStorage.getItem('logged_reg');
+        document.getElementById('reqEmpName').value = toTitleCase(localStorage.getItem('logged_name'));
+        document.getElementById('reqRegion').value = cleanRegion(localStorage.getItem('logged_reg'));
       }
       document.getElementById('requestModal').classList.remove('hidden');
     }
     function closeRequestModal() { document.getElementById('requestModal').classList.add('hidden'); }
     
     function openDemandModal() {
-      document.getElementById('demandAddedBy').value = localStorage.getItem('logged_name') || 'Admin';
+      document.getElementById('demandAddedBy').value = toTitleCase(localStorage.getItem('logged_name') || 'Admin');
       document.getElementById('demandModal').classList.remove('hidden');
     }
     function closeDemandModal() { document.getElementById('demandModal').classList.add('hidden'); }
     
     function openAdminConsumptionModal() {
-      document.getElementById('adminConsBy').value = localStorage.getItem('logged_name') || 'Admin';
+      document.getElementById('adminConsBy').value = toTitleCase(localStorage.getItem('logged_name') || 'Admin');
       document.getElementById('adminConsumptionModal').classList.remove('hidden');
     }
     function closeAdminConsumptionModal() { document.getElementById('adminConsumptionModal').classList.add('hidden'); }
 
     async function submitDemandStock() {
       const date = document.getElementById('demandDate').value;
-      const addedBy = document.getElementById('demandAddedBy').value.trim();
-      if (!date || !addedBy) { alert("Date and Name required."); return; }
+      const addedBy = toTitleCase(document.getElementById('demandAddedBy').value.trim());
+      if (!date || !addedBy) { alert("Date And Name Required."); return; }
       let items = {};
       document.querySelectorAll('.demandItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
-      showLoader("Saving demand stock...");
+      showLoader("Saving Demand Stock...");
       try {
         await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "demand", date, addedBy, items }) });
-        hideLoader(); alert("✅ Demand stock added!"); closeDemandModal(); loadData();
+        hideLoader(); alert("✅ Demand Stock Added!"); closeDemandModal(); loadData();
       } catch (err) { hideLoader(); alert("Error: " + err); }
     }
 
     async function submitAdminConsumption() {
       const date = document.getElementById('adminConsDate').value;
-      const addedBy = document.getElementById('adminConsBy').value.trim();
-      if (!date || !addedBy) { alert("Date and Name required."); return; }
+      const addedBy = toTitleCase(document.getElementById('adminConsBy').value.trim());
+      if (!date || !addedBy) { alert("Date And Name Required."); return; }
       let items = {};
       document.querySelectorAll('.adminConsItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
-      showLoader("Saving office consumption...");
+      showLoader("Saving Office Consumption...");
       try {
         await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "admin_consumption", date, addedBy, items }) });
-        hideLoader(); alert("✅ Office consumption saved!"); closeAdminConsumptionModal(); loadData();
+        hideLoader(); alert("✅ Office Consumption Saved!"); closeAdminConsumptionModal(); loadData();
       } catch (err) { hideLoader(); alert("Error: " + err); }
     }
 
@@ -1319,16 +1327,16 @@
       btn.disabled = true;
       const date = document.getElementById('modalDate').value;
       const empId = document.getElementById('modalEmpId').value;
-      const empName = document.getElementById('modalEmpName').value;
-      const region = document.getElementById('modalRegion').value;
+      const empName = toTitleCase(document.getElementById('modalEmpName').value);
+      const region = cleanRegion(document.getElementById('modalRegion').value);
       const caseNumber = document.getElementById('modalCaseNum').value.trim();
-      if (!date || !empId || !caseNumber) { alert("Date, ID and Case Number required."); btn.disabled = false; return; }
+      if (!date || !empId || !caseNumber) { alert("Date, Id And Case Number Required."); btn.disabled = false; return; }
       let items = {};
       document.querySelectorAll('.modalItemsContainer-input').forEach(inp => { items[inp.dataset.item] = Number(inp.value) || 0; });
-      showLoader("Submitting consumption...");
+      showLoader("Submitting Consumption...");
       try {
         await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "consumption", date, region, empId, empName, caseNumber, items }) });
-        hideLoader(); alert("✅ Consumption submitted!"); closeStaffModal(); document.getElementById('modalCaseNum').value = ""; loadData();
+        hideLoader(); alert("✅ Consumption Submitted!"); closeStaffModal(); document.getElementById('modalCaseNum').value = ""; loadData();
       } catch (err) { hideLoader(); alert("Error: " + err); }
       btn.disabled = false;
     }
@@ -1338,9 +1346,9 @@
       btn.disabled = true;
       const date = document.getElementById('reqDate').value;
       const empId = document.getElementById('reqEmpId').value;
-      const empName = document.getElementById('reqEmpName').value;
-      const region = document.getElementById('reqRegion').value;
-      if (!date || !empId) { alert("Date and ID required."); btn.disabled = false; return; }
+      const empName = toTitleCase(document.getElementById('reqEmpName').value);
+      const region = cleanRegion(document.getElementById('reqRegion').value);
+      if (!date || !empId) { alert("Date And Id Required."); btn.disabled = false; return; }
 
       let items = {};
       let count = 0;
@@ -1349,16 +1357,16 @@
         let val = Number(inp.value) || 0;
         let maxLim = Number(inp.dataset.max) || 50;
         if (val > maxLim) {
-          alert(`Quantity for ${inp.dataset.item} exceeds maximum allowed limit (${maxLim}).`);
+          alert(`Quantity For ${toTitleCase(inp.dataset.item)} Exceeds Maximum Allowed Limit (${maxLim}).`);
           limitExceeded = true;
         }
         if (val > 0) { items[inp.dataset.item] = val; count++; }
       });
 
       if (limitExceeded) { btn.disabled = false; return; }
-      if (count === 0) { alert("Please enter quantity for at least one item."); btn.disabled = false; return; }
+      if (count === 0) { alert("Please Enter Quantity For At Least One Item."); btn.disabled = false; return; }
 
-      showLoader("Submitting grouped stock request...");
+      showLoader("Submitting Grouped Stock Request...");
       try {
         await fetch(SCRIPT_URL, {
           method: "POST",
@@ -1366,7 +1374,7 @@
           body: JSON.stringify({ type: "request", date, region, empId, empName, items })
         });
         hideLoader();
-        alert("✅ Grouped stock request submitted successfully!");
+        alert("✅ Grouped Stock Request Submitted Successfully!");
         closeRequestModal();
         loadData();
       } catch (err) { hideLoader(); alert("Error: " + err); }
@@ -1385,7 +1393,7 @@
     }
 
     async function processRequestAction(reqId, action, itemKey = null) {
-      let adminName = localStorage.getItem('logged_name') || "Admin";
+      let adminName = toTitleCase(localStorage.getItem('logged_name') || "Admin");
       let approvedItems = {};
       let remarks = "";
 
@@ -1394,11 +1402,11 @@
         let qty = Number(inputEl ? inputEl.value : 0) || 0;
         approvedItems[itemKey] = qty;
       } else if (action === "partial_cancel") {
-        remarks = `Item ${itemKey} cancelled by admin.`;
+        remarks = `Item ${toTitleCase(itemKey)} Cancelled By Admin.`;
       } else if (action === "cancel_all") {
-        let promptRes = prompt("Enter cancellation reason / notes for rider:");
+        let promptRes = prompt("Enter Cancellation Reason / Notes For Rider:");
         if (promptRes === null) return;
-        remarks = promptRes || "Cancelled by Admin";
+        remarks = toTitleCase(promptRes) || "Cancelled By Admin";
       }
 
       showLoader("Processing & Issuing Stock...");
@@ -1409,7 +1417,7 @@
           body: JSON.stringify({ type: "process_request", reqId, action, approvedItems, cancelledRemarks: remarks, handler: adminName })
         });
         hideLoader();
-        alert("✅ Request resolved and stock updated automatically!");
+        alert("✅ Request Resolved And Stock Updated Automatically!");
         loadData();
       } catch (e) {
         hideLoader();
@@ -1439,9 +1447,9 @@
         return true;
       });
 
-      document.getElementById('reqShowingCount').innerText = `Showing ${filtered.length} of ${parsedRows.length} requests`;
+      document.getElementById('reqShowingCount').innerText = `Showing ${filtered.length} Of ${parsedRows.length} Requests`;
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="bg-white p-8 rounded-2xl border text-center text-slate-400">No requests found.</div>`;
+        container.innerHTML = `<div class="bg-white p-8 rounded-2xl border text-center text-slate-400">No Requests Found.</div>`;
         return;
       }
 
@@ -1459,9 +1467,9 @@
           itemsHtml += `
             <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs">
               <div>
-                <strong class="text-slate-800">${itemKey}</strong> : 
+                <strong class="text-slate-800">${toTitleCase(itemKey)}</strong> : 
                 ${isOpen 
-                  ? `Qty requested = <span class="text-sky-600 font-bold">${qty}</span>` 
+                  ? `Qty Requested = <span class="text-sky-600 font-bold">${qty}</span>` 
                   : `<span class="text-emerald-700 font-bold">Processed Qty: ${qty}</span>`}
               </div>
               <div class="flex items-center gap-2">
@@ -1470,7 +1478,7 @@
                   <button onclick="processRequestAction('${r.reqId}', 'partial_approve', '${itemKey}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded font-bold transition">Approve</button>
                   <button onclick="processRequestAction('${r.reqId}', 'partial_cancel', '${itemKey}')" class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded font-bold transition">Cancel</button>
                 ` : `
-                  <span class="px-2.5 py-1 bg-slate-200 text-slate-600 rounded font-bold">Locked (${r.status})</span>
+                  <span class="px-2.5 py-1 bg-slate-200 text-slate-600 rounded font-bold">Locked (${toTitleCase(r.status)})</span>
                 `}
               </div>
             </div>`;
@@ -1490,11 +1498,11 @@
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 space-y-3">
             <div class="flex justify-between items-start gap-4">
               <div>
-                <h4 class="font-black text-slate-900 text-base">Request ID: ${r.reqId}</h4>
-                <p class="text-xs text-slate-500 mt-0.5"><strong class="text-slate-700">${r.empName}</strong> • ID: ${r.empId} • Region: ${r.region} • Date: ${r.date} • <span class="text-indigo-600 font-semibold">Handler: ${r.handler}</span></p>
-                ${r.remarks ? `<p class="text-xs text-slate-600 font-medium mt-1">Note: ${r.remarks}</p>` : ``}
+                <h4 class="font-black text-slate-900 text-base">Request Id: ${r.reqId}</h4>
+                <p class="text-xs text-slate-500 mt-0.5"><strong class="text-slate-700">${toTitleCase(r.empName)}</strong> • Id: ${r.empId} • Region: ${cleanRegion(r.region)} • Date: ${r.date} • <span class="text-indigo-600 font-semibold">Handler: ${toTitleCase(r.handler)}</span></p>
+                ${r.remarks ? `<p class="text-xs text-slate-600 font-medium mt-1">Note: ${toTitleCase(r.remarks)}</p>` : ``}
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusBg}">${r.status.toUpperCase()}</span>
+              <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusBg}">${toTitleCase(r.status)}</span>
             </div>
             ${itemsHtml}
             ${globalActions}
@@ -1537,7 +1545,7 @@
         let balColor = balance < 0 ? "text-rose-600 font-bold" : "text-emerald-700 font-extrabold";
         tbody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
-            <td class="p-4 font-bold text-slate-800">${cat}</td>
+            <td class="p-4 font-bold text-slate-800">${toTitleCase(cat)}</td>
             <td class="p-4 text-center font-bold text-sky-600">${received}</td>
             <td class="p-4 text-center font-semibold text-amber-600">${outTotal}</td>
             <td class="p-4 text-center ${balColor}">${balance}</td>
@@ -1566,7 +1574,8 @@
           let name = empMap[id].toLowerCase();
           if (id.toLowerCase().includes(search) || name.includes(search)) matchedEmpIds.push(id);
         });
-        reportTitle.innerText = `(Filtered for Employee(s): ${matchedEmpIds.join(', ') || search})`;
+        let displayMatches = matchedEmpIds.map(id => `${empMap[id]} (${id})`).join(', ');
+        reportTitle.innerText = `(Filtered For: ${displayMatches || toTitleCase(search)})`;
       } else {
         reportTitle.innerText = "(Overall Summary)";
       }
@@ -1652,7 +1661,7 @@
         let balColor = itBal < 0 ? "text-rose-600 font-bold" : "text-emerald-700 font-bold";
         itemsSummaryBody.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
-            <td class="p-3 font-bold text-slate-700">${item}</td>
+            <td class="p-3 font-bold text-slate-700">${toTitleCase(item)}</td>
             <td class="p-3 text-center text-indigo-600 font-semibold">${itIssued}</td>
             <td class="p-3 text-center text-amber-600 font-semibold">${itUsed}</td>
             <td class="p-3 text-center ${balColor}">${itBal}</td>
@@ -1668,7 +1677,7 @@
 
     function renderRawTables() {
       const buildFilteredTable = (rows, tableId, regFilterId, startFilterId, endFilterId) => {
-        if (!rows || rows.length === 0) return "<p class='text-slate-400'>No records found.</p>";
+        if (!rows || rows.length === 0) return "<p class='text-slate-400'>No Records Found.</p>";
         let regFilter = document.getElementById(regFilterId) ? document.getElementById(regFilterId).value : "ALL";
         let startFilter = document.getElementById(startFilterId) ? document.getElementById(startFilterId).value : "";
         let endFilter = document.getElementById(endFilterId) ? document.getElementById(endFilterId).value : "";
@@ -1682,8 +1691,8 @@
           }
         });
 
-        let html = `<table id="${tableId}" class="w-full text-left text-xs border-collapse"><thead><tr class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0">`;
-        validColIndices.forEach(idx => html += `<th class="p-3 border-b whitespace-nowrap">${h[idx]}</th>`);
+        let html = `<table id="${tableId}" class="w-full text-left text-xs border-collapse"><thead><tr class="bg-slate-100 text-slate-700 font-bold sticky top-0">`;
+        validColIndices.forEach(idx => html += `<th class="p-3 border-b whitespace-nowrap">${toTitleCase(h[idx])}</th>`);
         html += `</tr></thead><tbody class="divide-y divide-slate-100">`;
 
         let count = 0;
@@ -1701,12 +1710,13 @@
           validColIndices.forEach(idx => {
             let val = (r[idx] !== undefined && r[idx] !== null) ? r[idx] : '';
             if (idx === 0 && rowDate) val = rowDate;
+            else if (idx === 1 || idx === 3) val = toTitleCase(val);
             html += `<td class="p-3 whitespace-nowrap ${Number(val) > 0 && idx >= 4 ? 'font-bold text-sky-700 bg-sky-50/40' : ''}">${val}</td>`;
           });
           html += `</tr>`;
         }
         if (count === 0) {
-          html += `<tr><td colspan="${validColIndices.length}" class="p-6 text-center text-slate-400">No matching records found for selected filters.</td></tr>`;
+          html += `<tr><td colspan="${validColIndices.length}" class="p-6 text-center text-slate-400">No Matching Records Found For Selected Filters.</td></tr>`;
         }
         return html + `</tbody></table>`;
       };
@@ -1715,15 +1725,67 @@
       document.getElementById('consumptionRawBox').innerHTML = buildFilteredTable(rawConsumed, 'consumptionRawTable', 'consRegionFilter', 'consStartDate', 'consEndDate');
     }
 
+    // Export Dashboard CSV with Employee Name, Employee ID, Region & Date Range
     function exportDashboardCSV() {
       let now = new Date();
-      let csv = ["\"HS ERP CLL - Inventory Report\"", `"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`, "", "Item Name,Total Issued,Total Used,Remaining Balance,Min Threshold,Max Limit"];
+      let search = document.getElementById('empSearch').value.toLowerCase().trim();
+      let selectedRegion = document.getElementById('regionFilter').value;
+      let startDate = document.getElementById('startDateFilter').value || "Start";
+      let endDate = document.getElementById('endDateFilter').value || "Present";
+
+      let empNameLabel = "All Employees (Overall Summary)";
+      let empIdLabel = "All";
+      let empRegionLabel = selectedRegion === "ALL" ? "All Regions" : selectedRegion;
+      let fileSuffix = "Overall_Summary";
+
+      if (search) {
+        let matched = [];
+        Object.keys(empMap).forEach(id => {
+          let name = empMap[id];
+          if (id.toLowerCase().includes(search) || name.toLowerCase().includes(search)) {
+            matched.push({ id: id, name: name, region: empRegionMap[id] || "Center 1" });
+          }
+        });
+
+        if (matched.length === 1) {
+          empNameLabel = matched[0].name;
+          empIdLabel = matched[0].id;
+          empRegionLabel = matched[0].region;
+          fileSuffix = `${matched[0].name.replace(/\s+/g, '_')}_${matched[0].id}`;
+        } else if (matched.length > 1) {
+          empNameLabel = matched.map(m => m.name).join(" | ");
+          empIdLabel = matched.map(m => m.id).join(" | ");
+          fileSuffix = `Filtered_${toTitleCase(search).replace(/\s+/g, '_')}`;
+        } else {
+          empNameLabel = toTitleCase(search);
+          empIdLabel = search;
+          fileSuffix = toTitleCase(search).replace(/\s+/g, '_');
+        }
+      }
+
+      let csv = [
+        "\"Hs Erp Cll - Inventory Report\"",
+        `"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`,
+        `"Employee Name","${empNameLabel}"`,
+        `"Employee Id","${empIdLabel}"`,
+        `"Region","${empRegionLabel}"`,
+        `"Date Range","${startDate} To ${endDate}"`,
+        "",
+        "Item Name,Total Issued,Total Used,Remaining Balance,Min Threshold,Max Limit"
+      ];
+
       document.querySelectorAll("#itemsSummaryTableBody tr").forEach(row => {
         let cols = row.querySelectorAll("td");
-        if (cols.length === 6) csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
+        if (cols.length === 6) {
+          csv.push(Array.from(cols).map((c, idx) => `"${idx === 0 ? toTitleCase(c.innerText) : c.innerText.trim()}"`).join(","));
+        }
       });
+
       let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-      let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = "employee_filtered_inventory_report.csv"; a.click();
+      let a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = `${fileSuffix}_Inventory_Report.csv`;
+      a.click();
     }
 
     function exportRawTable(tableId, filename) {
@@ -1732,7 +1794,7 @@
       let csv = [];
       table.querySelectorAll("tr").forEach(row => {
         let cols = row.querySelectorAll("th, td");
-        csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/\n/g, ' ')}"`).join(","));
+        csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/\n/g, ' ').trim()}"`).join(","));
       });
       let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
       let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = filename; a.click();
@@ -1742,10 +1804,10 @@
       let csv = ["Item Category,Total Received,Total Issued/Consumed,Remaining Balance,Status"];
       document.querySelectorAll("#demandRoomTableBody tr").forEach(row => {
         let cols = row.querySelectorAll("td");
-        if (cols.length === 5) csv.push(Array.from(cols).map(c => `"${c.innerText}"`).join(","));
+        if (cols.length === 5) csv.push(Array.from(cols).map(c => `"${c.innerText.trim()}"`).join(","));
       });
       let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
-      let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = "demand_room_ledger.csv"; a.click();
+      let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = "Demand_Room_Ledger.csv"; a.click();
     }
   </script>
 </body>
