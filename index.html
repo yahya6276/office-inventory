@@ -1712,25 +1712,71 @@
           let jsonRows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
           let riders = [];
-          for (let i = 1; i < jsonRows.length; i++) {
+          let startRow = 1;
+          let nameCol = 0, idCol = 1, regCol = 2, passCol = 3;
+          if (jsonRows.length > 0 && Array.isArray(jsonRows[0])) {
+            let hRow = jsonRows[0].map(c => c ? c.toString().trim().toLowerCase() : "");
+            let fName = hRow.findIndex(h => h.includes("name"));
+            let fId = hRow.findIndex(h => h === "id" || h.includes("emp id") || h.includes("empid") || h.includes("rider id") || h === "employee id");
+            let fReg = hRow.findIndex(h => h.includes("region") || h.includes("area") || h.includes("center"));
+            let fPass = hRow.findIndex(h => h.includes("pass"));
+            if (fName !== -1 || fId !== -1) {
+              if (fName !== -1) nameCol = fName;
+              if (fId !== -1) idCol = fId;
+              if (fReg !== -1) regCol = fReg;
+              if (fPass !== -1) passCol = fPass;
+              startRow = 1;
+            } else {
+              startRow = 0;
+            }
+          }
+
+          for (let i = startRow; i < jsonRows.length; i++) {
             let r = jsonRows[i];
-            if (r && r[0] && r[1]) {
-              riders.push([
-                toTitleCase(r[0].toString()),
-                r[1].toString().trim(),
-                cleanRegion(r[2] ? r[2].toString() : "Center 1"),
-                r[3] ? r[3].toString().trim() : "12345"
-              ]);
+            if (!r) continue;
+            let rawName = r[nameCol] ? r[nameCol].toString().trim() : "";
+            let rawId = r[idCol] ? r[idCol].toString().trim() : "";
+            if (rawName || rawId) {
+              let finalId = rawId || ("EMP-" + i);
+              let finalName = toTitleCase(rawName || ("Employee " + finalId));
+              let finalReg = cleanRegion(r[regCol] ? r[regCol].toString() : "Center 1");
+              let finalPass = r[passCol] ? r[passCol].toString().trim() : "12345";
+              riders.push([finalName, finalId, finalReg, finalPass]);
             }
           }
           if (riders.length === 0) { alert("ایکسل شیٹ میں درست ڈیٹا نہیں ملا۔"); return; }
 
           showLoader("Uploading Excel Riders To Sheet...");
-          await fetch(SCRIPT_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ type: "bulk_riders", riders })
+          const payload = JSON.stringify({ type: "bulk_riders", riders });
+          try {
+            await fetch(SCRIPT_URL, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: payload,
+              redirect: "follow"
+            });
+          } catch (fetchErr) {
+            // Fallback with no-cors when GAS redirect/CORS blocks reading response on some networks
+            await fetch(SCRIPT_URL, {
+              method: "POST",
+              mode: "no-cors",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: payload
+            });
+          }
+
+          // Also update in-memory rider maps immediately so all riders appear right away even if sheet sync takes a moment
+          riders.forEach(rd => {
+            let [rName, rId, rReg, rPass] = rd;
+            if (rId) {
+              empMap[rId] = rName || ("Employee " + rId);
+              empRegionMap[rId] = rReg || "Center 1";
+              empPassMap[rId] = rPass || "12345";
+            }
           });
+          renderRidersTable();
+          populateDropdownsAndForms();
+
           fileInput.value = "";
           closeBulkRiderModal();
           await loadData(true);
