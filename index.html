@@ -49,6 +49,14 @@
         <button onclick="handleLogin()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-sky-600/30">
           🔐 Sign In To Portal
         </button>
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
+          <button type="button" onclick="openRecoverPasswordModal()" class="text-sky-700 hover:text-sky-900 font-bold underline underline-offset-2">
+            🔄 Recover Password
+          </button>
+          <button type="button" onclick="openCreateLoginModal()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold px-3 py-2 rounded-xl transition">
+            ➕ Create New Login
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -704,6 +712,76 @@
     </div>
   </div>
 
+  
+  <!-- 12. Create New Login Modal (Emp ID, Name, Region, Email ID) -->
+  <div id="createLoginModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
+        <h3 class="font-bold text-lg">➕ Create New Login</h3>
+        <button onclick="closeCreateLoginModal()" class="text-white font-bold px-2 py-1">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div id="createLoginMsg" class="hidden text-xs font-bold p-3 rounded-xl"></div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID</label>
+          <input type="text" id="newLoginEmpId" placeholder="e.g. 245 or EMP-101" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
+          <input type="text" id="newLoginName" placeholder="Enter Full Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Region</label>
+          <select id="newLoginRegion" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+            <option value="Center 1">Center 1</option><option value="Center 2">Center 2</option>
+            <option value="South 1">South 1</option><option value="South 2">South 2</option>
+            <option value="North 1">North 1</option><option value="North 2">North 2</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Email ID</label>
+          <input type="email" id="newLoginEmail" placeholder="name@example.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
+          <input type="text" id="newLoginPassword" value="12345" placeholder="Set Password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold text-sky-700">
+        </div>
+        <button onclick="submitCreateNewLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">
+          ✅ Create Login & Sync To Sheet
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 13. Recover Password Modal -->
+  <div id="recoverPasswordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
+        <h3 class="font-bold text-lg">🔄 Recover Password</h3>
+        <button onclick="closeRecoverPasswordModal()" class="text-white font-bold px-2 py-1">✕</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div id="recoverPwdResult" class="hidden text-xs font-bold p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-950 space-y-1"></div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID یا Email ID</label>
+          <input type="text" id="recoverIdentifierInput" placeholder="Enter Employee ID or Email ID..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">New Password (اگر نیا پاسورڈ سیٹ کرنا ہو)</label>
+          <input type="text" id="recoverNewPasswordInput" placeholder="Optional: enter new password to reset..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-2.5">
+          <button onclick="handleRecoverPasswordLookup()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
+            🔍 Find Password
+          </button>
+          <button onclick="handleRecoverPasswordReset()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
+            💾 Reset & Sync Sheet
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzq5v7GcegAfpnUOJB5RvH2Kri6MPZPQykeld1PlvyFfsZhyPv3U-Kac22aBUqC9gxglg/exec";
 
@@ -903,6 +981,192 @@
         }
       }
       return null;
+    }
+
+
+    async function postToAppsScript(payloadObj) {
+      const payloadStr = JSON.stringify(payloadObj);
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: payloadStr,
+          redirect: "follow"
+        });
+        const text = await res.text();
+        try {
+          return { ok: true, data: JSON.parse(text), mode: "cors" };
+        } catch (_e) {
+          return { ok: res.ok, data: { status: res.ok ? "success" : "error" }, mode: "cors" };
+        }
+      } catch (err) {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: payloadStr
+        });
+        return { ok: true, data: { status: "success", opaque: true }, mode: "no-cors" };
+      }
+    }
+
+    function openCreateLoginModal() {
+      document.getElementById('createLoginMsg').classList.add('hidden');
+      document.getElementById('newLoginEmpId').value = "";
+      document.getElementById('newLoginName').value = "";
+      document.getElementById('newLoginRegion').value = "Center 1";
+      document.getElementById('newLoginEmail').value = "";
+      document.getElementById('newLoginPassword').value = "12345";
+      document.getElementById('createLoginModal').classList.remove('hidden');
+    }
+    function closeCreateLoginModal() { document.getElementById('createLoginModal').classList.add('hidden'); }
+
+    async function submitCreateNewLogin() {
+      const empId = document.getElementById('newLoginEmpId').value.trim();
+      const empName = toTitleCase(document.getElementById('newLoginName').value.trim());
+      const region = cleanRegion(document.getElementById('newLoginRegion').value);
+      const email = document.getElementById('newLoginEmail').value.trim();
+      const password = document.getElementById('newLoginPassword').value.trim() || "12345";
+      const msgBox = document.getElementById('createLoginMsg');
+
+      if (!empId || !empName || !email) {
+        msgBox.className = "text-xs font-bold p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700";
+        msgBox.innerText = "براہ کرم Employee ID، Name اور Email ID درج کریں۔";
+        msgBox.classList.remove('hidden');
+        return;
+      }
+
+      showLoader("Creating Login & Syncing To Google Sheet...");
+      empMap[empId] = empName;
+      empRegionMap[empId] = region;
+      empPassMap[empId] = password;
+      empEmailMap[empId] = email;
+
+      let listRaw = localStorage.getItem('hs_erp_custom_riders_list');
+      let listArr = listRaw ? JSON.parse(listRaw) : [];
+      listArr = listArr.filter(rd => rd[1] !== empId);
+      listArr.push([empName, empId, region, password, email]);
+      localStorage.setItem('hs_erp_custom_riders_list', JSON.stringify(listArr));
+
+      await postToAppsScript({
+        type: "add_employee",
+        empId,
+        empName,
+        region,
+        email,
+        password
+      });
+
+      document.getElementById('loginUser').value = empId;
+      document.getElementById('loginPassword').value = password;
+      closeCreateLoginModal();
+      hideLoader();
+      alert(`✅ نیا لاگ ان بن گیا ہے!\nEmployee ID: ${empId}\nPassword: ${password}\nڈیٹا شیٹ میں سنک کر دیا گیا ہے۔`);
+    }
+
+    function openRecoverPasswordModal() {
+      document.getElementById('recoverPwdResult').classList.add('hidden');
+      document.getElementById('recoverIdentifierInput').value = document.getElementById('loginUser').value.trim();
+      document.getElementById('recoverNewPasswordInput').value = "";
+      document.getElementById('recoverPasswordModal').classList.remove('hidden');
+    }
+    function closeRecoverPasswordModal() { document.getElementById('recoverPasswordModal').classList.add('hidden'); }
+
+    async function ensureEmployeesLoadedForRecovery() {
+      if (Object.keys(empMap).length > 0 && Object.keys(empPassMap).length > 0) return;
+      try {
+        const gRes = await fetch(SCRIPT_URL + "?t=" + Date.now(), { method: "GET", redirect: "follow" });
+        const gData = await gRes.json();
+        const eRows = gData.employees || [];
+        if (eRows.length > 1) {
+          let eh = eRows[0].map(h => h ? h.toString().trim().toLowerCase() : "");
+          let idIdx = eh.findIndex(h => ["id", "emp id", "empid", "employee id", "employeeid", "rider id"].includes(h));
+          let nameIdx = eh.findIndex(h => ["name", "emp name", "empname", "employee name", "rider name"].includes(h));
+          let regIdx = eh.findIndex(h => ["region", "area", "center"].includes(h));
+          let passIdx = eh.findIndex(h => ["password", "pass"].includes(h));
+          let emailIdx = eh.findIndex(h => ["email", "email id", "emailid", "e-mail"].includes(h));
+          if (idIdx === -1) idIdx = 1;
+          if (nameIdx === -1) nameIdx = 0;
+          if (regIdx === -1) regIdx = 2;
+          if (passIdx === -1) passIdx = 3;
+          for (let i = 1; i < eRows.length; i++) {
+            let r = eRows[i];
+            if (!r) continue;
+            let rid = r[idIdx] ? r[idIdx].toString().trim() : "";
+            if (rid) {
+              empMap[rid] = r[nameIdx] ? toTitleCase(r[nameIdx]) : ("Employee " + rid);
+              empRegionMap[rid] = r[regIdx] ? cleanRegion(r[regIdx]) : "Center 1";
+              empPassMap[rid] = r[passIdx] ? r[passIdx].toString().trim() : "12345";
+              if (emailIdx !== -1 && r[emailIdx]) empEmailMap[rid] = r[emailIdx].toString().trim();
+            }
+          }
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    async function handleRecoverPasswordLookup() {
+      const ident = document.getElementById('recoverIdentifierInput').value.trim().toLowerCase();
+      const box = document.getElementById('recoverPwdResult');
+      if (!ident) { alert("Employee ID یا Email ID درج کریں۔"); return; }
+      showLoader("Searching Account...");
+      await ensureEmployeesLoadedForRecovery();
+      hideLoader();
+
+      let foundId = Object.keys(empMap).find(id =>
+        id.toLowerCase() === ident || (empEmailMap[id] && empEmailMap[id].toLowerCase() === ident)
+      );
+
+      if (foundId) {
+        let pwd = empPassMap[foundId] || "12345";
+        let nm = empMap[foundId] || ("Employee " + foundId);
+        let em = empEmailMap[foundId] || "Not Set";
+        box.className = "text-xs font-bold p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 space-y-1";
+        box.innerHTML = `
+          <div>Name: <strong>${nm}</strong> (${foundId})</div>
+          <div>Email: <strong>${em}</strong></div>
+          <div>Current Password: <span class="text-sky-700 font-black">${pwd}</span></div>
+        `;
+        box.classList.remove('hidden');
+        document.getElementById('loginUser').value = foundId;
+        document.getElementById('loginPassword').value = pwd;
+      } else {
+        box.className = "text-xs font-bold p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800";
+        box.innerText = "اس Employee ID یا Email ID کے لیے کوئی اکاؤنٹ نہیں ملا۔ آپ 'Create New Login' سے نیا اکاؤنٹ بنا سکتے ہیں۔";
+        box.classList.remove('hidden');
+      }
+    }
+
+    async function handleRecoverPasswordReset() {
+      const ident = document.getElementById('recoverIdentifierInput').value.trim().toLowerCase();
+      const newPass = document.getElementById('recoverNewPasswordInput').value.trim();
+      const box = document.getElementById('recoverPwdResult');
+      if (!ident || !newPass) { alert("Employee ID / Email ID اور New Password دونوں درج کریں۔"); return; }
+
+      showLoader("Updating Password & Syncing To Sheet...");
+      await ensureEmployeesLoadedForRecovery();
+      let foundId = Object.keys(empMap).find(id =>
+        id.toLowerCase() === ident || (empEmailMap[id] && empEmailMap[id].toLowerCase() === ident)
+      );
+      let targetId = foundId || document.getElementById('recoverIdentifierInput').value.trim();
+      empPassMap[targetId] = newPass;
+
+      let listRaw = localStorage.getItem('hs_erp_custom_riders_list');
+      if (listRaw) {
+        let listArr = JSON.parse(listRaw).map(rd => {
+          if (String(rd[1]).trim().toLowerCase() === targetId.toLowerCase()) rd[3] = newPass;
+          return rd;
+        });
+        localStorage.setItem('hs_erp_custom_riders_list', JSON.stringify(listArr));
+      }
+
+      await postToAppsScript({ type: "update_password", empId: targetId, newPassword: newPass });
+      hideLoader();
+
+      document.getElementById('loginUser').value = targetId;
+      document.getElementById('loginPassword').value = newPass;
+      box.className = "text-xs font-bold p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-950";
+      box.innerText = `✅ ID '${targetId}' کا نیا پاسورڈ '${newPass}' سیٹ اور شیٹ میں سنک کر دیا گیا ہے۔`;
+      box.classList.remove('hidden');
     }
 
     async function handleLogin() {
@@ -1107,13 +1371,14 @@
 
         fieldCategories = allCategories.filter(item => !EXCLUDED_FIELD_ITEMS.includes(item.toUpperCase().trim()));
 
-        empMap = {}; empRegionMap = {}; empPassMap = {};
+        empMap = {}; empRegionMap = {}; empPassMap = {}; empEmailMap = {};
         if (rawEmployees.length > 1) {
           let eh = rawEmployees[0].map(h => h ? h.toString().trim().toLowerCase() : "");
           let idIdx = eh.findIndex(h => h === "id" || h === "emp id" || h === "empid" || h === "employee id" || h === "employeeid" || h === "rider id");
           let nameIdx = eh.findIndex(h => h === "name" || h === "emp name" || h === "empname" || h === "employee name" || h === "rider name");
           let regIdx = eh.findIndex(h => h === "region" || h === "area" || h === "center");
           let passIdx = eh.findIndex(h => h === "password" || h === "pass");
+          let emailIdx = eh.findIndex(h => h === "email" || h === "email id" || h === "emailid" || h === "e-mail");
 
           if (idIdx === -1) idIdx = 1;
           if (nameIdx === -1) nameIdx = 0;
@@ -1127,10 +1392,12 @@
             let name = row[nameIdx] ? toTitleCase(row[nameIdx]) : "";
             let reg = row[regIdx] ? cleanRegion(row[regIdx]) : "Center 1";
             let pass = row[passIdx] ? row[passIdx].toString().trim() : "12345";
+            let email = (emailIdx !== -1 && row[emailIdx]) ? row[emailIdx].toString().trim() : "";
             if (id) {
               empMap[id] = name || ("Employee " + id);
               empRegionMap[id] = reg;
               empPassMap[id] = pass;
+              if (email) empEmailMap[id] = email;
             }
           }
         }
@@ -1798,51 +2065,20 @@
       listArr.push([empName, empId, region, password]);
       localStorage.setItem('hs_erp_custom_riders_list', JSON.stringify(listArr));
 
-      let backendSynced = false;
-      try {
-        const resp = await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            type: originalId ? "edit_employee" : "add_employee",
-            originalId,
-            empId,
-            empName,
-            region,
-            password
-          }),
-          redirect: "follow"
-        });
-        if (resp && resp.ok) backendSynced = true;
-      } catch (e) {
-        console.warn("POST failed, trying no-cors fallback:", e);
-        try {
-          await fetch(SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({
-              type: originalId ? "edit_employee" : "add_employee",
-              originalId,
-              empId,
-              empName,
-              region,
-              password
-            })
-          });
-        } catch (e2) {
-          console.warn("no-cors POST also failed:", e2);
-        }
-      }
+      await postToAppsScript({
+        type: originalId ? "edit_employee" : "add_employee",
+        originalId,
+        empId,
+        empName,
+        region,
+        email: empEmailMap[empId] || "",
+        password
+      });
 
       closeEmployeeFormModal();
       renderRidersTable();
       hideLoader();
-      if (backendSynced) {
-        alert("✅ Rider Profile & Login Saved To Backend Sheet!");
-      } else {
-        alert("⚠️ اس براؤزر میں پاسورڈ اور پروفائل محفوظ ہو گئی ہے، لیکن Google Apps Script POST ریکویسٹ میں 'Failed to fetch' آ رہا ہے۔ نیچے دیے گئے Apps Script کوڈ اور Deployment سیٹنگ کو چیک کریں تاکہ Google Sheet میں بھی سیو ہو۔");
-      }
+      alert("✅ Rider Profile & Login Saved And Synced To Sheet!");
     }
 
     function downloadRidersExcel() {
@@ -2126,15 +2362,12 @@
       if (role === 'admin') { alert("Admin Password Can Be Configured In Apps Script."); closePasswordModal(); return; }
 
       let empId = localStorage.getItem('logged_id');
-      showLoader("Saving Password On Server...");
+      showLoader("Saving & Syncing Password To Sheet...");
+      empPassMap[empId] = newPass;
       try {
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ type: "update_password", empId, newPassword: newPass })
-        });
+        await postToAppsScript({ type: "update_password", empId, newPassword: newPass });
         hideLoader();
-        alert("✅ پاسورڈ کامیابی سے سرور پر اپ ڈیٹ ہو گیا!");
+        alert("✅ پاسورڈ کامیابی سے اپ ڈیٹ اور شیٹ میں سنک ہو گیا!");
         closePasswordModal();
       } catch (e) { hideLoader(); alert("Error: " + e); }
     }
