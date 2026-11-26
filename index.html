@@ -704,7 +704,7 @@
     </div>
   </div>
 
-  <>
+  <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzq5v7GcegAfpnUOJB5RvH2Kri6MPZPQykeld1PlvyFfsZhyPv3U-Kac22aBUqC9gxglg/exec";
 
     let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], rawThresholds = [];
@@ -785,11 +785,11 @@
         }
       });
 
+      setTimeout(() => { hideLoader(); }, 4000);
       try {
         let sessionRole = localStorage.getItem('erp_role');
         if (sessionRole) {
           loadDataAndInitSession();
-          setTimeout(() => { hideLoader(); }, 8000);
         } else {
           hideLoader();
         }
@@ -1195,6 +1195,7 @@
         console.error(e);
         if (syncEl) syncEl.innerText = "Sync Warning!";
       } finally {
+        if (showBlockingLoader) hideLoader();
         isSyncing = false;
         if (pendingSync) {
           pendingSync = false;
@@ -1782,8 +1783,24 @@
       if (!empId || !empName) { alert("Employee ID اور Name لازمی ہیں۔"); return; }
 
       showLoader("Saving Employee Profile & Login To Sheet...");
+      if (originalId && originalId !== empId) {
+        delete empMap[originalId];
+        delete empRegionMap[originalId];
+        delete empPassMap[originalId];
+      }
+      empMap[empId] = empName;
+      empRegionMap[empId] = region;
+      empPassMap[empId] = password;
+
+      let listRaw = localStorage.getItem('hs_erp_custom_riders_list');
+      let listArr = listRaw ? JSON.parse(listRaw) : [];
+      listArr = listArr.filter(rd => rd[1] !== originalId && rd[1] !== empId);
+      listArr.push([empName, empId, region, password]);
+      localStorage.setItem('hs_erp_custom_riders_list', JSON.stringify(listArr));
+
+      let backendSynced = false;
       try {
-        await fetch(SCRIPT_URL, {
+        const resp = await fetch(SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
@@ -1793,19 +1810,39 @@
             empName,
             region,
             password
-          })
+          }),
+          redirect: "follow"
         });
-        let listRaw = localStorage.getItem('hs_erp_custom_riders_list');
-        let listArr = listRaw ? JSON.parse(listRaw) : [];
-        listArr = listArr.filter(rd => rd[1] !== originalId && rd[1] !== empId);
-        listArr.push([empName, empId, region, password]);
-        localStorage.setItem('hs_erp_custom_riders_list', JSON.stringify(listArr));
-        closeEmployeeFormModal();
-        await loadData(true);
-        applyUploadedRidersOverride();
-        renderRidersTable();
+        if (resp && resp.ok) backendSynced = true;
+      } catch (e) {
+        console.warn("POST failed, trying no-cors fallback:", e);
+        try {
+          await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              type: originalId ? "edit_employee" : "add_employee",
+              originalId,
+              empId,
+              empName,
+              region,
+              password
+            })
+          });
+        } catch (e2) {
+          console.warn("no-cors POST also failed:", e2);
+        }
+      }
+
+      closeEmployeeFormModal();
+      renderRidersTable();
+      hideLoader();
+      if (backendSynced) {
         alert("✅ Rider Profile & Login Saved To Backend Sheet!");
-      } catch (e) { hideLoader(); alert("Error: " + e); }
+      } else {
+        alert("⚠️ اس براؤزر میں پاسورڈ اور پروفائل محفوظ ہو گئی ہے، لیکن Google Apps Script POST ریکویسٹ میں 'Failed to fetch' آ رہا ہے۔ نیچے دیے گئے Apps Script کوڈ اور Deployment سیٹنگ کو چیک کریں تاکہ Google Sheet میں بھی سیو ہو۔");
+      }
     }
 
     function downloadRidersExcel() {
