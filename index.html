@@ -836,35 +836,69 @@
       else closeSidebar();
     }
 
-    function tryLocalRiderLogin(username, pass) {
-      applyUploadedRidersOverride();
-      // Also hydrate from hs_erp_custom_riders_list if empMap is empty
-      if (Object.keys(empMap).length === 0) {
-        let savedRaw = localStorage.getItem('hs_erp_custom_riders_list');
-        if (savedRaw) {
-          try {
-            let savedList = JSON.parse(savedRaw);
-            savedList.forEach(rd => {
-              let [rName, rId, rReg, rPass] = rd;
-              if (rId) {
-                empMap[rId.toString().trim()] = rName || ("Employee " + rId);
-                empRegionMap[rId.toString().trim()] = rReg || "Center 1";
-                empPassMap[rId.toString().trim()] = (rPass || "12345").toString().trim();
+    async function tryLocalRiderLogin(username, pass) {
+      let localMap = Object.assign({}, empMap);
+      let localRegMap = Object.assign({}, empRegionMap);
+      let localPassMap = Object.assign({}, empPassMap);
+
+      let savedRaw = localStorage.getItem('hs_erp_custom_riders_list');
+      if (savedRaw) {
+        try {
+          let savedList = JSON.parse(savedRaw);
+          savedList.forEach(rd => {
+            let [rName, rId, rReg, rPass] = rd;
+            if (rId) {
+              let key = rId.toString().trim();
+              localMap[key] = rName || ("Employee " + key);
+              localRegMap[key] = rReg || "Center 1";
+              localPassMap[key] = (rPass || "12345").toString().trim();
+            }
+          });
+        } catch (err) { console.error(err); }
+      }
+
+      // If no rider map is loaded yet (e.g. fresh incognito window), try fetching via GET
+      if (Object.keys(localMap).length === 0) {
+        try {
+          const gRes = await fetch(SCRIPT_URL + "?t=" + Date.now(), { method: "GET", redirect: "follow" });
+          const gData = await gRes.json();
+          const eRows = gData.employees || [];
+          if (eRows.length > 1) {
+            let eh = eRows[0].map(h => h ? h.toString().trim().toLowerCase() : "");
+            let idIdx = eh.findIndex(h => ["id", "emp id", "empid", "employee id", "employeeid", "rider id"].includes(h));
+            let nameIdx = eh.findIndex(h => ["name", "emp name", "empname", "employee name", "rider name"].includes(h));
+            let regIdx = eh.findIndex(h => ["region", "area", "center"].includes(h));
+            let passIdx = eh.findIndex(h => ["password", "pass"].includes(h));
+            if (idIdx === -1) idIdx = 1;
+            if (nameIdx === -1) nameIdx = 0;
+            if (regIdx === -1) regIdx = 2;
+            if (passIdx === -1) passIdx = 3;
+            for (let i = 1; i < eRows.length; i++) {
+              let r = eRows[i];
+              if (!r) continue;
+              let rid = r[idIdx] ? r[idIdx].toString().trim() : "";
+              if (rid) {
+                localMap[rid] = r[nameIdx] ? toTitleCase(r[nameIdx]) : ("Employee " + rid);
+                localRegMap[rid] = r[regIdx] ? cleanRegion(r[regIdx]) : "Center 1";
+                localPassMap[rid] = r[passIdx] ? r[passIdx].toString().trim() : "12345";
               }
-            });
-          } catch (err) { console.error(err); }
+            }
+          }
+        } catch (getErr) {
+          console.error("GET fallback failed:", getErr);
         }
       }
-      let matchedId = Object.keys(empMap).find(k => k.toLowerCase() === username.toLowerCase());
+
+      let matchedId = Object.keys(localMap).find(k => k.toLowerCase() === username.toLowerCase());
       if (matchedId) {
-        let expectedPass = (empPassMap[matchedId] || "12345").toString().trim();
+        let expectedPass = (localPassMap[matchedId] || "12345").toString().trim();
         if (pass === expectedPass) {
           return {
             status: "success",
             role: "employee",
             id: matchedId,
-            name: empMap[matchedId],
-            region: empRegionMap[matchedId] || "Center 1"
+            name: localMap[matchedId],
+            region: localRegMap[matchedId] || "Center 1"
           };
         }
       }
@@ -901,7 +935,7 @@
           }
           loadDataAndInitSession();
         } else {
-          let localMatch = tryLocalRiderLogin(username, pass);
+          let localMatch = await tryLocalRiderLogin(username, pass);
           if (localMatch) {
             localStorage.setItem('erp_role', localMatch.role);
             localStorage.setItem('logged_id', localMatch.id);
@@ -914,7 +948,7 @@
         }
       } catch (e) {
         // Fallback when Apps Script POST fetch fails with TypeError: Failed to fetch
-        let localMatch = tryLocalRiderLogin(username, pass);
+        let localMatch = await tryLocalRiderLogin(username, pass);
         hideLoader();
         if (localMatch) {
           localStorage.setItem('erp_role', localMatch.role);
