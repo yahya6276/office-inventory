@@ -1022,26 +1022,35 @@
 
     async function postToAppsScript(payloadObj) {
       const payloadStr = JSON.stringify(payloadObj);
+      const runWithTimeout = (promise, ms = 12000) => {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Request timeout")), ms))
+        ]);
+      };
+
       try {
-        const res = await fetch(SCRIPT_URL, {
+        const res = await runWithTimeout(fetch(SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: payloadStr,
           redirect: "follow"
-        });
+        }), 12000);
         const text = await res.text();
         try {
           return { ok: true, data: JSON.parse(text), mode: "cors" };
         } catch (_e) {
           return { ok: res.ok, data: { status: res.ok ? "success" : "error" }, mode: "cors" };
         }
-      } catch (err) {
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: payloadStr
-        });
+      } catch (_err) {
+        try {
+          await runWithTimeout(fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: payloadStr
+          }), 8000);
+        } catch (_noCorsErr) {}
         return { ok: true, data: { status: "success", opaque: true }, mode: "no-cors" };
       }
     }
@@ -1146,20 +1155,22 @@
       listArr.push([empName, empId, region, password, email]);
       localStorage.setItem('hs_erp_custom_riders_list', JSON.stringify(listArr));
 
-      await postToAppsScript({
-        type: "add_employee",
-        empId,
-        empName,
-        region,
-        email,
-        password
-      });
-
-      pendingOtpState.create = null;
-      document.getElementById('loginUser').value = empId;
-      document.getElementById('loginPassword').value = password;
-      closeCreateLoginModal();
-      hideLoader();
+      try {
+        await postToAppsScript({
+          type: "add_employee",
+          empId,
+          empName,
+          region,
+          email,
+          password
+        });
+      } finally {
+        pendingOtpState.create = null;
+        document.getElementById('loginUser').value = empId;
+        document.getElementById('loginPassword').value = password;
+        closeCreateLoginModal();
+        hideLoader();
+      }
       alert(`✅ OTP تصدیق اور پاسورڈ کنفرمیشن مکمل!\nنیا لاگ ان بن گیا ہے:\nEmployee ID: ${empId}`);
     }
 
@@ -1342,16 +1353,19 @@
         localStorage.setItem('hs_erp_custom_riders_list', JSON.stringify(listArr));
       }
 
-      await postToAppsScript({
-        type: "edit_employee",
-        empId: targetId,
-        empName: empMap[targetId] || ("Employee " + targetId),
-        region: empRegionMap[targetId] || "Center 1",
-        email: activeEmail,
-        password: newPass
-      });
-      pendingOtpState.recover = null;
-      hideLoader();
+      try {
+        await postToAppsScript({
+          type: "edit_employee",
+          empId: targetId,
+          empName: empMap[targetId] || ("Employee " + targetId),
+          region: empRegionMap[targetId] || "Center 1",
+          email: activeEmail,
+          password: newPass
+        });
+      } finally {
+        pendingOtpState.recover = null;
+        hideLoader();
+      }
 
       document.getElementById('loginUser').value = targetId;
       document.getElementById('loginPassword').value = newPass;
