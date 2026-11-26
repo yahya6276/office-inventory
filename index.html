@@ -771,7 +771,7 @@
     </div>
   </div>
 
-  <!-- 13. Recover Password Modal (6-Digit Email OTP + 2x New Password) -->
+  <!-- 13. Recover Password Modal (Separate Employee ID + Fresh Email ID + 6-Digit OTP + 2x New Password) -->
   <div id="recoverPasswordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
@@ -780,14 +780,21 @@
       </div>
       <div class="p-5 space-y-3.5 max-h-[82vh] overflow-y-auto">
         <div id="recoverPwdResult" class="hidden text-xs font-bold p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-950 space-y-1"></div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID یا Email ID</label>
-          <div class="flex gap-2">
-            <input type="text" id="recoverIdentifierInput" placeholder="Enter Employee ID or Email ID..." class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
-            <button type="button" onclick="sendRecoverPasswordOtp()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-2 rounded-xl text-xs whitespace-nowrap transition">
-              📩 Send OTP
-            </button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID (کس کا اکاؤنٹ)</label>
+            <input type="text" id="recoverEmpIdInput" oninput="previewRecoverEmployee()" placeholder="e.g. 1119" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
           </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Email ID (نئی/فریش ای میل)</label>
+            <input type="email" id="recoverEmailInput" placeholder="fresh@example.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
+          </div>
+        </div>
+        <div class="flex items-center justify-between gap-2 bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl">
+          <span id="recoverTargetPreview" class="text-xs font-bold text-slate-700">Employee ID درج کریں تاکہ نام اور اکاؤنٹ واضح ہو۔</span>
+          <button type="button" onclick="sendRecoverPasswordOtp()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-2 rounded-xl text-xs whitespace-nowrap transition shrink-0">
+            📩 Send OTP
+          </button>
         </div>
         <div class="bg-sky-50 border border-sky-200 p-3 rounded-xl space-y-1.5">
           <label class="block text-xs font-bold text-sky-900">6-Digit Email OTP</label>
@@ -1156,16 +1163,39 @@
       alert(`✅ OTP تصدیق اور پاسورڈ کنفرمیشن مکمل!\nنیا لاگ ان بن گیا ہے:\nEmployee ID: ${empId}`);
     }
 
+    function previewRecoverEmployee() {
+      const empInput = document.getElementById('recoverEmpIdInput').value.trim().toLowerCase();
+      const prevEl = document.getElementById('recoverTargetPreview');
+      if (!empInput) {
+        prevEl.innerText = "Employee ID درج کریں تاکہ نام اور اکاؤنٹ واضح ہو۔";
+        return;
+      }
+      const matchedId = Object.keys(empMap).find(id => id.toLowerCase() === empInput);
+      if (matchedId) {
+        const nm = empMap[matchedId] || ("Employee " + matchedId);
+        const reg = empRegionMap[matchedId] || "Center 1";
+        prevEl.innerHTML = `Account: <strong class="text-sky-800">${nm}</strong> (ID: <strong>${matchedId}</strong> • ${reg})`;
+        const emInput = document.getElementById('recoverEmailInput');
+        if (emInput && !emInput.value.trim() && empEmailMap[matchedId]) {
+          emInput.value = empEmailMap[matchedId];
+        }
+      } else {
+        prevEl.innerHTML = `Target Employee ID: <strong class="text-indigo-700">${document.getElementById('recoverEmpIdInput').value.trim()}</strong>`;
+      }
+    }
+
     function openRecoverPasswordModal() {
       pendingOtpState.recover = null;
       const box = document.getElementById('recoverPwdResult');
       box.classList.add('hidden');
       box.innerHTML = "";
-      document.getElementById('recoverIdentifierInput').value = document.getElementById('loginUser').value.trim();
+      document.getElementById('recoverEmpIdInput').value = document.getElementById('loginUser').value.trim();
+      document.getElementById('recoverEmailInput').value = "";
       document.getElementById('recoverOtpInput').value = "";
-      document.getElementById('recoverOtpHint').innerText = "Employee ID یا Email ID لکھ کر 'Send OTP' دبائیں۔";
+      document.getElementById('recoverOtpHint').innerText = "Employee ID اور Email ID لکھ کر 'Send OTP' دبائیں۔";
       document.getElementById('recoverNewPasswordInput').value = "";
       document.getElementById('recoverConfirmPasswordInput').value = "";
+      previewRecoverEmployee();
       document.getElementById('recoverPasswordModal').classList.remove('hidden');
     }
     function closeRecoverPasswordModal() { document.getElementById('recoverPasswordModal').classList.add('hidden'); }
@@ -1203,54 +1233,73 @@
     }
 
     async function sendRecoverPasswordOtp() {
-      const rawIdent = document.getElementById('recoverIdentifierInput').value.trim();
-      const ident = rawIdent.toLowerCase();
+      const rawEmpId = document.getElementById('recoverEmpIdInput').value.trim();
+      const rawEmail = document.getElementById('recoverEmailInput').value.trim();
       const box = document.getElementById('recoverPwdResult');
-      if (!ident) { alert("Employee ID یا Email ID درج کریں۔"); return; }
 
-      showLoader("Finding Account & Sending 6-Digit OTP...");
+      if (!rawEmpId) {
+        alert("براہ کرم Employee ID درج کریں تاکہ معلوم ہو کس کا پاسورڈ ریکور ہو رہا ہے۔");
+        return;
+      }
+
+      showLoader("Checking Employee & Sending 6-Digit OTP...");
       await ensureEmployeesLoadedForRecovery();
+      previewRecoverEmployee();
 
-      let foundId = Object.keys(empMap).find(id =>
-        id.toLowerCase() === ident || (empEmailMap[id] && empEmailMap[id].toLowerCase() === ident)
-      );
+      let foundId = Object.keys(empMap).find(id => id.toLowerCase() === rawEmpId.toLowerCase());
+      let targetId = foundId || rawEmpId;
+      let targetEmail = rawEmail || (foundId ? (empEmailMap[foundId] || "") : "");
 
-      let targetEmail = foundId ? (empEmailMap[foundId] || "") : (ident.includes("@") ? rawIdent : "");
       if (!targetEmail || !targetEmail.includes("@")) {
         hideLoader();
         box.className = "text-xs font-bold p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800";
-        box.innerText = "اس اکاؤنٹ کے ساتھ کوئی Email ID رجسٹرڈ نہیں ہے۔ براہ کرم اپنا Email ID درج کریں۔";
+        box.innerText = "براہ کرم درست Email ID درج کریں جس پر 6-digit OTP بھیجا جائے۔";
         box.classList.remove('hidden');
         return;
       }
 
-      const targetId = foundId || rawIdent;
+      const empLabel = empMap[targetId] ? `${empMap[targetId]} (${targetId})` : `Employee ID: ${targetId}`;
       const otp = generateSixDigitOtp();
-      pendingOtpState.recover = { targetId, email: targetEmail.toLowerCase(), otp, expiresAt: Date.now() + 10 * 60 * 1000 };
+      pendingOtpState.recover = {
+        targetId,
+        empLabel,
+        email: targetEmail.toLowerCase(),
+        otp,
+        expiresAt: Date.now() + 10 * 60 * 1000
+      };
 
       await postToAppsScript({ type: "send_otp", purpose: "recover_password", email: targetEmail, empId: targetId, otp });
       hideLoader();
 
       box.className = "text-xs font-bold p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950";
-      box.innerText = `📩 6-Digit OTP (${targetEmail}) پر بھیج دیا گیا ہے۔ OTP اور نیا پاسورڈ 2 بار لکھ کر ری سیٹ کریں۔`;
+      box.innerText = `📩 ${empLabel} کے لیے 6-Digit OTP (${targetEmail}) پر بھیج دیا گیا ہے۔ OTP اور نیا پاسورڈ 2 بار لکھ کر ری سیٹ کریں۔`;
       box.classList.remove('hidden');
-      document.getElementById('recoverOtpHint').innerText = `OTP بھیجا گیا: ${targetEmail}`;
+      document.getElementById('recoverOtpHint').innerText = `Account: ${empLabel} → Email: ${targetEmail}`;
     }
 
     async function handleRecoverPasswordReset() {
-      const rawIdent = document.getElementById('recoverIdentifierInput').value.trim();
-      const ident = rawIdent.toLowerCase();
+      const rawEmpId = document.getElementById('recoverEmpIdInput').value.trim();
+      const rawEmail = document.getElementById('recoverEmailInput').value.trim();
       const otpEntered = document.getElementById('recoverOtpInput').value.trim();
       const newPass = document.getElementById('recoverNewPasswordInput').value.trim();
       const confirmPass = document.getElementById('recoverConfirmPasswordInput').value.trim();
       const box = document.getElementById('recoverPwdResult');
 
-      if (!ident) { alert("Employee ID یا Email ID درج کریں۔"); return; }
+      if (!rawEmpId) {
+        alert("براہ کرم Employee ID درج کریں۔");
+        return;
+      }
 
       const st = pendingOtpState.recover;
-      if (!st || Date.now() > st.expiresAt || (st.targetId.toLowerCase() !== ident && st.email !== ident)) {
+      if (!st || Date.now() > st.expiresAt || st.targetId.toLowerCase() !== rawEmpId.toLowerCase()) {
         box.className = "text-xs font-bold p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800";
-        box.innerText = "پہلے 'Send OTP' دبا کر ای میل پر 6-digit OTP منگوائیں۔";
+        box.innerText = "پہلے Employee ID اور Email ID لکھ کر 'Send OTP' دبائیں۔";
+        box.classList.remove('hidden');
+        return;
+      }
+      if (rawEmail && rawEmail.toLowerCase() !== st.email) {
+        box.className = "text-xs font-bold p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800";
+        box.innerText = "Email ID تبدیل کر دی گئی ہے! براہ کرم نئی Email ID پر دوبارہ 'Send OTP' دبائیں۔";
         box.classList.remove('hidden');
         return;
       }
@@ -1275,29 +1324,39 @@
 
       showLoader("Updating Password & Syncing To Sheet...");
       await ensureEmployeesLoadedForRecovery();
-      let foundId = Object.keys(empMap).find(id =>
-        id.toLowerCase() === ident || (empEmailMap[id] && empEmailMap[id].toLowerCase() === ident)
-      );
-      let targetId = foundId || st.targetId || rawIdent;
+      let foundId = Object.keys(empMap).find(id => id.toLowerCase() === rawEmpId.toLowerCase());
+      let targetId = foundId || st.targetId || rawEmpId;
+      let activeEmail = rawEmail || st.email;
       empPassMap[targetId] = newPass;
+      if (activeEmail) empEmailMap[targetId] = activeEmail;
 
       let listRaw = localStorage.getItem('hs_erp_custom_riders_list');
       if (listRaw) {
         let listArr = JSON.parse(listRaw).map(rd => {
-          if (String(rd[1]).trim().toLowerCase() === targetId.toLowerCase()) rd[3] = newPass;
+          if (String(rd[1]).trim().toLowerCase() === targetId.toLowerCase()) {
+            rd[3] = newPass;
+            if (activeEmail) rd[4] = activeEmail;
+          }
           return rd;
         });
         localStorage.setItem('hs_erp_custom_riders_list', JSON.stringify(listArr));
       }
 
-      await postToAppsScript({ type: "update_password", empId: targetId, newPassword: newPass });
+      await postToAppsScript({
+        type: "edit_employee",
+        empId: targetId,
+        empName: empMap[targetId] || ("Employee " + targetId),
+        region: empRegionMap[targetId] || "Center 1",
+        email: activeEmail,
+        password: newPass
+      });
       pendingOtpState.recover = null;
       hideLoader();
 
       document.getElementById('loginUser').value = targetId;
       document.getElementById('loginPassword').value = newPass;
       box.className = "text-xs font-bold p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-950";
-      box.innerText = `✅ OTP تصدیق کے بعد ID '${targetId}' کا نیا پاسورڈ محفوظ اور شیٹ میں سنک کر دیا گیا ہے۔`;
+      box.innerText = `✅ OTP تصدیق کے بعد ${st.empLabel} کا نیا پاسورڈ محفوظ اور شیٹ میں سنک کر دیا گیا ہے۔`;
       box.classList.remove('hidden');
     }
 
