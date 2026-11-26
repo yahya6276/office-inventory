@@ -713,71 +713,100 @@
   </div>
 
   
-  <!-- 12. Create New Login Modal (Emp ID, Name, Region, Email ID) -->
-  <div id="createLoginModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+  <!-- 12. Create New Login Modal (Emp ID, Name, Region, Email ID + 6-Digit OTP + 2x Password) -->
+  <div id="createLoginModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
-        <h3 class="font-bold text-lg">➕ Create New Login</h3>
+        <h3 class="font-bold text-lg">➕ Create New Login (Email OTP)</h3>
         <button onclick="closeCreateLoginModal()" class="text-white font-bold px-2 py-1">✕</button>
       </div>
-      <div class="p-6 space-y-4">
+      <div class="p-5 space-y-3.5 max-h-[82vh] overflow-y-auto">
         <div id="createLoginMsg" class="hidden text-xs font-bold p-3 rounded-xl"></div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID</label>
-          <input type="text" id="newLoginEmpId" placeholder="e.g. 245 or EMP-101" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID</label>
+            <input type="text" id="newLoginEmpId" placeholder="e.g. 245" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Region</label>
+            <select id="newLoginRegion" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+              <option value="Center 1">Center 1</option><option value="Center 2">Center 2</option>
+              <option value="South 1">South 1</option><option value="South 2">South 2</option>
+              <option value="North 1">North 1</option><option value="North 2">North 2</option>
+            </select>
+          </div>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
-          <input type="text" id="newLoginName" placeholder="Enter Full Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Region</label>
-          <select id="newLoginRegion" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
-            <option value="Center 1">Center 1</option><option value="Center 2">Center 2</option>
-            <option value="South 1">South 1</option><option value="South 2">South 2</option>
-            <option value="North 1">North 1</option><option value="North 2">North 2</option>
-          </select>
+          <input type="text" id="newLoginName" placeholder="Enter Full Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Email ID</label>
-          <input type="email" id="newLoginEmail" placeholder="name@example.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+          <div class="flex gap-2">
+            <input type="email" id="newLoginEmail" placeholder="name@example.com" class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+            <button type="button" onclick="sendCreateLoginOtp()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-2 rounded-xl text-xs whitespace-nowrap transition">
+              📩 Send OTP
+            </button>
+          </div>
         </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Password</label>
-          <input type="text" id="newLoginPassword" value="12345" placeholder="Set Password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold text-sky-700">
+        <div id="createOtpSection" class="bg-sky-50 border border-sky-200 p-3 rounded-xl space-y-1.5">
+          <label class="block text-xs font-bold text-sky-900">6-Digit Email OTP</label>
+          <input type="text" id="newLoginOtpInput" maxlength="6" inputmode="numeric" placeholder="Enter 6-digit OTP..." class="w-full bg-white border border-sky-300 rounded-xl px-3 py-2 text-sm font-black tracking-widest text-center text-sky-900">
+          <p id="createOtpHint" class="text-[11px] text-sky-700"></p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">New Password</label>
+            <input type="password" id="newLoginPassword" placeholder="Enter password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold text-sky-700">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Confirm Password (2nd Time)</label>
+            <input type="password" id="newLoginConfirmPassword" placeholder="Re-enter password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold text-emerald-700">
+          </div>
         </div>
         <button onclick="submitCreateNewLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">
-          ✅ Create Login & Sync To Sheet
+          ✅ Verify OTP & Create Login
         </button>
       </div>
     </div>
   </div>
 
-  <!-- 13. Recover Password Modal -->
-  <div id="recoverPasswordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+  <!-- 13. Recover Password Modal (6-Digit Email OTP + 2x New Password) -->
+  <div id="recoverPasswordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
-        <h3 class="font-bold text-lg">🔄 Recover Password</h3>
+        <h3 class="font-bold text-lg">🔄 Recover Password (Email OTP)</h3>
         <button onclick="closeRecoverPasswordModal()" class="text-white font-bold px-2 py-1">✕</button>
       </div>
-      <div class="p-6 space-y-4">
+      <div class="p-5 space-y-3.5 max-h-[82vh] overflow-y-auto">
         <div id="recoverPwdResult" class="hidden text-xs font-bold p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-950 space-y-1"></div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID یا Email ID</label>
-          <input type="text" id="recoverIdentifierInput" placeholder="Enter Employee ID or Email ID..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm font-bold">
+          <div class="flex gap-2">
+            <input type="text" id="recoverIdentifierInput" placeholder="Enter Employee ID or Email ID..." class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
+            <button type="button" onclick="sendRecoverPasswordOtp()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-2 rounded-xl text-xs whitespace-nowrap transition">
+              📩 Send OTP
+            </button>
+          </div>
         </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">New Password (اگر نیا پاسورڈ سیٹ کرنا ہو)</label>
-          <input type="text" id="recoverNewPasswordInput" placeholder="Optional: enter new password to reset..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+        <div class="bg-sky-50 border border-sky-200 p-3 rounded-xl space-y-1.5">
+          <label class="block text-xs font-bold text-sky-900">6-Digit Email OTP</label>
+          <input type="text" id="recoverOtpInput" maxlength="6" inputmode="numeric" placeholder="Enter 6-digit OTP..." class="w-full bg-white border border-sky-300 rounded-xl px-3 py-2 text-sm font-black tracking-widest text-center text-sky-900">
+          <p id="recoverOtpHint" class="text-[11px] text-sky-700"></p>
         </div>
-        <div class="grid grid-cols-2 gap-2.5">
-          <button onclick="handleRecoverPasswordLookup()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
-            🔍 Find Password
-          </button>
-          <button onclick="handleRecoverPasswordReset()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
-            💾 Reset & Sync Sheet
-          </button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">New Password</label>
+            <input type="password" id="recoverNewPasswordInput" placeholder="Enter new password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Confirm New Password (2nd Time)</label>
+            <input type="password" id="recoverConfirmPasswordInput" placeholder="Re-enter new password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
+          </div>
         </div>
+        <button onclick="handleRecoverPasswordReset()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">
+          💾 Verify OTP & Save New Password
+        </button>
       </div>
     </div>
   </div>
@@ -1010,28 +1039,90 @@
       }
     }
 
+    let pendingOtpState = { create: null, recover: null };
+
+    function generateSixDigitOtp() {
+      return String(Math.floor(100000 + Math.random() * 900000));
+    }
+
     function openCreateLoginModal() {
+      pendingOtpState.create = null;
       document.getElementById('createLoginMsg').classList.add('hidden');
       document.getElementById('newLoginEmpId').value = "";
       document.getElementById('newLoginName').value = "";
       document.getElementById('newLoginRegion').value = "Center 1";
       document.getElementById('newLoginEmail').value = "";
-      document.getElementById('newLoginPassword').value = "12345";
+      document.getElementById('newLoginOtpInput').value = "";
+      document.getElementById('createOtpHint').innerText = "Email ID لکھ کر 'Send OTP' دبائیں تاکہ 6-digit کوڈ ای میل پر بھیجا جائے۔";
+      document.getElementById('newLoginPassword').value = "";
+      document.getElementById('newLoginConfirmPassword').value = "";
       document.getElementById('createLoginModal').classList.remove('hidden');
     }
     function closeCreateLoginModal() { document.getElementById('createLoginModal').classList.add('hidden'); }
+
+    async function sendCreateLoginOtp() {
+      const email = document.getElementById('newLoginEmail').value.trim();
+      const empId = document.getElementById('newLoginEmpId').value.trim();
+      const msgBox = document.getElementById('createLoginMsg');
+      if (!email || !email.includes("@")) {
+        msgBox.className = "text-xs font-bold p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700";
+        msgBox.innerText = "براہ کرم درست Email ID درج کریں۔";
+        msgBox.classList.remove('hidden');
+        return;
+      }
+      const otp = generateSixDigitOtp();
+      pendingOtpState.create = { email: email.toLowerCase(), otp, expiresAt: Date.now() + 10 * 60 * 1000 };
+      showLoader("Sending 6-Digit OTP To Email...");
+      const res = await postToAppsScript({ type: "send_otp", purpose: "create_login", email, empId, otp });
+      hideLoader();
+
+      msgBox.className = "text-xs font-bold p-3 rounded-xl bg-sky-50 border border-sky-200 text-sky-900";
+      msgBox.innerText = `📩 6-Digit OTP (${email}) پر بھیج دیا گیا ہے۔ کوڈ درج کر کے پاسورڈ 2 بار لکھیں۔`;
+      msgBox.classList.remove('hidden');
+      document.getElementById('createOtpHint').innerText =
+        (res && res.mode === "no-cors")
+          ? "OTP بھیج دیا گیا ہے (اگر Apps Script میں MailApp سیٹ ہے تو ان باکس/اسپیم چیک کریں)۔"
+          : "OTP بھیج دیا گیا ہے، 10 منٹ کے اندر 6 ہندسوں کا کوڈ درج کریں۔";
+    }
 
     async function submitCreateNewLogin() {
       const empId = document.getElementById('newLoginEmpId').value.trim();
       const empName = toTitleCase(document.getElementById('newLoginName').value.trim());
       const region = cleanRegion(document.getElementById('newLoginRegion').value);
       const email = document.getElementById('newLoginEmail').value.trim();
-      const password = document.getElementById('newLoginPassword').value.trim() || "12345";
+      const otpEntered = document.getElementById('newLoginOtpInput').value.trim();
+      const password = document.getElementById('newLoginPassword').value.trim();
+      const confirmPassword = document.getElementById('newLoginConfirmPassword').value.trim();
       const msgBox = document.getElementById('createLoginMsg');
 
       if (!empId || !empName || !email) {
         msgBox.className = "text-xs font-bold p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700";
         msgBox.innerText = "براہ کرم Employee ID، Name اور Email ID درج کریں۔";
+        msgBox.classList.remove('hidden');
+        return;
+      }
+      const st = pendingOtpState.create;
+      if (!st || st.email !== email.toLowerCase() || Date.now() > st.expiresAt) {
+        msgBox.className = "text-xs font-bold p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700";
+        msgBox.innerText = "پہلے 'Send OTP' دبا کر اس Email ID پر 6-digit OTP حاصل کریں۔";
+        msgBox.classList.remove('hidden');
+        return;
+      }
+      if (!/^\d{6}$/.test(otpEntered) || otpEntered !== st.otp) {
+        msgBox.className = "text-xs font-bold p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700";
+        msgBox.innerText = "غلط یا نامکمل 6-digit OTP! درست 6 ہندسوں کا کوڈ درج کریں۔";
+        msgBox.classList.remove('hidden');
+        return;
+      }
+      if (!password || !confirmPassword) {
+        msgBox.className = "text-xs font-bold p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700";
+        msgBox.innerText = "براہ کرم Password دونوں خانوں میں لکھیں۔";
+        msgBox.classList.remove('hidden');
+        return;
+      }
+      if (password !== confirmPassword) {
+        msgBox.className = "text-xs font-bold p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700";
+        msgBox.innerText = "دونوں پاسورڈ آپس میں میچ نہیں کر رہے! دوبارہ چیک کریں۔";
         msgBox.classList.remove('hidden');
         return;
       }
@@ -1057,17 +1148,24 @@
         password
       });
 
+      pendingOtpState.create = null;
       document.getElementById('loginUser').value = empId;
       document.getElementById('loginPassword').value = password;
       closeCreateLoginModal();
       hideLoader();
-      alert(`✅ نیا لاگ ان بن گیا ہے!\nEmployee ID: ${empId}\nPassword: ${password}\nڈیٹا شیٹ میں سنک کر دیا گیا ہے۔`);
+      alert(`✅ OTP تصدیق اور پاسورڈ کنفرمیشن مکمل!\nنیا لاگ ان بن گیا ہے:\nEmployee ID: ${empId}`);
     }
 
     function openRecoverPasswordModal() {
-      document.getElementById('recoverPwdResult').classList.add('hidden');
+      pendingOtpState.recover = null;
+      const box = document.getElementById('recoverPwdResult');
+      box.classList.add('hidden');
+      box.innerHTML = "";
       document.getElementById('recoverIdentifierInput').value = document.getElementById('loginUser').value.trim();
+      document.getElementById('recoverOtpInput').value = "";
+      document.getElementById('recoverOtpHint').innerText = "Employee ID یا Email ID لکھ کر 'Send OTP' دبائیں۔";
       document.getElementById('recoverNewPasswordInput').value = "";
+      document.getElementById('recoverConfirmPasswordInput').value = "";
       document.getElementById('recoverPasswordModal').classList.remove('hidden');
     }
     function closeRecoverPasswordModal() { document.getElementById('recoverPasswordModal').classList.add('hidden'); }
@@ -1104,50 +1202,83 @@
       } catch (e) { console.error(e); }
     }
 
-    async function handleRecoverPasswordLookup() {
-      const ident = document.getElementById('recoverIdentifierInput').value.trim().toLowerCase();
+    async function sendRecoverPasswordOtp() {
+      const rawIdent = document.getElementById('recoverIdentifierInput').value.trim();
+      const ident = rawIdent.toLowerCase();
       const box = document.getElementById('recoverPwdResult');
       if (!ident) { alert("Employee ID یا Email ID درج کریں۔"); return; }
-      showLoader("Searching Account...");
+
+      showLoader("Finding Account & Sending 6-Digit OTP...");
       await ensureEmployeesLoadedForRecovery();
-      hideLoader();
 
       let foundId = Object.keys(empMap).find(id =>
         id.toLowerCase() === ident || (empEmailMap[id] && empEmailMap[id].toLowerCase() === ident)
       );
 
-      if (foundId) {
-        let pwd = empPassMap[foundId] || "12345";
-        let nm = empMap[foundId] || ("Employee " + foundId);
-        let em = empEmailMap[foundId] || "Not Set";
-        box.className = "text-xs font-bold p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950 space-y-1";
-        box.innerHTML = `
-          <div>Name: <strong>${nm}</strong> (${foundId})</div>
-          <div>Email: <strong>${em}</strong></div>
-          <div>Current Password: <span class="text-sky-700 font-black">${pwd}</span></div>
-        `;
-        box.classList.remove('hidden');
-        document.getElementById('loginUser').value = foundId;
-        document.getElementById('loginPassword').value = pwd;
-      } else {
+      let targetEmail = foundId ? (empEmailMap[foundId] || "") : (ident.includes("@") ? rawIdent : "");
+      if (!targetEmail || !targetEmail.includes("@")) {
+        hideLoader();
         box.className = "text-xs font-bold p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800";
-        box.innerText = "اس Employee ID یا Email ID کے لیے کوئی اکاؤنٹ نہیں ملا۔ آپ 'Create New Login' سے نیا اکاؤنٹ بنا سکتے ہیں۔";
+        box.innerText = "اس اکاؤنٹ کے ساتھ کوئی Email ID رجسٹرڈ نہیں ہے۔ براہ کرم اپنا Email ID درج کریں۔";
         box.classList.remove('hidden');
+        return;
       }
+
+      const targetId = foundId || rawIdent;
+      const otp = generateSixDigitOtp();
+      pendingOtpState.recover = { targetId, email: targetEmail.toLowerCase(), otp, expiresAt: Date.now() + 10 * 60 * 1000 };
+
+      await postToAppsScript({ type: "send_otp", purpose: "recover_password", email: targetEmail, empId: targetId, otp });
+      hideLoader();
+
+      box.className = "text-xs font-bold p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-950";
+      box.innerText = `📩 6-Digit OTP (${targetEmail}) پر بھیج دیا گیا ہے۔ OTP اور نیا پاسورڈ 2 بار لکھ کر ری سیٹ کریں۔`;
+      box.classList.remove('hidden');
+      document.getElementById('recoverOtpHint').innerText = `OTP بھیجا گیا: ${targetEmail}`;
     }
 
     async function handleRecoverPasswordReset() {
-      const ident = document.getElementById('recoverIdentifierInput').value.trim().toLowerCase();
+      const rawIdent = document.getElementById('recoverIdentifierInput').value.trim();
+      const ident = rawIdent.toLowerCase();
+      const otpEntered = document.getElementById('recoverOtpInput').value.trim();
       const newPass = document.getElementById('recoverNewPasswordInput').value.trim();
+      const confirmPass = document.getElementById('recoverConfirmPasswordInput').value.trim();
       const box = document.getElementById('recoverPwdResult');
-      if (!ident || !newPass) { alert("Employee ID / Email ID اور New Password دونوں درج کریں۔"); return; }
+
+      if (!ident) { alert("Employee ID یا Email ID درج کریں۔"); return; }
+
+      const st = pendingOtpState.recover;
+      if (!st || Date.now() > st.expiresAt || (st.targetId.toLowerCase() !== ident && st.email !== ident)) {
+        box.className = "text-xs font-bold p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800";
+        box.innerText = "پہلے 'Send OTP' دبا کر ای میل پر 6-digit OTP منگوائیں۔";
+        box.classList.remove('hidden');
+        return;
+      }
+      if (!/^\d{6}$/.test(otpEntered) || otpEntered !== st.otp) {
+        box.className = "text-xs font-bold p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800";
+        box.innerText = "غلط یا نامکمل 6-digit OTP! ای میل والا درست 6 ہندسوں کا کوڈ لکھیں۔";
+        box.classList.remove('hidden');
+        return;
+      }
+      if (!newPass || !confirmPass) {
+        box.className = "text-xs font-bold p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800";
+        box.innerText = "نیا پاسورڈ دونوں خانوں میں لکھنا لازمی ہے۔";
+        box.classList.remove('hidden');
+        return;
+      }
+      if (newPass !== confirmPass) {
+        box.className = "text-xs font-bold p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800";
+        box.innerText = "نیا پاسورڈ اور کنفرم پاسورڈ آپس میں میچ نہیں کر رہے!";
+        box.classList.remove('hidden');
+        return;
+      }
 
       showLoader("Updating Password & Syncing To Sheet...");
       await ensureEmployeesLoadedForRecovery();
       let foundId = Object.keys(empMap).find(id =>
         id.toLowerCase() === ident || (empEmailMap[id] && empEmailMap[id].toLowerCase() === ident)
       );
-      let targetId = foundId || document.getElementById('recoverIdentifierInput').value.trim();
+      let targetId = foundId || st.targetId || rawIdent;
       empPassMap[targetId] = newPass;
 
       let listRaw = localStorage.getItem('hs_erp_custom_riders_list');
@@ -1160,12 +1291,13 @@
       }
 
       await postToAppsScript({ type: "update_password", empId: targetId, newPassword: newPass });
+      pendingOtpState.recover = null;
       hideLoader();
 
       document.getElementById('loginUser').value = targetId;
       document.getElementById('loginPassword').value = newPass;
       box.className = "text-xs font-bold p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-950";
-      box.innerText = `✅ ID '${targetId}' کا نیا پاسورڈ '${newPass}' سیٹ اور شیٹ میں سنک کر دیا گیا ہے۔`;
+      box.innerText = `✅ OTP تصدیق کے بعد ID '${targetId}' کا نیا پاسورڈ محفوظ اور شیٹ میں سنک کر دیا گیا ہے۔`;
       box.classList.remove('hidden');
     }
 
