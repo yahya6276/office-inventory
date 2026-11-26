@@ -836,10 +836,46 @@
       else closeSidebar();
     }
 
+    function tryLocalRiderLogin(username, pass) {
+      applyUploadedRidersOverride();
+      // Also hydrate from hs_erp_custom_riders_list if empMap is empty
+      if (Object.keys(empMap).length === 0) {
+        let savedRaw = localStorage.getItem('hs_erp_custom_riders_list');
+        if (savedRaw) {
+          try {
+            let savedList = JSON.parse(savedRaw);
+            savedList.forEach(rd => {
+              let [rName, rId, rReg, rPass] = rd;
+              if (rId) {
+                empMap[rId.toString().trim()] = rName || ("Employee " + rId);
+                empRegionMap[rId.toString().trim()] = rReg || "Center 1";
+                empPassMap[rId.toString().trim()] = (rPass || "12345").toString().trim();
+              }
+            });
+          } catch (err) { console.error(err); }
+        }
+      }
+      let matchedId = Object.keys(empMap).find(k => k.toLowerCase() === username.toLowerCase());
+      if (matchedId) {
+        let expectedPass = (empPassMap[matchedId] || "12345").toString().trim();
+        if (pass === expectedPass) {
+          return {
+            status: "success",
+            role: "employee",
+            id: matchedId,
+            name: empMap[matchedId],
+            region: empRegionMap[matchedId] || "Center 1"
+          };
+        }
+      }
+      return null;
+    }
+
     async function handleLogin() {
       let username = document.getElementById('loginUser').value.trim();
       let pass = document.getElementById('loginPassword').value.trim();
       let errBox = document.getElementById('loginError');
+      errBox.classList.add('hidden');
       if (!username || !pass) { alert("Please Enter Username And Password."); return; }
 
       showLoader("Verifying Credentials...");
@@ -847,7 +883,8 @@
         const res = await fetch(SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ type: "login", username, password: pass })
+          body: JSON.stringify({ type: "login", username, password: pass }),
+          redirect: "follow"
         });
         const result = await res.json();
         hideLoader();
@@ -864,11 +901,30 @@
           }
           loadDataAndInitSession();
         } else {
-          errBox.classList.remove('hidden');
+          let localMatch = tryLocalRiderLogin(username, pass);
+          if (localMatch) {
+            localStorage.setItem('erp_role', localMatch.role);
+            localStorage.setItem('logged_id', localMatch.id);
+            localStorage.setItem('logged_name', toTitleCase(localMatch.name));
+            localStorage.setItem('logged_reg', cleanRegion(localMatch.region));
+            loadDataAndInitSession();
+          } else {
+            errBox.classList.remove('hidden');
+          }
         }
       } catch (e) {
+        // Fallback when Apps Script POST fetch fails with TypeError: Failed to fetch
+        let localMatch = tryLocalRiderLogin(username, pass);
         hideLoader();
-        alert("Login Error: " + e.toString());
+        if (localMatch) {
+          localStorage.setItem('erp_role', localMatch.role);
+          localStorage.setItem('logged_id', localMatch.id);
+          localStorage.setItem('logged_name', toTitleCase(localMatch.name));
+          localStorage.setItem('logged_reg', cleanRegion(localMatch.region));
+          loadDataAndInitSession();
+        } else {
+          alert("Login Error: " + e.toString() + "\n\nاگر آپ نے ابھی Excel یا Edit Rider میں پاسورڈ سیٹ کیا ہے تو Google Apps Script Deployment میں 'Who has access: Anyone' چیک کریں۔");
+        }
       }
     }
 
