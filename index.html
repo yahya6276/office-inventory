@@ -54,10 +54,11 @@
   </div>
 
   <!-- MAIN APPLICATION -->
-  <div id="mainApp" class="hidden min-h-screen flex flex-col lg:flex-row">
+  <div id="mainApp" class="hidden min-h-screen flex flex-col relative">
+    <div id="sidebarBackdrop" onclick="closeSidebar()" class="hidden fixed inset-0 bg-slate-950/40 backdrop-blur-[1px] z-30"></div>
     
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="hidden lg:flex flex-col w-72 bg-slate-900 text-slate-300 min-h-screen p-5 space-y-6 shrink-0 z-30">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 flex flex-col w-72 bg-slate-900 text-slate-300 min-h-screen p-5 space-y-6 shrink-0 z-40 transition-transform duration-200 -translate-x-full shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-4">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-md">HS</div>
@@ -66,7 +67,7 @@
             <p class="text-[11px] text-sky-400 font-semibold">Inventory Control</p>
           </div>
         </div>
-        <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white font-bold">✕</button>
+        <button onclick="closeSidebar()" class="text-slate-400 hover:text-white font-bold px-2 py-1 rounded hover:bg-slate-800">✕</button>
       </div>
 
       <!-- ADMIN NAVIGATION -->
@@ -117,12 +118,12 @@
     </aside>
 
     <!-- CONTENT AREA -->
-    <div class="flex-1 flex flex-col overflow-y-auto max-h-screen" onscroll="checkScroll()">
+    <div id="contentScrollArea" class="w-full min-h-screen flex flex-col overflow-y-auto" onscroll="checkScroll()">
       
       <!-- TOP HEADER -->
       <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20">
         <div class="flex items-center gap-3">
-          <button onclick="toggleSidebar()" class="lg:hidden bg-slate-100 p-2 rounded-lg text-slate-700 font-bold">☰</button>
+          <button onclick="toggleSidebar(event)" class="bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg text-slate-700 font-bold transition">☰ Menu</button>
           <div>
             <h1 id="pageTitle" class="text-xl font-black text-slate-900">Admin Dashboard</h1>
             <p id="syncStatus" class="text-xs text-slate-500 font-medium">Ready</p>
@@ -765,6 +766,16 @@
       document.getElementById('demandDate').valueAsDate = new Date();
       document.getElementById('adminConsDate').valueAsDate = new Date();
 
+      document.addEventListener('click', function(e) {
+        let sb = document.getElementById('sidebar');
+        if (!sb || sb.classList.contains('-translate-x-full')) return;
+        let clickedInsideSidebar = sb.contains(e.target);
+        let clickedMenuBtn = e.target.closest('button[onclick*="toggleSidebar"]');
+        if (!clickedInsideSidebar && !clickedMenuBtn) {
+          closeSidebar();
+        }
+      });
+
       window.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !document.getElementById('loginScreen').classList.contains('hidden')) handleLogin();
         if (e.key === 'Escape') {
@@ -796,11 +807,34 @@
 
     function checkScroll() {
       let btn = document.getElementById('scrollTopBtn');
-      if (window.scrollY > 300 || document.querySelector('.flex-1.flex.flex-col.overflow-y-auto').scrollTop > 300) btn.classList.remove('hidden');
+      let area = document.getElementById('contentScrollArea');
+      if (window.scrollY > 300 || (area && area.scrollTop > 300)) btn.classList.remove('hidden');
       else btn.classList.add('hidden');
     }
-    function scrollToTop() { document.querySelector('.flex-1.flex.flex-col.overflow-y-auto').scrollTo({ top: 0, behavior: 'smooth' }); }
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
+    function scrollToTop() {
+      let area = document.getElementById('contentScrollArea');
+      if (area) area.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function openSidebar() {
+      let sb = document.getElementById('sidebar');
+      let bd = document.getElementById('sidebarBackdrop');
+      if (sb) sb.classList.remove('-translate-x-full');
+      if (bd) bd.classList.remove('hidden');
+    }
+    function closeSidebar() {
+      let sb = document.getElementById('sidebar');
+      let bd = document.getElementById('sidebarBackdrop');
+      if (sb) sb.classList.add('-translate-x-full');
+      if (bd) bd.classList.add('hidden');
+    }
+    function toggleSidebar(e) {
+      if (e) e.stopPropagation();
+      let sb = document.getElementById('sidebar');
+      if (!sb) return;
+      if (sb.classList.contains('-translate-x-full')) openSidebar();
+      else closeSidebar();
+    }
 
     async function handleLogin() {
       let username = document.getElementById('loginUser').value.trim();
@@ -861,6 +895,8 @@
     }
 
     // 1. Live Tab-Switch Refresh (Instant UI switch + immediate background sync)
+    let pendingSync = false;
+
     function switchTab(tab) {
       ['dashboard', 'demandroom', 'requests', 'riders', 'categories', 'issued', 'consumption'].forEach(t => {
         let el = document.getElementById(`tab-${t}`);
@@ -883,6 +919,17 @@
         consumption: "Daily Consumption Records" 
       };
       document.getElementById('pageTitle').innerText = titles[tab] || "HS ERP Portal";
+      closeSidebar();
+
+      // Immediately render current in-memory data so the tab is never blank
+      if (localStorage.getItem('erp_role') === 'admin') {
+        if (tab === 'dashboard') renderDashboard();
+        else if (tab === 'demandroom') renderDemandRoom();
+        else if (tab === 'requests') renderRequests();
+        else if (tab === 'riders') renderRidersTable();
+        else if (tab === 'categories') renderCategoriesTable();
+        else if (tab === 'issued' || tab === 'consumption') renderRawTables();
+      }
 
       loadData(false);
     }
@@ -913,8 +960,12 @@
 
     // 2. Fast Data Sync
     async function loadData(showBlockingLoader = false) {
-      if (isSyncing) return;
+      if (isSyncing) {
+        pendingSync = true;
+        return;
+      }
       isSyncing = true;
+      pendingSync = false;
       const syncEl = document.getElementById('syncStatus');
       if (showBlockingLoader) showLoader("Syncing Live Data...");
       else if (syncEl) syncEl.innerHTML = `<span class="text-sky-600 font-bold">⏳ Refreshing live records...</span>`;
@@ -945,20 +996,53 @@
 
         empMap = {}; empRegionMap = {}; empPassMap = {};
         if (rawEmployees.length > 1) {
+          let eh = rawEmployees[0].map(h => h ? h.toString().trim().toLowerCase() : "");
+          let idIdx = eh.findIndex(h => h === "id" || h === "emp id" || h === "empid" || h === "employee id" || h === "employeeid" || h === "rider id");
+          let nameIdx = eh.findIndex(h => h === "name" || h === "emp name" || h === "empname" || h === "employee name" || h === "rider name");
+          let regIdx = eh.findIndex(h => h === "region" || h === "area" || h === "center");
+          let passIdx = eh.findIndex(h => h === "password" || h === "pass");
+
+          if (idIdx === -1) idIdx = 1;
+          if (nameIdx === -1) nameIdx = 0;
+          if (regIdx === -1) regIdx = 2;
+          if (passIdx === -1) passIdx = 3;
+
           for (let i = 1; i < rawEmployees.length; i++) {
             let row = rawEmployees[i];
             if (!row || row.length === 0) continue;
-            let name = row[0] ? toTitleCase(row[0]) : "";
-            let id = row[1] ? row[1].toString().trim() : "";
-            let reg = cleanRegion(row[2]);
-            let pass = row[3] ? row[3].toString().trim() : "12345";
+            let id = row[idIdx] ? row[idIdx].toString().trim() : "";
+            let name = row[nameIdx] ? toTitleCase(row[nameIdx]) : "";
+            let reg = row[regIdx] ? cleanRegion(row[regIdx]) : "Center 1";
+            let pass = row[passIdx] ? row[passIdx].toString().trim() : "12345";
             if (id) {
-              empMap[id] = name || "Employee " + id;
+              empMap[id] = name || ("Employee " + id);
               empRegionMap[id] = reg;
               empPassMap[id] = pass;
             }
           }
         }
+
+        // Recover any riders present in Issued, Consumed, or Requests sheets if missing from Employees list
+        const recoverFromSheet = (rows, idCol, nameCol, regCol) => {
+          if (!rows || rows.length <= 1) return;
+          for (let i = 1; i < rows.length; i++) {
+            let r = rows[i];
+            if (!r) continue;
+            let id = r[idCol] ? r[idCol].toString().trim() : "";
+            let name = r[nameCol] ? toTitleCase(r[nameCol]) : "";
+            let reg = r[regCol] ? cleanRegion(r[regCol]) : "Center 1";
+            if (id && !empMap[id]) {
+              empMap[id] = name || ("Employee " + id);
+              empRegionMap[id] = reg;
+              if (!empPassMap[id]) empPassMap[id] = "12345";
+            } else if (id && empMap[id] && empMap[id].startsWith("Employee ") && name) {
+              empMap[id] = name;
+            }
+          }
+        };
+        recoverFromSheet(rawIssued, 2, 3, 1);
+        recoverFromSheet(rawConsumed, 2, 3, 1);
+        recoverFromSheet(rawRequests, 3, 4, 2);
 
         computeDemandRoomBalances();
 
@@ -993,6 +1077,10 @@
         if (syncEl) syncEl.innerText = "Sync Warning!";
       } finally {
         isSyncing = false;
+        if (pendingSync) {
+          pendingSync = false;
+          setTimeout(() => loadData(false), 150);
+        }
       }
     }
 
