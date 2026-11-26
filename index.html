@@ -774,9 +774,18 @@
         }
       });
 
-      let sessionRole = localStorage.getItem('erp_role');
-      if (sessionRole) loadDataAndInitSession();
-      else hideLoader();
+      try {
+        let sessionRole = localStorage.getItem('erp_role');
+        if (sessionRole) {
+          loadDataAndInitSession();
+          setTimeout(() => { hideLoader(); }, 8000);
+        } else {
+          hideLoader();
+        }
+      } catch (err) {
+        console.error(err);
+        hideLoader();
+      }
     };
 
     function showLoader(text = "Loading...") {
@@ -1179,8 +1188,7 @@
       let text = document.getElementById('bulkDemandText').value.trim();
       if (!text) { alert("براہ کرم آئٹم کا نام اور مقدار درج کریں۔"); return; }
       let itemsObj = {};
-      text.split('
-').forEach(line => {
+      text.split('\n').forEach(line => {
         let parts = line.split(',').map(p => p.trim());
         if (parts.length >= 2 && parts[0]) {
           let qty = Number(parts[1]) || 0;
@@ -1223,8 +1231,7 @@
         let avail = Number(inp.dataset.avail) || 0;
         if (val > 0) {
           if (avail <= 0 || val > avail) {
-            overStockError += `• ${toTitleCase(inp.dataset.item)}: Available Stock = ${avail}, Entered = ${val}
-`;
+            overStockError += `• ${toTitleCase(inp.dataset.item)}: Available Stock = ${avail}, Entered = ${val}\n`;
           } else {
             items[inp.dataset.item] = val;
             hasItem = true;
@@ -1233,9 +1240,7 @@
       });
 
       if (overStockError) {
-        alert("⚠️ اسٹاک دستیاب نہیں ہے یا مقدار دستیاب بیلنس سے زیادہ ہے:
-
-" + overStockError);
+        alert("⚠️ اسٹاک دستیاب نہیں ہے یا مقدار دستیاب بیلنس سے زیادہ ہے:\n\n" + overStockError);
         return;
       }
       if (!hasItem) { alert("کم از کم ایک دستیاب آئٹم کی مقدار درج کریں۔"); return; }
@@ -1301,8 +1306,7 @@
         let itemsStr = Object.keys(r.itemsObj).map(k => `${toTitleCase(k)}: ${r.itemsObj[k]}`).join(" | ");
         csv.push(`"${r.reqId}","${r.date}","${r.region}","${r.empId}","${r.empName}","${r.status}","${itemsStr}","${r.remarks.replace(/"/g, "'")}"`);
       });
-      let blob = new Blob([csv.join("
-")], { type: "text/csv;charset=utf-8;" });
+      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
       let a = document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
       a.download = "Stock_Requests_History_Report.csv";
@@ -2339,7 +2343,7 @@
       }
 
       let csv = [
-        ""HS ERP CLL - Inventory Report"",
+        "\"HS ERP CLL - Inventory Report\"",
         `"Report Date & Time","${now.toLocaleDateString()} ${now.toLocaleTimeString()}"`,
         `"Employee Name","${empNameLabel}"`,
         `"Employee Id","${empIdLabel}"`,
@@ -2356,8 +2360,7 @@
         }
       });
 
-      let blob = new Blob([csv.join("
-")], { type: "text/csv;charset=utf-8;" });
+      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
       let a = document.createElement("a");
       a.href = window.URL.createObjectURL(blob);
       a.download = `${fileSuffix}_Inventory_Report.csv`;
@@ -2370,11 +2373,9 @@
       let csv = [];
       table.querySelectorAll("tr").forEach(row => {
         let cols = row.querySelectorAll("th, td");
-        csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/
-/g, ' ').trim()}"`).join(","));
+        csv.push(Array.from(cols).map(c => `"${c.innerText.replace(/\n/g, ' ').trim()}"`).join(","));
       });
-      let blob = new Blob([csv.join("
-")], { type: "text/csv;charset=utf-8;" });
+      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
       let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = filename; a.click();
     }
 
@@ -2384,8 +2385,7 @@
         let cols = row.querySelectorAll("td");
         if (cols.length === 5) csv.push(Array.from(cols).map(c => `"${c.innerText.trim()}"`).join(","));
       });
-      let blob = new Blob([csv.join("
-")], { type: "text/csv;charset=utf-8;" });
+      let blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
       let a = document.createElement("a"); a.href = window.URL.createObjectURL(blob); a.download = "Demand_Room_Ledger.csv"; a.click();
     }
   </script>
