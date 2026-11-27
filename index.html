@@ -76,7 +76,7 @@
           <span class="flex items-center gap-3"><span>📑</span> Stock Requests</span>
           <span id="reqBadge" class="hidden bg-rose-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">0 New</span>
         </button>
-        <button onclick="switchTab('riders')" id="nav-riders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition"><span>🚴</span> Rider Management</button>
+        <button onclick="switchTab('riders')" id="nav-riders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition"><span>🚴</span> Rider Management <span id="devBadge" class="hidden bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full ml-auto">0</span></button>
         <button onclick="switchTab('categories')" id="nav-categories" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition"><span>⚙️</span> Categories & Thresholds</button>
         <button onclick="switchTab('issued')" id="nav-issued" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition"><span>📦</span> Inventory Issued</button>
         <button onclick="switchTab('consumption')" id="nav-consumption" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800/80 hover:text-white text-slate-300 font-medium transition"><span>📝</span> Daily Consumption</button>
@@ -252,6 +252,13 @@
               <button onclick="downloadRidersExcel()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition shadow-xs">📥 Download Riders Excel</button>
             </div>
           </div>
+          <div id="deviceReqCard" class="hidden bg-amber-50 border-2 border-amber-300 p-5 rounded-2xl space-y-3">
+            <div>
+              <h4 class="font-black text-amber-900 text-sm">📱 New Device Approval Requests <span id="deviceReqCount" class="ml-1 bg-amber-500 text-white text-[11px] px-2 py-0.5 rounded-full">0</span></h4>
+              <p class="text-xs text-amber-800 mt-0.5">منظوری دینے پر رائیڈر کی پرانی ڈیوائس ہٹ جائے گی اور نئی ڈیوائس رجسٹرڈ ہو جائے گی۔</p>
+            </div>
+            <div id="deviceReqList" class="space-y-2"></div>
+          </div>
           <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 space-y-4">
             <input type="text" id="riderTabSearch" onkeyup="renderRidersTable()" placeholder="Search Rider By Name Or ID..." class="w-full sm:w-96 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none">
             <div class="overflow-x-auto">
@@ -376,6 +383,11 @@
           <div class="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 text-center space-y-3">
             <h2 id="welcomeEmpTitle" class="text-2xl font-black text-slate-900">خوش آمدید!</h2>
             <p class="text-sm text-slate-600 max-w-lg mx-auto">یہاں آپ اپنا موجودہ اسٹاک بیلنس، اسٹاک ریکویسٹ کا اسٹیٹس اور ایڈمن نوٹیفیکیشنز دیکھ سکتے ہیں۔</p>
+          </div>
+
+          <div id="empDeviceBanner" class="hidden bg-amber-50 border-2 border-amber-400 p-5 rounded-2xl shadow-xs space-y-1">
+            <h4 class="font-black text-amber-900 text-sm">📱 نئی ڈیوائس — ایڈمن کی منظوری درکار</h4>
+            <p class="text-xs text-amber-900 leading-relaxed">یہ ڈیوائس آپ کی رجسٹرڈ ڈیوائس نہیں ہے۔ آپ لاگ ان کر کے اپنا بیلنس دیکھ سکتے ہیں، مگر <strong>Stock Request</strong> اور <strong>Consumption</strong> صرف رجسٹرڈ ڈیوائس سے ممکن ہے۔ ایڈمن کو منظوری کی درخواست بھیج دی گئی ہے۔ منظوری کے بعد پرانی ڈیوائس ہٹ جائے گی اور یہ ڈیوائس رجسٹرڈ ہو جائے گی۔ منظوری کے بعد "Sync Now" دبائیں۔</p>
           </div>
 
           <div id="empNotificationBox" class="hidden bg-amber-50 border-2 border-amber-400 p-5 rounded-2xl shadow-xs space-y-3">
@@ -592,6 +604,10 @@
           <input type="text" id="empFormName" placeholder="e.g. Muhammad Ali" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
         </div>
         <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Email (Password Recovery OTP Ke Liye)</label>
+          <input type="email" id="empFormEmail" placeholder="name@example.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
+        </div>
+        <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Region</label>
           <select id="empFormRegion" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-sm">
             <option value="Center 1">Center 1</option><option value="Center 2">Center 2</option>
@@ -612,7 +628,7 @@
     <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 class="font-bold text-lg">📥 Bulk Rider Excel (.xlsx) Upload</h3><button onclick="closeBulkRiderModal()" class="text-white font-bold px-2 py-1">✕</button></div>
       <div class="p-6 space-y-4">
-        <p class="text-xs text-slate-600">Excel شیٹ (<code>.xlsx</code> یا <code>.xls</code>) منتخب کریں جس میں کالمز ہوں: <strong>Name, ID, Region, Password</strong></p>
+        <p class="text-xs text-slate-600">Excel شیٹ (<code>.xlsx</code> یا <code>.xls</code>) منتخب کریں جس میں کالمز ہوں: <strong>Name, ID, Region, Password, Email</strong> (Password/Email خالی ہو تو پہلے سے محفوظ ویلیو برقرار رہے گی)</p>
         <p class="text-xs text-rose-700 font-bold">⚠️ اپ لوڈ کرنے سے پرانی رائیڈرز لسٹ مکمل طور پر اس شیٹ سے تبدیل ہو جائے گی۔</p>
         <input type="file" id="riderExcelFileInput" accept=".xlsx,.xls,.csv" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm">
         <button onclick="submitBulkRidersExcel()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-sm transition">Upload Excel To Sheet</button>
@@ -661,7 +677,7 @@
     </div>
   </div>
 
-  <!-- Create New Login (self-registration; blocks existing IDs) -->
+  <!-- Create New Login (email OTP verified) -->
   <div id="createLoginModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
@@ -688,6 +704,18 @@
           <label class="block text-xs font-bold text-slate-600 mb-1">Full Name</label>
           <input type="text" id="newLoginName" placeholder="Enter Full Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
         </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Email (OTP Isi Par Aayega)</label>
+          <div class="flex gap-2">
+            <input type="email" id="newLoginEmail" placeholder="name@example.com" class="flex-1 min-w-0 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+            <button type="button" id="createOtpBtn" onclick="sendCreateOtp()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 rounded-xl text-xs whitespace-nowrap transition">📧 Send OTP</button>
+          </div>
+        </div>
+        <div id="createOtpBox" class="hidden">
+          <label class="block text-xs font-bold text-slate-600 mb-1">6-Digit OTP</label>
+          <input type="text" id="newLoginOtp" inputmode="numeric" maxlength="6" placeholder="------" class="w-full bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 text-lg tracking-[0.5em] text-center font-black">
+          <p class="text-[11px] text-slate-500 mt-1">OTP نہ ملے تو Spam فولڈر دیکھیں یا دوبارہ "Send OTP" دبائیں۔</p>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">New Password</label>
@@ -698,35 +726,58 @@
             <input type="password" id="newLoginConfirmPassword" placeholder="Re-enter password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold text-emerald-700">
           </div>
         </div>
-        <p class="text-[11px] text-slate-500">اگر یہ Employee ID پہلے سے موجود ہے تو نیا لاگ ان نہیں بنے گا۔ پاسورڈ بھول گئے ہوں تو ایڈمن سے رابطہ کریں۔</p>
-        <button onclick="submitCreateNewLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">✅ Create Login</button>
+        <p class="text-[11px] text-slate-500 leading-relaxed">اگر یہ Employee ID پہلے سے موجود ہے تو نیا لاگ ان نہیں بنے گا۔ پہلی لاگ ان والی ڈیوائس آپ کی رجسٹرڈ ڈیوائس بن جائے گی (Stock Request / Consumption صرف اسی سے ہوں گے)۔</p>
+        <button onclick="submitCreateNewLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">✅ Verify OTP & Create Login</button>
       </div>
     </div>
   </div>
 
-  <!-- Recover Password (admin-assisted) -->
+  <!-- Recover Password (email OTP) -->
   <div id="recoverPasswordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
     <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
         <h3 class="font-bold text-lg">🔄 Recover Password</h3>
         <button onclick="closeRecoverPasswordModal()" class="text-white font-bold px-2 py-1">✕</button>
       </div>
-      <div class="p-6 space-y-4 text-sm text-slate-700">
-        <p class="font-bold text-slate-900">پاسورڈ ری سیٹ کے لیے اپنے ایڈمن سے رابطہ کریں۔</p>
-        <p class="text-xs leading-relaxed">ایڈمن لاگ ان کر کے <strong>Rider Management → Edit / Login</strong> میں آپ کا نیا پاسورڈ سیٹ کر دے گا۔ اس کے بعد آپ نئے پاسورڈ سے لاگ ان کر سکتے ہیں اور سائیڈ مینو سے <strong>Change Password</strong> کے ذریعے اسے بدل سکتے ہیں۔</p>
-        <p class="text-[11px] text-slate-500">Contact your admin: they can set a new password for your Employee ID from Rider Management → Edit / Login.</p>
-        <button onclick="closeRecoverPasswordModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-sm">OK</button>
+      <div class="p-5 space-y-3.5 max-h-[82vh] overflow-y-auto">
+        <div id="recoverMsg" class="hidden text-xs font-bold p-3 rounded-xl"></div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID</label>
+          <div class="flex gap-2">
+            <input type="text" id="recoverEmpId" placeholder="e.g. 245" class="flex-1 min-w-0 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
+            <button type="button" onclick="sendRecoverOtp()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 rounded-xl text-xs whitespace-nowrap transition">📧 Send OTP</button>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1">OTP اسی ای میل پر جائے گا جو آپ کے اکاؤنٹ میں محفوظ ہے۔ اگر ای میل محفوظ نہیں تو ایڈمن سے رابطہ کریں۔</p>
+        </div>
+        <div id="recoverStep2" class="hidden space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">6-Digit OTP</label>
+            <input type="text" id="recoverOtp" inputmode="numeric" maxlength="6" placeholder="------" class="w-full bg-amber-50 border border-amber-300 rounded-xl px-3 py-2 text-lg tracking-[0.5em] text-center font-black">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">New Password</label>
+              <input type="password" id="recoverNewPass" placeholder="New password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold text-sky-700">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Confirm Password</label>
+              <input type="password" id="recoverConfirmPass" placeholder="Re-enter password..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold text-emerald-700">
+            </div>
+          </div>
+          <button onclick="submitRecoverReset()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">🔑 Reset Password</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlyuiaq_e71xSn8s6fSe6vONJWEWZz2ALoVgx8RR6JIiLCowmPIwFuhbpiGglBXIX6VQ/exec";
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzq5v7GcegAfpnUOJB5RvH2Kri6MPZPQykeld1PlvyFfsZhyPv3U-Kac22aBUqC9gxglg/exec";
 
     let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], rawThresholds = [];
     let allCategories = [], fieldCategories = [];
     let empMap = {}, empRegionMap = {}, empPassMap = {}, itemThresholds = {}, itemMaxLimits = {};
     let demandBalanceMap = {};
+    let rawDeviceReqs = [], empEmailMap = {}, deviceStatus = "active", authExpiredShown = false;
     let currentReqStatusFilter = "ALL";
     let isSyncing = false, pendingSync = false;
     let activeKpiFilter = null;
@@ -786,15 +837,38 @@
       }
     }
 
+    /* ---------- device + session helpers ---------- */
+    function getDeviceId() {
+      try {
+        let d = localStorage.getItem('erp_device_id');
+        if (!d) {
+          d = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('d-' + Date.now() + '-' + Math.random().toString(16).slice(2));
+          localStorage.setItem('erp_device_id', d);
+        }
+        return d;
+      } catch (_e) { return 'nols-' + (navigator.userAgent || '').length; }
+    }
+    function deviceInfoStr() { return (navigator.userAgent || "").slice(0, 100); }
+    function getToken() { try { return localStorage.getItem('erp_token') || ""; } catch (_e) { return ""; } }
+    function handleAuthExpired() {
+      if (authExpiredShown) return;
+      authExpiredShown = true;
+      alert("آپ کا سیشن ختم ہو گیا ہے۔ براہ کرم دوبارہ لاگ ان کریں۔");
+      logout();
+    }
+
     /* ---------- API ---------- */
     async function apiGet() {
-      const res = await fetch(SCRIPT_URL + "?t=" + Date.now(), { method: "GET", redirect: "follow" });
+      const res = await fetch(SCRIPT_URL + "?token=" + encodeURIComponent(getToken()) + "&t=" + Date.now(), { method: "GET", redirect: "follow" });
       const data = await res.json();
+      if (data && data.code === "AUTH") { handleAuthExpired(); throw new Error("Session expired"); }
       if (data && data.status === "error") throw new Error(data.message || "Server error");
       return data;
     }
-    // Throws on server-reported errors. On network/CORS failure retries opaquely and flags opaque:true (result unconfirmed).
-    async function apiPost(payload) {
+    // Throws on server-reported errors. opts.strict = never use the unconfirmed no-cors retry (OTP / registration).
+    async function apiPost(payload, opts) {
+      opts = opts || {};
+      if (!payload.token) payload.token = getToken();
       const body = JSON.stringify(payload);
       try {
         const res = await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body, redirect: "follow" });
@@ -802,10 +876,12 @@
         let d;
         try { d = JSON.parse(text); }
         catch (_e) { throw new Error("Server ne unexpected jawab diya. Apps Script Deployment me 'Who has access: Anyone' check karein."); }
+        if (d && d.code === "AUTH") { handleAuthExpired(); throw new Error(d.message || "Session expired"); }
         if (!d || d.status !== "success") throw new Error((d && d.message) || "Server Error");
         return d;
       } catch (err) {
         if (err instanceof TypeError) {
+          if (opts.strict) throw new Error("Server tak rasai nahi ho saki (network). Internet check karein.");
           try { await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body }); }
           catch (_e2) { throw new Error("Server tak rasai nahi ho saki (network). Internet check karein."); }
           return { status: "success", opaque: true };
@@ -872,13 +948,14 @@
 
     /* ---------- employees parsing ---------- */
     function parseEmployees(rows) {
-      const out = { map: {}, reg: {}, pass: {} };
+      const out = { map: {}, reg: {}, pass: {}, email: {} };
       if (!rows || rows.length < 2) return out;
       const eh = rows[0].map(h => h ? h.toString().trim().toLowerCase() : "");
       let idIdx = eh.findIndex(h => ["id", "emp id", "empid", "employee id", "employeeid", "rider id"].includes(h));
       let nameIdx = eh.findIndex(h => ["name", "emp name", "empname", "employee name", "rider name"].includes(h));
       let regIdx = eh.findIndex(h => ["region", "area", "center"].includes(h));
       let passIdx = eh.findIndex(h => ["password", "pass"].includes(h));
+      const emailIdx = eh.findIndex(h => ["email", "email id", "emailid", "e-mail"].includes(h));
       if (idIdx === -1) idIdx = 1; if (nameIdx === -1) nameIdx = 0; if (regIdx === -1) regIdx = 2; if (passIdx === -1) passIdx = 3;
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
@@ -887,14 +964,18 @@
         if (!id) continue;
         out.map[id] = row[nameIdx] ? toTitleCase(row[nameIdx]) : ("Employee " + id);
         out.reg[id] = row[regIdx] ? cleanRegion(row[regIdx]) : "Center 1";
-        out.pass[id] = row[passIdx] ? row[passIdx].toString().trim() : "12345";
+        out.pass[id] = row[passIdx] ? row[passIdx].toString().trim() : "";
+        out.email[id] = (emailIdx !== -1 && row[emailIdx]) ? row[emailIdx].toString().trim() : "";
       }
       return out;
     }
 
     /* ---------- login / session ---------- */
     function startSession(result) {
+      authExpiredShown = false;
       localStorage.setItem('erp_role', result.role);
+      localStorage.setItem('erp_token', result.token || "");
+      deviceStatus = result.deviceStatus || "active";
       if (result.role === 'admin') {
         localStorage.setItem('logged_id', 'Admin');
         localStorage.setItem('logged_name', 'Administrator');
@@ -919,38 +1000,27 @@
       try {
         const res = await fetch(SCRIPT_URL, {
           method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ type: "login", username, password: pass }), redirect: "follow"
+          body: JSON.stringify({ type: "login", username, password: pass, deviceId: getDeviceId(), deviceInfo: deviceInfoStr() }), redirect: "follow"
         });
         result = JSON.parse(await res.text());
-      } catch (_e) { result = null; }
-
-      if (result) {
+      } catch (e) {
         hideLoader();
-        if (result.status === "success") startSession(result);
-        else errBox.classList.remove('hidden');   // server said invalid -> no local fallback
+        alert("Login Error: server tak rasai nahi ho saki.\n\nInternet connection aur Apps Script Deployment ('Who has access: Anyone') check karein.");
         return;
       }
-
-      // Server login unreachable (network/CORS): fall back to freshly-fetched server data only
-      try {
-        const data = await apiGet();
-        const emp = parseEmployees(data.employees || []);
-        const matchedId = Object.keys(emp.map).find(k => k.toLowerCase() === username.toLowerCase());
-        hideLoader();
-        if (matchedId && emp.pass[matchedId] === pass) {
-          startSession({ role: "employee", id: matchedId, name: emp.map[matchedId], region: emp.reg[matchedId] });
-        } else {
-          errBox.classList.remove('hidden');
-        }
-      } catch (e2) {
-        hideLoader();
-        alert("Login Error: server tak rasai nahi ho saki.\n\nGoogle Apps Script Deployment me 'Who has access: Anyone' check karein aur internet connection dekhein.\n\n" + e2);
-      }
+      hideLoader();
+      if (result && result.status === "success") { startSession(result); return; }
+      errBox.innerText = (result && result.code && result.code !== "BAD_CREDENTIALS" && result.message) ? result.message : "Invalid Username Or Password!";
+      errBox.classList.remove('hidden');
     }
 
     function logout() {
-      ['erp_role', 'logged_id', 'logged_name', 'logged_reg'].forEach(k => localStorage.removeItem(k));
-      location.reload();
+      try {
+        const t = getToken();
+        if (t) fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "logout", token: t }), keepalive: true }).catch(() => {});
+      } catch (_e) {}
+      ['erp_role', 'erp_token', 'logged_id', 'logged_name', 'logged_reg'].forEach(k => localStorage.removeItem(k));
+      setTimeout(() => location.reload(), 150);
     }
 
     function loadDataAndInitSession() {
@@ -1060,6 +1130,8 @@
         rawAdminConsumed = data.adminConsumed || [];
         rawRequests = data.requests || [];
         rawThresholds = data.thresholds || [];
+        rawDeviceReqs = data.deviceRequests || [];
+        if (data.deviceStatus) deviceStatus = data.deviceStatus;
 
         // normalized, de-duplicated item list
         const seen = new Set();
@@ -1076,7 +1148,7 @@
         fieldCategories = allCategories.filter(item => !EXCLUDED_FIELD_ITEMS.includes(item));
 
         const emp = parseEmployees(rawEmployees);
-        empMap = emp.map; empRegionMap = emp.reg; empPassMap = emp.pass;
+        empMap = emp.map; empRegionMap = emp.reg; empPassMap = emp.pass; empEmailMap = emp.email;
 
         // riders that appear in history sheets but not in Employees (display only; no login created)
         const recoverFromSheet = (rows, idCol, nameCol, regCol) => {
@@ -1504,20 +1576,23 @@
 
     /* ---------- rider management ---------- */
     function openEmployeeFormModal(empId = null) {
+      const pw = document.getElementById('empFormPassword');
       if (empId) {
         document.getElementById('empFormModalTitle').innerText = `✏️ Edit Rider Profile & Login (${empId})`;
         document.getElementById('empFormOriginalId').value = empId;
         document.getElementById('empFormId').value = empId;
         document.getElementById('empFormName').value = empMap[empId] || "";
+        document.getElementById('empFormEmail').value = empEmailMap[empId] || "";
         document.getElementById('empFormRegion').value = empRegionMap[empId] || "Center 1";
-        document.getElementById('empFormPassword').value = empPassMap[empId] || "12345";
+        pw.value = ""; pw.placeholder = "خالی چھوڑیں = موجودہ پاسورڈ برقرار";
       } else {
         document.getElementById('empFormModalTitle').innerText = "➕ Add New Rider & Create Login";
         document.getElementById('empFormOriginalId').value = "";
         document.getElementById('empFormId').value = "";
         document.getElementById('empFormName').value = "";
+        document.getElementById('empFormEmail').value = "";
         document.getElementById('empFormRegion').value = "Center 1";
-        document.getElementById('empFormPassword').value = "12345";
+        pw.value = "12345"; pw.placeholder = "Set Login Password...";
       }
       document.getElementById('employeeFormModal').classList.remove('hidden');
     }
@@ -1527,16 +1602,19 @@
       const originalId = document.getElementById('empFormOriginalId').value.trim();
       const empId = document.getElementById('empFormId').value.trim();
       const empName = toTitleCase(document.getElementById('empFormName').value.trim());
+      const email = document.getElementById('empFormEmail').value.trim().toLowerCase();
       const region = cleanRegion(document.getElementById('empFormRegion').value);
-      const password = document.getElementById('empFormPassword').value.trim() || "12345";
+      let password = document.getElementById('empFormPassword').value.trim();
       if (!empId || !empName) { alert("Employee ID اور Name لازمی ہیں۔"); return; }
+      if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { alert("درست Email درج کریں۔"); return; }
+      if (!originalId && !password) password = "12345";
 
       const idTaken = Object.keys(empMap).some(k => k.toLowerCase() === empId.toLowerCase() && k !== originalId);
       if (idTaken) { alert(`❌ Employee ID '${empId}' پہلے سے موجود ہے۔ کوئی دوسرا ID استعمال کریں۔`); return; }
 
       showLoader("Saving Employee Profile & Login To Sheet...");
       try {
-        const res = await apiPost({ type: originalId ? "edit_employee" : "add_employee", originalId, empId, empName, region, password });
+        const res = await apiPost({ type: originalId ? "edit_employee" : "add_employee", originalId, empId, empName, region, password, email });
         closeEmployeeFormModal();
         await loadData(true);
         alert(savedMsg(res, "✅ Rider Profile & Login Saved And Synced To Sheet!"));
@@ -1544,8 +1622,9 @@
     }
 
     function downloadRidersExcel() {
-      const rows = [["Name", "Employee ID", "Region", "Password"]];
-      Object.keys(empMap).forEach(id => rows.push([empMap[id], id, empRegionMap[id] || "Center 1", empPassMap[id] || "12345"]));
+      // passwords are never sent to the browser; leave the Password column blank when re-uploading to keep existing ones
+      const rows = [["Name", "Employee ID", "Region", "Password", "Email"]];
+      Object.keys(empMap).forEach(id => rows.push([empMap[id], id, empRegionMap[id] || "Center 1", "", empEmailMap[id] || ""]));
       const ws = XLSX.utils.aoa_to_sheet(rows);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Riders_List");
@@ -1565,16 +1644,17 @@
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonRows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-          let startRow = 1, nameCol = 0, idCol = 1, regCol = 2, passCol = 3;
+          let startRow = 1, nameCol = 0, idCol = 1, regCol = 2, passCol = 3, emailCol = 4;
           if (jsonRows.length > 0 && Array.isArray(jsonRows[0])) {
             const hRow = jsonRows[0].map(c => c ? c.toString().trim().toLowerCase() : "");
             const fName = hRow.findIndex(h => h.includes("name"));
             const fId = hRow.findIndex(h => h === "id" || h.includes("emp id") || h.includes("empid") || h.includes("rider id") || h === "employee id");
             const fReg = hRow.findIndex(h => h.includes("region") || h.includes("area") || h.includes("center"));
             const fPass = hRow.findIndex(h => h.includes("pass"));
+            const fEmail = hRow.findIndex(h => h.includes("mail"));
             if (fName !== -1 || fId !== -1) {
               if (fName !== -1) nameCol = fName; if (fId !== -1) idCol = fId;
-              if (fReg !== -1) regCol = fReg; if (fPass !== -1) passCol = fPass;
+              if (fReg !== -1) regCol = fReg; if (fPass !== -1) passCol = fPass; if (fEmail !== -1) emailCol = fEmail;
               startRow = 1;
             } else startRow = 0;
           }
@@ -1592,7 +1672,8 @@
             riders.push([
               toTitleCase(rawName || ("Employee " + finalId)), finalId,
               cleanRegion(r[regCol] ? r[regCol].toString() : "Center 1"),
-              r[passCol] ? r[passCol].toString().trim() : "12345"
+              r[passCol] ? r[passCol].toString().trim() : "",
+              r[emailCol] ? r[emailCol].toString().trim().toLowerCase() : ""
             ]);
           }
           if (riders.length === 0) { alert("ایکسل شیٹ میں درست ڈیٹا نہیں ملا۔"); return; }
@@ -1635,6 +1716,7 @@
     function renderRidersTable() {
       const tbody = document.getElementById('riderTableBody');
       if (!tbody) return;
+      renderDeviceRequests();
       const searchInput = document.getElementById('riderTabSearch').value.toLowerCase().trim();
       const summary = computeRiderSummary();
       const riders = Object.values(summary).filter(r => !searchInput || r.id.toLowerCase().includes(searchInput) || r.name.toLowerCase().includes(searchInput));
@@ -1654,6 +1736,7 @@
             <td class="p-4 text-center space-x-1.5">
               <button data-id="${esc(item.id)}" onclick="openEmployeeFormModal(this.dataset.id)" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold px-3 py-1.5 rounded-xl text-xs transition">✏️ Edit / Login</button>
               <button data-id="${esc(item.id)}" onclick="openRiderHistory(this.dataset.id)" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition">History</button>
+              <button data-id="${esc(item.id)}" onclick="resetRiderDevice(this.dataset.id)" title="Registered device hata do (agla login naya device ban jaye ga)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-3 py-1.5 rounded-xl text-xs transition">📱 Reset Device</button>
             </td>
           </tr>`;
       }).join("");
@@ -1753,7 +1836,18 @@
       const newPass = document.getElementById('newPasswordInput').value.trim();
       const confirmPass = document.getElementById('confirmPasswordInput').value.trim();
       const role = localStorage.getItem('erp_role');
-      if (role === 'admin') { alert("Admin کا پاسورڈ Google Apps Script میں ADMIN_PASSWORD سے تبدیل کیا جاتا ہے۔"); closePasswordModal(); return; }
+      if (role === 'admin') {
+        if (newPass.length < 6) { alert("Admin پاسورڈ کم از کم 6 حروف کا ہونا چاہیے۔"); return; }
+        if (newPass !== confirmPass) { alert("دونوں پاسورڈ آپس میں میچ نہیں کر رہے!"); return; }
+        const oldPassword = prompt("موجودہ Admin پاسورڈ درج کریں:");
+        if (oldPassword === null) return;
+        showLoader("Updating Admin Password...");
+        try {
+          await apiPost({ type: "change_admin_password", oldPassword: oldPassword.trim(), newPassword: newPass });
+          hideLoader(); alert("✅ Admin پاسورڈ تبدیل ہو گیا۔ اگلی بار نئے پاسورڈ سے لاگ ان کریں۔"); closePasswordModal();
+        } catch (e) { hideLoader(); alert("❌ Error: " + e.message); }
+        return;
+      }
       if (!newPass) { alert("پاسورڈ خالی نہیں ہو سکتا!"); return; }
       if (newPass !== confirmPass) { alert("دونوں پاسورڈ آپس میں میچ نہیں کر رہے!"); return; }
       const empId = localStorage.getItem('logged_id');
@@ -1766,58 +1860,115 @@
       } catch (e) { hideLoader(); alert("❌ Error: " + e.message); }
     }
 
-    /* ---------- create login / recover ---------- */
-    function showCreateMsg(text, ok) {
-      const box = document.getElementById('createLoginMsg');
-      box.className = "text-xs font-bold p-3 rounded-xl " + (ok ? "bg-emerald-50 border border-emerald-200 text-emerald-800" : "bg-rose-50 border border-rose-200 text-rose-700");
+    /* ---------- create login / recover (email OTP) ---------- */
+    const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    function boxMsg(id, text, okFlag) {
+      const box = document.getElementById(id);
+      box.className = "text-xs font-bold p-3 rounded-xl " + (okFlag ? "bg-emerald-50 border border-emerald-200 text-emerald-800" : "bg-rose-50 border border-rose-200 text-rose-700");
       box.innerText = text;
       box.classList.remove('hidden');
     }
+    function showCreateMsg(text, ok) { boxMsg('createLoginMsg', text, ok); }
+    function showRecoverMsg(text, ok) { boxMsg('recoverMsg', text, ok); }
+
     function openCreateLoginModal() {
       document.getElementById('createLoginMsg').classList.add('hidden');
-      ['newLoginEmpId', 'newLoginName', 'newLoginPassword', 'newLoginConfirmPassword'].forEach(id => { document.getElementById(id).value = ""; });
+      document.getElementById('createOtpBox').classList.add('hidden');
+      ['newLoginEmpId', 'newLoginName', 'newLoginEmail', 'newLoginOtp', 'newLoginPassword', 'newLoginConfirmPassword'].forEach(id => { document.getElementById(id).value = ""; });
       document.getElementById('newLoginRegion').value = "Center 1";
       document.getElementById('createLoginModal').classList.remove('hidden');
     }
     function closeCreateLoginModal() { document.getElementById('createLoginModal').classList.add('hidden'); }
 
+    async function sendCreateOtp() {
+      const empId = document.getElementById('newLoginEmpId').value.trim();
+      const email = document.getElementById('newLoginEmail').value.trim().toLowerCase();
+      if (!empId) { showCreateMsg("پہلے Employee ID درج کریں۔", false); return; }
+      if (!EMAIL_RE.test(email)) { showCreateMsg("درست Email درج کریں۔", false); return; }
+      const btn = document.getElementById('createOtpBtn');
+      btn.disabled = true;
+      showLoader("Sending OTP...");
+      try {
+        const res = await apiPost({ type: "send_otp", purpose: "create_login", empId, email }, { strict: true });
+        hideLoader();
+        document.getElementById('createOtpBox').classList.remove('hidden');
+        showCreateMsg(`✅ OTP ${res.maskedEmail || email} پر بھیج دیا گیا ہے۔ 10 منٹ میں درج کریں۔`, true);
+      } catch (e) { hideLoader(); showCreateMsg("❌ " + e.message, false); }
+      btn.disabled = false;
+    }
+
     async function submitCreateNewLogin() {
       const empId = document.getElementById('newLoginEmpId').value.trim();
       const empName = toTitleCase(document.getElementById('newLoginName').value.trim());
       const region = cleanRegion(document.getElementById('newLoginRegion').value);
+      const email = document.getElementById('newLoginEmail').value.trim().toLowerCase();
+      const otp = document.getElementById('newLoginOtp').value.trim();
       const password = document.getElementById('newLoginPassword').value.trim();
       const confirmPassword = document.getElementById('newLoginConfirmPassword').value.trim();
 
       if (!empId || !empName) { showCreateMsg("براہ کرم Employee ID اور Name درج کریں۔", false); return; }
+      if (!EMAIL_RE.test(email)) { showCreateMsg("درست Email درج کریں۔", false); return; }
+      if (!/^\d{6}$/.test(otp)) { showCreateMsg("پہلے 'Send OTP' دبائیں اور ای میل پر آیا 6 ہندسوں کا OTP درج کریں۔", false); return; }
       if (!password || !confirmPassword) { showCreateMsg("براہ کرم Password دونوں خانوں میں لکھیں۔", false); return; }
+      if (password.length < 4) { showCreateMsg("پاسورڈ کم از کم 4 حروف کا ہو۔", false); return; }
       if (password !== confirmPassword) { showCreateMsg("دونوں پاسورڈ آپس میں میچ نہیں کر رہے! دوبارہ چیک کریں۔", false); return; }
 
-      showLoader("Checking Employee ID...");
+      showLoader("Verifying OTP & Creating Login...");
       try {
-        // always check against FRESH server data so an existing account can never be overwritten
-        const data = await apiGet();
-        const emp = parseEmployees(data.employees || []);
-        if (Object.keys(emp.map).some(k => k.toLowerCase() === empId.toLowerCase())) {
-          hideLoader();
-          showCreateMsg(`Employee ID '${empId}' پہلے سے موجود ہے۔ پاسورڈ بھول گئے ہیں تو ایڈمن سے رابطہ کریں۔`, false);
-          return;
-        }
-        showLoader("Creating Login...");
-        const res = await apiPost({ type: "add_employee", empId, empName, region, password });
+        await apiPost({ type: "register", empId, empName, region, email, password, otp }, { strict: true });
         hideLoader();
         document.getElementById('loginUser').value = empId;
         document.getElementById('loginPassword').value = password;
         closeCreateLoginModal();
-        alert(savedMsg(res, `✅ نیا لاگ ان بن گیا ہے!\nEmployee ID: ${empId}\nاب 'Sign In' دبائیں۔`));
-      } catch (e) { hideLoader(); showCreateMsg("❌ Error: " + e.message, false); }
+        alert(`✅ نیا لاگ ان بن گیا ہے!\nEmployee ID: ${empId}\nاب 'Sign In' دبائیں۔ پہلی لاگ ان والی ڈیوائس آپ کی رجسٹرڈ ڈیوائس بنے گی۔`);
+      } catch (e) { hideLoader(); showCreateMsg("❌ " + e.message, false); }
     }
 
-    function openRecoverPasswordModal() { document.getElementById('recoverPasswordModal').classList.remove('hidden'); }
+    function openRecoverPasswordModal() {
+      document.getElementById('recoverMsg').classList.add('hidden');
+      document.getElementById('recoverStep2').classList.add('hidden');
+      ['recoverEmpId', 'recoverOtp', 'recoverNewPass', 'recoverConfirmPass'].forEach(id => { document.getElementById(id).value = ""; });
+      document.getElementById('recoverPasswordModal').classList.remove('hidden');
+    }
     function closeRecoverPasswordModal() { document.getElementById('recoverPasswordModal').classList.add('hidden'); }
+
+    async function sendRecoverOtp() {
+      const empId = document.getElementById('recoverEmpId').value.trim();
+      if (!empId) { showRecoverMsg("Employee ID درج کریں۔", false); return; }
+      showLoader("Sending OTP...");
+      try {
+        const res = await apiPost({ type: "send_otp", purpose: "recover_password", empId }, { strict: true });
+        hideLoader();
+        document.getElementById('recoverStep2').classList.remove('hidden');
+        showRecoverMsg(res.maskedEmail
+          ? `✅ OTP ${res.maskedEmail} پر بھیج دیا گیا ہے۔ 10 منٹ میں درج کریں۔`
+          : "اگر اس ID پر ای میل رجسٹرڈ ہے تو OTP بھیج دیا گیا ہے۔ ای میل نہ ملے تو ایڈمن سے رابطہ کریں (وہ آپ کی ای میل شامل کر سکتا ہے)۔", true);
+      } catch (e) { hideLoader(); showRecoverMsg("❌ " + e.message, false); }
+    }
+
+    async function submitRecoverReset() {
+      const empId = document.getElementById('recoverEmpId').value.trim();
+      const otp = document.getElementById('recoverOtp').value.trim();
+      const newPassword = document.getElementById('recoverNewPass').value.trim();
+      const confirm2 = document.getElementById('recoverConfirmPass').value.trim();
+      if (!/^\d{6}$/.test(otp)) { showRecoverMsg("6 ہندسوں کا OTP درج کریں۔", false); return; }
+      if (newPassword.length < 4) { showRecoverMsg("پاسورڈ کم از کم 4 حروف کا ہو۔", false); return; }
+      if (newPassword !== confirm2) { showRecoverMsg("دونوں پاسورڈ آپس میں میچ نہیں کر رہے!", false); return; }
+      showLoader("Resetting Password...");
+      try {
+        await apiPost({ type: "reset_password", empId, otp, newPassword }, { strict: true });
+        hideLoader();
+        document.getElementById('loginUser').value = empId;
+        document.getElementById('loginPassword').value = newPassword;
+        closeRecoverPasswordModal();
+        alert("✅ پاسورڈ ری سیٹ ہو گیا ہے۔ اب 'Sign In' دبائیں۔");
+      } catch (e) { hideLoader(); showRecoverMsg("❌ " + e.message, false); }
+    }
 
     /* ---------- employee modals ---------- */
     function openStaffModal() {
       if (localStorage.getItem('erp_role') !== 'employee') return;
+      if (deviceStatus === 'pending') { alert("یہ رجسٹرڈ ڈیوائس نہیں ہے۔ Consumption صرف رجسٹرڈ ڈیوائس سے ممکن ہے۔ ایڈمن کی منظوری کا انتظار کریں۔"); return; }
       const empId = localStorage.getItem('logged_id');
       document.getElementById('modalEmpId').value = empId;
       document.getElementById('modalEmpName').value = toTitleCase(localStorage.getItem('logged_name'));
@@ -1837,6 +1988,7 @@
 
     function openRequestModal() {
       if (localStorage.getItem('erp_role') !== 'employee') return;
+      if (deviceStatus === 'pending') { alert("یہ رجسٹرڈ ڈیوائس نہیں ہے۔ Stock Request صرف رجسٹرڈ ڈیوائس سے ممکن ہے۔ ایڈمن کی منظوری کا انتظار کریں۔"); return; }
       document.getElementById('reqEmpId').value = localStorage.getItem('logged_id');
       document.getElementById('reqEmpName').value = toTitleCase(localStorage.getItem('logged_name'));
       document.getElementById('reqRegion').value = cleanRegion(localStorage.getItem('logged_reg'));
@@ -1929,6 +2081,68 @@
         alert(savedMsg(res, "✅ Stock Request Submitted Successfully!"));
       } catch (err) { hideLoader(); alert("❌ Error: " + err.message); }
       btn.disabled = false;
+    }
+
+    /* ---------- device approvals ---------- */
+    function applyDeviceStatus() {
+      const banner = document.getElementById('empDeviceBanner');
+      const qa = document.getElementById('quickActions');
+      if (!banner) return;
+      const pending = deviceStatus === 'pending';
+      banner.classList.toggle('hidden', !pending);
+      if (qa) qa.querySelectorAll('button').forEach(b => {
+        b.disabled = pending;
+        b.classList.toggle('opacity-50', pending);
+        b.classList.toggle('cursor-not-allowed', pending);
+      });
+    }
+
+    function renderDeviceRequests() {
+      const card = document.getElementById('deviceReqCard');
+      if (!card) return;
+      const badge = document.getElementById('devBadge');
+      const pending = (rawDeviceReqs || []).slice(1).filter(r => r && (r[5] || "").toString().trim() === "Pending");
+      if (badge) { if (pending.length) { badge.classList.remove('hidden'); badge.innerText = pending.length; } else badge.classList.add('hidden'); }
+      if (!pending.length) { card.classList.add('hidden'); return; }
+      card.classList.remove('hidden');
+      document.getElementById('deviceReqCount').innerText = pending.length;
+      document.getElementById('deviceReqList').innerHTML = pending.map(r => {
+        const id = (r[1] || "").toString().trim();
+        return `
+          <div class="bg-white border border-amber-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
+            <div class="text-xs space-y-0.5">
+              <div class="font-bold text-slate-900">${T(r[2])} <span class="text-slate-500 font-semibold">(${esc(id)})</span> <span class="text-slate-400 font-normal">• ${esc(r[0])}</span></div>
+              <div class="text-slate-500 break-all">${esc((r[4] || "").toString().slice(0, 90))}</div>
+            </div>
+            <div class="flex gap-2">
+              <button data-id="${esc(id)}" onclick="decideDevice(this.dataset.id, 'approve')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition">✅ Approve (پرانی ڈیوائس ہٹے گی)</button>
+              <button data-id="${esc(id)}" onclick="decideDevice(this.dataset.id, 'reject')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold px-3 py-1.5 rounded-lg text-xs transition">✖ Reject</button>
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    async function decideDevice(empId, decision) {
+      const msg = decision === 'approve'
+        ? `کیا آپ ${empId} کی نئی ڈیوائس منظور کرتے ہیں؟ اس کی پرانی ڈیوائس ہٹ جائے گی۔`
+        : `کیا آپ ${empId} کی نئی ڈیوائس کی درخواست رد کرتے ہیں؟`;
+      if (!confirm(msg)) return;
+      showLoader("Updating Device Request...");
+      try {
+        await apiPost({ type: "device_decision", empId, decision });
+        await loadData(true);
+        alert(decision === 'approve' ? "✅ نئی ڈیوائس رجسٹر ہو گئی، پرانی ہٹ گئی۔" : "درخواست رد کر دی گئی۔");
+      } catch (e) { hideLoader(); alert("❌ Error: " + e.message); }
+    }
+
+    async function resetRiderDevice(empId) {
+      if (!confirm(`${empId} کی رجسٹرڈ ڈیوائس ہٹا دیں؟ اگلی لاگ ان والی ڈیوائس خودکار رجسٹر ہو جائے گی۔`)) return;
+      showLoader("Resetting Device...");
+      try {
+        await apiPost({ type: "reset_device", empId });
+        await loadData(true);
+        alert("✅ ڈیوائس ری سیٹ ہو گئی۔");
+      } catch (e) { hideLoader(); alert("❌ Error: " + e.message); }
     }
 
     /* ---------- thresholds / dashboard ---------- */
@@ -2142,6 +2356,7 @@
     }
 
     function renderEmployeePortalView() {
+      applyDeviceStatus();
       const empId = localStorage.getItem('logged_id');
       const parsedReqs = allRequests().filter(r => r.empId === empId);
 
