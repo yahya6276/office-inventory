@@ -96,10 +96,10 @@
     </aside>
 
     <!-- CONTENT AREA -->
-    <div id="contentScrollArea" class="w-full min-h-screen flex flex-col overflow-y-auto" onscroll="checkScroll()">
+    <div id="contentScrollArea" class="w-full min-h-screen flex flex-col">
 
       <!-- TOP HEADER -->
-      <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20">
+      <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-30 shadow-sm">
         <div class="flex items-center gap-3">
           <button onclick="toggleSidebar(event)" class="bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg text-slate-700 font-bold transition">☰ Menu</button>
           <div>
@@ -515,11 +515,20 @@
       <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
         <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl space-y-3">
           <h4 class="font-bold text-amber-900 text-sm">✏️ Rename Item Across All Backend Sheets</h4>
-          <p class="text-xs text-amber-800">اگر آپ کسی آئٹم کا نام بدلیں گے تو بیک اینڈ کی تمام شیٹس کے ہیڈرز خودکار تبدیل ہو جائیں گے۔ (اس کے لیے Apps Script میں rename_item سپورٹ ہونا ضروری ہے؛ ورنہ ایرر دکھایا جائے گا۔)</p>
+          <p class="text-xs text-amber-800">ایک آئٹم کا نام بدلیں گے تو بیک اینڈ کی تمام شیٹس کے ہیڈرز خودکار تبدیل ہو جائیں گے۔ ڈیٹا وہی رہتا ہے، صرف نام بدلتا ہے۔</p>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <select id="renameOldItemSelect" class="bg-white border border-amber-300 rounded-lg px-3 py-2 text-xs font-bold"></select>
             <input type="text" id="renameNewItemInput" placeholder="New Item Name..." class="bg-white border border-amber-300 rounded-lg px-3 py-2 text-xs font-bold">
             <button onclick="submitRenameItem()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition">Update Item Name</button>
+          </div>
+        </div>
+        <div class="bg-violet-50 border border-violet-200 p-4 rounded-xl space-y-3">
+          <h4 class="font-bold text-violet-900 text-sm">📑 Bulk Rename From Excel</h4>
+          <p class="text-xs text-violet-800 leading-relaxed">1) نیچے سے Template ڈاؤن لوڈ کریں (اس میں تمام موجودہ آئٹمز "Old Name" میں درج ہوں گے)۔ 2) جس آئٹم کا نام بدلنا ہو اس کے سامنے "New Name" لکھیں، باقی خالی چھوڑ دیں۔ 3) فائل اپ لوڈ کریں۔ تمام شیٹس میں صرف نام بدلیں گے، کوئی ڈیٹا ڈیلیٹ نہیں ہوگا۔</p>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="downloadRenameTemplate()" class="bg-violet-100 hover:bg-violet-200 text-violet-900 font-bold px-3 py-2 rounded-lg text-xs transition">📥 Download Template</button>
+            <input type="file" id="renameExcelInput" accept=".xlsx,.xls,.csv" class="flex-1 min-w-[180px] bg-white border border-violet-300 rounded-lg p-1.5 text-xs">
+            <button onclick="submitBulkRenameExcel()" class="bg-violet-600 hover:bg-violet-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition">📤 Upload & Rename All</button>
           </div>
         </div>
         <div class="space-y-3">
@@ -744,10 +753,23 @@
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Employee ID</label>
           <div class="flex gap-2">
-            <input type="text" id="recoverEmpId" placeholder="e.g. 245" class="flex-1 min-w-0 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
-            <button type="button" onclick="sendRecoverOtp()" class="bg-sky-600 hover:bg-sky-700 text-white font-bold px-3 rounded-xl text-xs whitespace-nowrap transition">📧 Send OTP</button>
+            <input type="text" id="recoverEmpId" oninput="resetRecoverFlow()" placeholder="e.g. 245" class="flex-1 min-w-0 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold">
+            <button type="button" onclick="lookupRecoverId()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-3 rounded-xl text-xs whitespace-nowrap transition">🔍 Check ID</button>
           </div>
-          <p class="text-[11px] text-slate-500 mt-1">OTP اسی ای میل پر جائے گا جو آپ کے اکاؤنٹ میں محفوظ ہے۔ اگر ای میل محفوظ نہیں تو ایڈمن سے رابطہ کریں۔</p>
+        </div>
+        <div id="recoverSendArea" class="hidden space-y-3">
+          <p id="recoverInfo" class="text-xs text-slate-700 leading-relaxed bg-slate-50 border border-slate-200 rounded-xl p-3"></p>
+          <div id="recoverNewEmailBox" class="hidden space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Full Name (جیسا اکاؤنٹ میں درج ہے)</label>
+              <input type="text" id="recoverName" placeholder="Enter Full Name..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">New Email</label>
+              <input type="email" id="recoverEmail" placeholder="name@example.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+            </div>
+          </div>
+          <button type="button" onclick="sendRecoverOtp()" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-2.5 rounded-xl text-sm transition">📧 Send OTP</button>
         </div>
         <div id="recoverStep2" class="hidden space-y-3">
           <div>
@@ -770,8 +792,34 @@
     </div>
   </div>
 
+  <!-- Edit Issued / Consumption record -->
+  <div id="recordEditModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-6">
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center"><h3 id="recEditTitle" class="font-bold text-lg">✏️ Edit Record</h3><button onclick="closeRecordEdit()" class="text-white font-bold px-2 py-1">✕</button></div>
+      <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label class="block text-xs font-bold text-slate-600 mb-1">Date</label><input type="date" id="recEditDate" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
+          <div><label class="block text-xs font-bold text-slate-600 mb-1">Region</label>
+            <select id="recEditRegion" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm">
+              <option value="Center 1">Center 1</option><option value="Center 2">Center 2</option>
+              <option value="South 1">South 1</option><option value="South 2">South 2</option>
+              <option value="North 1">North 1</option><option value="North 2">North 2</option>
+            </select></div>
+          <div><label class="block text-xs font-bold text-slate-600 mb-1">Employee ID</label><input type="text" id="recEditEmpId" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold"></div>
+          <div><label class="block text-xs font-bold text-slate-600 mb-1">Employee Name</label><input type="text" id="recEditEmpName" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
+          <div id="recEditCaseWrap" class="hidden sm:col-span-2"><label class="block text-xs font-bold text-slate-600 mb-1">Case Number</label><input type="text" id="recEditCase" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm"></div>
+        </div>
+        <div><label class="block text-xs font-bold text-slate-600 mb-2">Item Quantities</label><div id="recEditItems" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div></div>
+        <div class="flex gap-3">
+          <button onclick="saveRecordEdit()" class="flex-1 bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">💾 Save Changes To Sheet</button>
+          <button onclick="closeRecordEdit()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-5 rounded-xl text-sm transition">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzq5v7GcegAfpnUOJB5RvH2Kri6MPZPQykeld1PlvyFfsZhyPv3U-Kac22aBUqC9gxglg/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7h9oD1Bnn06TQ9XmMviAwbk4NBSs7RtxkDI0bhcw702UW3TZ6t80gc26WUZtAcswjGQ/exec";
 
     let rawEmployees = [], rawIssued = [], rawConsumed = [], rawDemand = [], rawAdminConsumed = [], rawRequests = [], rawThresholds = [];
     let allCategories = [], fieldCategories = [];
@@ -786,7 +834,7 @@
     const EXCLUDED_FIELD_ITEMS = ["SMALL BAG", "LARGE BAG", "ICE POUCH", "ICE PACK", "TONER 05A", "TONER 79", "OTHERS"];
     const EXPIRY_REQUIRED_ITEMS = ["AEROBIC", "ANAEROBIC", "PEADS", "COVID"];
     const REQUEST_META_COLS = ["REQ ID", "REQUEST ID", "DATE", "REGION", "EMP ID", "EMP NAME", "STATUS", "HANDLER", "REMARKS"];
-    const MODAL_IDS = ['demandModal','bulkDemandModal','adminConsumptionModal','staffModal','requestModal','editRequestModal','employeeFormModal','thresholdModal','bulkRiderModal','riderHistoryModal','passwordModal','createLoginModal','recoverPasswordModal'];
+    const MODAL_IDS = ['demandModal','bulkDemandModal','adminConsumptionModal','staffModal','requestModal','editRequestModal','employeeFormModal','thresholdModal','bulkRiderModal','riderHistoryModal','passwordModal','createLoginModal','recoverPasswordModal','recordEditModal'];
 
     /* ---------- helpers ---------- */
     function esc(s) {
@@ -911,6 +959,7 @@
       });
 
       setTimeout(hideLoader, 4000);
+      window.addEventListener('scroll', checkScroll, { passive: true });
       try {
         if (localStorage.getItem('erp_role')) loadDataAndInitSession();
         else hideLoader();
@@ -1760,8 +1809,8 @@
             <td class="p-3 text-center"><input type="checkbox" class="cat-select-chk" data-cat="${esc(cat)}"></td>
             <td class="p-3 font-bold text-slate-800">${T(cat)}</td>
             <td class="p-3 text-center">${typeBadge}</td>
-            <td class="p-3 text-center"><input type="number" value="${limit}" data-cat="${esc(cat)}" class="cat-thresh-input w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-center font-bold text-sm"></td>
-            <td class="p-3 text-center"><input type="number" value="${maxLim}" data-cat="${esc(cat)}" class="cat-max-input w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-center font-bold text-sm text-sky-600"></td>
+            <td class="p-3 text-center"><input type="number" value="${limit}" data-cat="${esc(cat)}" onchange="autoSaveThresholds()" class="cat-thresh-input w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-center font-bold text-sm"></td>
+            <td class="p-3 text-center"><input type="number" value="${maxLim}" data-cat="${esc(cat)}" onchange="autoSaveThresholds()" class="cat-max-input w-24 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-center font-bold text-sm text-sky-600"></td>
             <td class="p-3 text-center"><button data-cat="${esc(cat)}" onclick="deleteCategory(this.dataset.cat)" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold px-3 py-1 rounded-lg text-xs transition">Delete</button></td>
           </tr>`;
       }).join("");
@@ -1782,10 +1831,10 @@
         }
       });
       if (updatedCount === 0) { alert("کم از کم ایک آئٹم منتخب کریں۔"); return; }
-      alert(`✅ ${updatedCount} آئٹمز کی ویلیوز اپ ڈیٹ ہو گئی ہیں! شیٹ میں محفوظ کرنے کے لیے 'Save All To Sheet' پر کلک کریں۔`);
+      saveCategoriesAndThresholds({ silent: true, msg: `✅ ${updatedCount} آئٹمز اپ ڈیٹ ہو کر شیٹ میں محفوظ ہو گئے` });
     }
 
-    function addNewCategory() {
+    async function addNewCategory() {
       const name = norm(document.getElementById('newCatInput').value);
       const limit = Number(document.getElementById('newCatThreshold').value) || 5;
       const maxLim = Number(document.getElementById('newCatMaxLimit').value) || 50;
@@ -1796,32 +1845,43 @@
       itemThresholds[name] = limit; itemMaxLimits[name] = maxLim;
       document.getElementById('newCatInput').value = "";
       renderCategoriesTable();
-      alert("✅ Item Added. Click 'Save All To Sheet' To Persist.");
+      await saveCategoriesAndThresholds({ msg: `✅ '${toTitleCase(name)}' شامل ہو گیا اور شیٹ میں محفوظ ہو گیا` });
     }
 
-    function deleteCategory(cat) {
-      if (!confirm(`Are You Sure You Want To Delete Category '${toTitleCase(cat)}'?\n\nنوٹ: اگر اس آئٹم کے کالم شیٹس میں موجود ہیں تو وہ دوبارہ نظر آ سکتا ہے۔`)) return;
-      allCategories = allCategories.filter(c => c !== cat);
-      fieldCategories = fieldCategories.filter(c => c !== cat);
-      delete itemThresholds[cat]; delete itemMaxLimits[cat];
-      renderCategoriesTable();
-      alert("✅ Category Removed. Click 'Save All To Sheet' To Persist.");
-    }
-
-    async function saveCategoriesAndThresholds() {
-      const thresholdsPayload = {};
-      allCategories.forEach(cat => {
-        let minVal = itemThresholds[cat] || 5, maxVal = itemMaxLimits[cat] || 50;
-        document.querySelectorAll('.cat-thresh-input').forEach(inp => { if (inp.dataset.cat === cat) minVal = Number(inp.value) || 5; });
-        document.querySelectorAll('.cat-max-input').forEach(inp => { if (inp.dataset.cat === cat) maxVal = Number(inp.value) || 50; });
-        thresholdsPayload[cat] = { min: minVal, max: maxVal };
-      });
-      showLoader("Syncing Categories & Thresholds To Sheet...");
+    async function deleteCategory(cat) {
+      if (!confirm(`Are You Sure You Want To Delete Category '${toTitleCase(cat)}'?\n\nنوٹ: جس آئٹم کا ڈیٹا کسی شیٹ میں موجود ہو وہ ڈیلیٹ نہیں ہوتا (اس کا Rename کریں)۔`)) return;
+      showLoader("Deleting Item From Sheets...");
       try {
-        const res = await apiPost({ type: "update_thresholds", thresholds: thresholdsPayload });
+        await apiPost({ type: "delete_item", name: cat });
         await loadData(true);
-        alert(savedMsg(res, "✅ Thresholds & Categories Saved To Backend Sheet!"));
-      } catch (e) { hideLoader(); alert("❌ Error: " + e.message); }
+        toast(`🗑️ '${toTitleCase(cat)}' شیٹس سے حذف ہو گیا`);
+      } catch (e) { hideLoader(); alert("❌ " + e.message); }
+    }
+
+    let _thTimer = null;
+    function autoSaveThresholds() {
+      clearTimeout(_thTimer);
+      _thTimer = setTimeout(() => saveCategoriesAndThresholds({ silent: true, msg: "✅ تبدیلی شیٹ میں خودکار محفوظ ہو گئی" }), 700);
+    }
+
+    async function saveCategoriesAndThresholds(opts) {
+      opts = opts || {};
+      const num = (v, d) => { const n = parseFloat(v); return isNaN(n) ? d : n; };
+      const payload = {};
+      allCategories.forEach(cat => {
+        let minVal = (cat in itemThresholds) ? itemThresholds[cat] : 5;
+        let maxVal = (cat in itemMaxLimits) ? itemMaxLimits[cat] : 50;
+        document.querySelectorAll('.cat-thresh-input').forEach(inp => { if (inp.dataset.cat === cat) minVal = num(inp.value, 5); });
+        document.querySelectorAll('.cat-max-input').forEach(inp => { if (inp.dataset.cat === cat) maxVal = num(inp.value, 50); });
+        payload[cat] = { min: minVal, max: maxVal };
+      });
+      if (!opts.silent) showLoader("Syncing Categories & Thresholds To Sheet...");
+      try {
+        await apiPost({ type: "update_thresholds", thresholds: payload });
+        Object.keys(payload).forEach(k => { itemThresholds[k] = payload[k].min; itemMaxLimits[k] = payload[k].max; });
+        if (!opts.silent) await loadData(true);
+        toast(opts.msg || "✅ Thresholds & Categories شیٹ میں محفوظ ہو گئے");
+      } catch (e) { if (!opts.silent) hideLoader(); alert("❌ Error: " + e.message); }
     }
 
     /* ---------- passwords ---------- */
@@ -1924,25 +1984,58 @@
       } catch (e) { hideLoader(); showCreateMsg("❌ " + e.message, false); }
     }
 
+    let recoverState = null;   // 'has' (email on file) | 'none' (account has no email yet)
     function openRecoverPasswordModal() {
       document.getElementById('recoverMsg').classList.add('hidden');
-      document.getElementById('recoverStep2').classList.add('hidden');
-      ['recoverEmpId', 'recoverOtp', 'recoverNewPass', 'recoverConfirmPass'].forEach(id => { document.getElementById(id).value = ""; });
+      ['recoverEmpId', 'recoverOtp', 'recoverNewPass', 'recoverConfirmPass', 'recoverName', 'recoverEmail'].forEach(id => { document.getElementById(id).value = ""; });
+      resetRecoverFlow();
       document.getElementById('recoverPasswordModal').classList.remove('hidden');
     }
     function closeRecoverPasswordModal() { document.getElementById('recoverPasswordModal').classList.add('hidden'); }
+    function resetRecoverFlow() {
+      recoverState = null;
+      document.getElementById('recoverSendArea').classList.add('hidden');
+      document.getElementById('recoverStep2').classList.add('hidden');
+    }
 
-    async function sendRecoverOtp() {
+    // step 1: ask the server whether this ID exists and whether an email is already saved on it
+    async function lookupRecoverId() {
       const empId = document.getElementById('recoverEmpId').value.trim();
       if (!empId) { showRecoverMsg("Employee ID درج کریں۔", false); return; }
+      showLoader("Checking Employee ID...");
+      try {
+        const res = await apiPost({ type: "recover_lookup", empId }, { strict: true });
+        hideLoader();
+        resetRecoverFlow();
+        if (!res.exists) { showRecoverMsg("❌ اس Employee ID کا اکاؤنٹ نہیں ملا۔ پہلے 'Create New Login' کریں۔", false); return; }
+        document.getElementById('recoverMsg').classList.add('hidden');
+        recoverState = res.hasEmail ? 'has' : 'none';
+        document.getElementById('recoverSendArea').classList.remove('hidden');
+        document.getElementById('recoverNewEmailBox').classList.toggle('hidden', !!res.hasEmail);
+        document.getElementById('recoverInfo').innerText = res.hasEmail
+          ? `اس اکاؤنٹ پر ای میل پہلے سے محفوظ ہے (${res.maskedEmail})۔ OTP اسی ای میل پر جائے گا۔ محفوظ ای میل تبدیل نہیں ہو سکتی۔`
+          : "اس اکاؤنٹ پر ابھی کوئی ای میل محفوظ نہیں۔ اپنا Full Name (جیسا اکاؤنٹ میں درج ہے) اور نئی ای میل لکھیں۔ OTP کی تصدیق کے بعد یہ ای میل اکاؤنٹ پر محفوظ ہو جائے گی۔";
+      } catch (e) { hideLoader(); showRecoverMsg("❌ " + e.message, false); }
+    }
+
+    // step 2: send the OTP (to the saved email, or to the new one when the account has none)
+    async function sendRecoverOtp() {
+      const empId = document.getElementById('recoverEmpId').value.trim();
+      if (!empId || !recoverState) { showRecoverMsg("پہلے Employee ID لکھ کر 'Check ID' دبائیں۔", false); return; }
+      const payload = { type: "send_otp", purpose: "recover_password", empId };
+      if (recoverState === 'none') {
+        const name = document.getElementById('recoverName').value.trim();
+        const email = document.getElementById('recoverEmail').value.trim().toLowerCase();
+        if (!name) { showRecoverMsg("اپنا Full Name درج کریں۔", false); return; }
+        if (!EMAIL_RE.test(email)) { showRecoverMsg("درست Email درج کریں۔", false); return; }
+        payload.empName = name; payload.email = email;
+      }
       showLoader("Sending OTP...");
       try {
-        const res = await apiPost({ type: "send_otp", purpose: "recover_password", empId }, { strict: true });
+        const res = await apiPost(payload, { strict: true });
         hideLoader();
         document.getElementById('recoverStep2').classList.remove('hidden');
-        showRecoverMsg(res.maskedEmail
-          ? `✅ OTP ${res.maskedEmail} پر بھیج دیا گیا ہے۔ 10 منٹ میں درج کریں۔`
-          : "اگر اس ID پر ای میل رجسٹرڈ ہے تو OTP بھیج دیا گیا ہے۔ ای میل نہ ملے تو ایڈمن سے رابطہ کریں (وہ آپ کی ای میل شامل کر سکتا ہے)۔", true);
+        showRecoverMsg(`✅ OTP ${res.maskedEmail || ''} پر بھیج دیا گیا ہے۔ 10 منٹ میں درج کریں۔`, true);
       } catch (e) { hideLoader(); showRecoverMsg("❌ " + e.message, false); }
     }
 
@@ -2259,7 +2352,7 @@
 
     /* ---------- raw tables ---------- */
     function renderRawTables() {
-      const buildFilteredTable = (rows, tableId, searchInputId, regFilterId, startFilterId, endFilterId) => {
+      const buildFilteredTable = (rows, tableId, searchInputId, regFilterId, startFilterId, endFilterId, kind) => {
         if (!rows || rows.length === 0) return "<p class='text-slate-400'>No Records Found.</p>";
         const searchVal = document.getElementById(searchInputId).value.toLowerCase().trim();
         const regFilter = document.getElementById(regFilterId).value;
@@ -2275,7 +2368,9 @@
 
         let html = `<table id="${tableId}" class="w-full text-left text-xs border-collapse"><thead><tr class="bg-slate-100 text-slate-700 font-bold sticky top-0">`;
         validColIndices.forEach(idx => { html += `<th class="p-3 border-b whitespace-nowrap">${T(h[idx])}</th>`; });
+        html += `<th class="p-3 border-b whitespace-nowrap no-export">Actions</th>`;
         html += `</tr></thead><tbody class="divide-y divide-slate-100">`;
+        const fpLen = h.length;
 
         let count = 0;
         for (let i = 1; i < rows.length; i++) {
@@ -2297,13 +2392,140 @@
             else if (idx === 3) val = empMap[rid] ? toTitleCase(empMap[rid]) : toTitleCase(val);
             html += `<td class="p-3 whitespace-nowrap ${Number(val) > 0 && idx >= 4 ? 'font-bold text-sky-700 bg-sky-50/40' : ''}">${esc(val)}</td>`;
           });
+          const fp = r.slice(0, fpLen).map(x => (x === null || x === undefined) ? "" : x).join("|");
+          html += `<td class="p-3 whitespace-nowrap no-export">
+            <button data-kind="${kind}" data-row="${i + 1}" data-fpl="${fpLen}" data-fp="${esc(fp)}" onclick="openRecordEdit(this)" class="bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold px-2.5 py-1 rounded-lg text-xs transition">✏️ Edit</button>
+            <button data-kind="${kind}" data-row="${i + 1}" data-fpl="${fpLen}" data-fp="${esc(fp)}" onclick="deleteRecord(this)" class="bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold px-2.5 py-1 rounded-lg text-xs transition">🗑️</button>
+          </td>`;
           html += `</tr>`;
         }
-        if (count === 0) html += `<tr><td colspan="${validColIndices.length}" class="p-6 text-center text-slate-400">No Matching Records Found For Selected Filters.</td></tr>`;
+        if (count === 0) html += `<tr><td colspan="${validColIndices.length + 1}" class="p-6 text-center text-slate-400">No Matching Records Found For Selected Filters.</td></tr>`;
         return html + `</tbody></table>`;
       };
-      document.getElementById('issuedRawBox').innerHTML = buildFilteredTable(rawIssued, 'issuedRawTable', 'issuedSearchInput', 'issuedRegionFilter', 'issuedStartDate', 'issuedEndDate');
-      document.getElementById('consumptionRawBox').innerHTML = buildFilteredTable(rawConsumed, 'consumptionRawTable', 'consSearchInput', 'consRegionFilter', 'consStartDate', 'consEndDate');
+      document.getElementById('issuedRawBox').innerHTML = buildFilteredTable(rawIssued, 'issuedRawTable', 'issuedSearchInput', 'issuedRegionFilter', 'issuedStartDate', 'issuedEndDate', 'issued');
+      document.getElementById('consumptionRawBox').innerHTML = buildFilteredTable(rawConsumed, 'consumptionRawTable', 'consSearchInput', 'consRegionFilter', 'consStartDate', 'consEndDate', 'consumed');
+    }
+
+    /* ---------- toast ---------- */
+    function toast(msg, ms) {
+      let t = document.getElementById('toastBox');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'toastBox';
+        t.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-[120] bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg max-w-[90vw] text-center';
+        document.body.appendChild(t);
+      }
+      t.innerText = msg; t.classList.remove('hidden');
+      clearTimeout(t._h); t._h = setTimeout(() => t.classList.add('hidden'), ms || 2800);
+    }
+
+    /* ---------- edit / delete Issued + Consumption records ---------- */
+    let recEdit = null;
+    function openRecordEdit(btn) {
+      const kind = btn.dataset.kind;
+      const rows = kind === 'issued' ? rawIssued : rawConsumed;
+      const rowNum = Number(btn.dataset.row), r = rows[rowNum - 1], h = rows[0];
+      if (!r) return;
+      recEdit = { kind, row: rowNum, fp: btn.dataset.fp, fpLen: Number(btn.dataset.fpl) };
+      const start = kind === 'issued' ? 4 : 5;
+      document.getElementById('recEditTitle').innerText = (kind === 'issued' ? '✏️ Edit Issued Record' : '✏️ Edit Consumption Record') + ` (Row ${rowNum})`;
+      document.getElementById('recEditDate').value = getRowDate(r) || "";
+      document.getElementById('recEditRegion').value = cleanRegion(r[1]);
+      document.getElementById('recEditEmpId').value = r[2] ? r[2].toString().trim() : "";
+      document.getElementById('recEditEmpName').value = r[3] ? r[3].toString().trim() : "";
+      document.getElementById('recEditCase').value = kind === 'consumed' && r[4] ? r[4].toString() : "";
+      document.getElementById('recEditCaseWrap').classList.toggle('hidden', kind !== 'consumed');
+      let html = "";
+      for (let c = start; c < h.length; c++) {
+        if (!h[c]) continue;
+        html += `<div class="bg-slate-50 p-2 rounded-xl border border-slate-200">
+          <label class="block text-xs font-bold text-slate-700 mb-1">${T(h[c])}</label>
+          <input type="number" min="0" value="${Number(r[c]) || 0}" data-item="${esc(norm(h[c]))}" class="rec-edit-item w-full bg-white border border-slate-300 rounded-lg px-2 py-1 text-sm font-bold">
+        </div>`;
+      }
+      document.getElementById('recEditItems').innerHTML = html;
+      document.getElementById('recordEditModal').classList.remove('hidden');
+    }
+    function closeRecordEdit() { document.getElementById('recordEditModal').classList.add('hidden'); recEdit = null; }
+
+    async function saveRecordEdit() {
+      if (!recEdit) return;
+      const date = document.getElementById('recEditDate').value;
+      const empId = document.getElementById('recEditEmpId').value.trim();
+      if (!date || !empId) { alert("Date اور Employee ID لازمی ہیں۔"); return; }
+      const items = {};
+      document.querySelectorAll('.rec-edit-item').forEach(inp => { items[inp.dataset.item] = Math.max(0, Number(inp.value) || 0); });
+      const payload = Object.assign({ type: "edit_record" }, recEdit, {
+        date, region: cleanRegion(document.getElementById('recEditRegion').value), empId,
+        empName: toTitleCase(document.getElementById('recEditEmpName').value.trim()),
+        caseNumber: document.getElementById('recEditCase').value.trim(), items
+      });
+      showLoader("Updating Record In Sheet...");
+      try {
+        await apiPost(payload);
+        closeRecordEdit();
+        await loadData(true);
+        toast("✅ ریکارڈ شیٹ میں اپ ڈیٹ ہو گیا");
+      } catch (e) { hideLoader(); alert("❌ " + e.message); }
+    }
+
+    async function deleteRecord(btn) {
+      if (!confirm("کیا آپ یہ ریکارڈ شیٹ سے ہمیشہ کے لیے ڈیلیٹ کرنا چاہتے ہیں؟ (Issued ڈیلیٹ کرنے سے Demand Room کا اسٹاک واپس بڑھ جائے گا)")) return;
+      showLoader("Deleting Record From Sheet...");
+      try {
+        await apiPost({ type: "delete_record", kind: btn.dataset.kind, row: Number(btn.dataset.row), fp: btn.dataset.fp, fpLen: Number(btn.dataset.fpl) });
+        await loadData(true);
+        toast("🗑️ ریکارڈ شیٹ سے ڈیلیٹ ہو گیا");
+      } catch (e) { hideLoader(); alert("❌ " + e.message); }
+    }
+
+    /* ---------- bulk rename items from Excel ---------- */
+    function downloadRenameTemplate() {
+      const rows = [["Old Name", "New Name"]];
+      allCategories.forEach(c => rows.push([c, ""]));
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols'] = [{ wch: 28 }, { wch: 28 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Rename_Items");
+      XLSX.writeFile(wb, "HS_ERP_Item_Rename_Template.xlsx");
+    }
+
+    function submitBulkRenameExcel() {
+      const fi = document.getElementById('renameExcelInput');
+      if (!fi.files || fi.files.length === 0) { alert("پہلے Excel فائل منتخب کریں۔"); return; }
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        try {
+          const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+          const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
+          let oldCol = 0, newCol = 1, start = 0;
+          if (rows.length && Array.isArray(rows[0])) {
+            const hd = rows[0].map(c => c ? c.toString().trim().toLowerCase() : "");
+            const fo = hd.findIndex(x => x.includes("old")), fn = hd.findIndex(x => x.includes("new"));
+            if (fo !== -1 && fn !== -1) { oldCol = fo; newCol = fn; start = 1; }
+          }
+          const pairs = [], unknown = [], seen = new Set();
+          for (let i = start; i < rows.length; i++) {
+            const r = rows[i]; if (!r) continue;
+            const o = norm(r[oldCol]), n = norm(r[newCol]);
+            if (!o || !n || o === n) continue;
+            if (!allCategories.includes(o)) { unknown.push(o); continue; }
+            if (seen.has(o)) continue;
+            seen.add(o); pairs.push([o, n]);
+          }
+          if (unknown.length) { alert("یہ پرانے نام موجودہ آئٹمز میں نہیں ملے:\n\n" + unknown.join("\n") + "\n\nTemplate دوبارہ ڈاؤن لوڈ کر کے Old Name میں بدلاؤ نہ کریں۔"); return; }
+          if (pairs.length === 0) { alert("کوئی نام تبدیل کرنے کے لیے نہیں ملا۔ جن آئٹمز کا نام بدلنا ہو ان کے سامنے 'New Name' لکھیں۔"); return; }
+          const preview = pairs.slice(0, 15).map(p => `${p[0]}  →  ${p[1]}`).join("\n") + (pairs.length > 15 ? `\n... اور ${pairs.length - 15}` : "");
+          if (!confirm(`${pairs.length} آئٹمز کے نام تبدیل ہوں گے (ڈیٹا وہی رہے گا):\n\n${preview}\n\nجاری رکھیں؟`)) return;
+          showLoader("Renaming Items In All Sheets...");
+          await apiPost({ type: "bulk_rename_items", pairs });
+          fi.value = "";
+          closeBulkDemandModal();
+          await loadData(true);
+          alert(`✅ ${pairs.length} آئٹمز کے نام تمام شیٹس میں تبدیل ہو گئے۔ ڈیٹا محفوظ ہے۔`);
+        } catch (err) { hideLoader(); alert("❌ " + (err.message || err)); }
+      };
+      reader.readAsArrayBuffer(fi.files[0]);
     }
 
     /* ---------- rider history ---------- */
@@ -2448,7 +2670,7 @@
       if (!table) return;
       const csv = [];
       table.querySelectorAll("tr").forEach(row => {
-        csv.push(Array.from(row.querySelectorAll("th, td")).map(c => csvCell(c.innerText.replace(/\n/g, ' ').trim())).join(","));
+        csv.push(Array.from(row.querySelectorAll("th, td")).filter(c => !c.classList.contains('no-export')).map(c => csvCell(c.innerText.replace(/\n/g, ' ').trim())).join(","));
       });
       downloadCSV(csv.join("\n"), filename);
     }
